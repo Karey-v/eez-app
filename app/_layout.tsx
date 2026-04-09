@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
-import { Stack } from 'expo-router'
+import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useFonts } from 'expo-font'
-import {
-  DMSerifDisplay_400Regular,
-} from '@expo-google-fonts/dm-serif-display'
+import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display'
 import {
   Inter_400Regular,
   Inter_600SemiBold,
@@ -12,12 +10,28 @@ import {
 } from '@expo-google-fonts/inter'
 import * as SplashScreen from 'expo-splash-screen'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { useUserStore } from '@/store/userStore'
 import 'react-native-reanimated'
 
 SplashScreen.preventAutoHideAsync()
 
-export const unstable_settings = {
-  anchor: '(tabs)',
+// Handles routing based on auth state. Rendered inside the Stack so
+// useSegments/useRouter have access to the navigation context.
+function AuthGuard() {
+  const segments = useSegments()
+  const router = useRouter()
+  const isSignedIn = useUserStore((s) => s.isSignedIn)
+
+  useEffect(() => {
+    const inAuth = segments[0] === '(auth)'
+    if (!isSignedIn && !inAuth) {
+      router.replace('/(auth)/splash')
+    } else if (isSignedIn && inAuth) {
+      router.replace('/(tabs)/')
+    }
+  }, [isSignedIn, segments])
+
+  return null
 }
 
 export default function RootLayout() {
@@ -39,8 +53,8 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen name="leakability/intro" />
         <Stack.Screen name="leakability/question" />
         <Stack.Screen name="leakability/result" />
@@ -57,6 +71,7 @@ export default function RootLayout() {
         <Stack.Screen name="notifications/index" />
         <Stack.Screen name="profile/badges" />
       </Stack>
+      <AuthGuard />
       <StatusBar style="auto" />
     </SafeAreaProvider>
   )
