@@ -102,7 +102,7 @@ export const questions: Question[] = [
   {
     id: 6,
     category: 'Habits',
-    type: 'multiple-choice',
+    type: 'scenario',
     prompt: 'you\'re at a coffee shop. you connect to the free Wi-Fi to check your bank app. how risky is this?',
     options: [
       { label: 'Totally fine, Wi-Fi is Wi-Fi', score: 3, feedback: 'public Wi-Fi can be intercepted. use mobile data for banking.' },

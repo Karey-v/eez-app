@@ -32,7 +32,7 @@ export default function SignInScreen() {
     // Prototype: accept any input — extract name from email as fallback
     const derivedName = email.split('@')[0] || 'you'
     signIn(derivedName)
-    router.replace('/(tabs)/')
+    router.replace('/(tabs)')
   }
 
   return (

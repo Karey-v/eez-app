@@ -27,7 +27,7 @@ function AuthGuard() {
     if (!isSignedIn && !inAuth) {
       router.replace('/(auth)/splash')
     } else if (isSignedIn && inAuth) {
-      router.replace('/(tabs)/')
+      router.replace('/(tabs)')
     }
   }, [isSignedIn, segments])
 

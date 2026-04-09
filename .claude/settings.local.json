@@ -4,7 +4,9 @@
       "Bash(npx expo:*)",
       "Bash(node -e \"require\\('./node_modules/zustand'\\)\")",
       "Bash(node -e \"require\\('./node_modules/react-native-svg'\\)\")",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(grep:*)"
     ]
   }
 }

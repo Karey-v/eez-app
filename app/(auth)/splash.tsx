@@ -23,7 +23,7 @@ export default function SplashScreen() {
 
   function navigate() {
     if (isSignedIn) {
-      router.replace('/(tabs)/')
+      router.replace('/(tabs)')
     } else {
       router.replace('/(auth)/welcome')
     }

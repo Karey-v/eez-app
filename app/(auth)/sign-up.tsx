@@ -37,7 +37,7 @@ export default function SignUpScreen() {
     }
     setNameError('')
     signIn(name.trim())
-    router.replace('/(tabs)/')
+    router.replace('/(tabs)')
   }
 
   return (
