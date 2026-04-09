@@ -231,7 +231,7 @@ export default function RadarScreen() {
         onPress={() => router.push('/radar/report')}
         style={({ pressed }) => [
           styles.fab,
-          { backgroundColor: brand.purpleCTA, bottom: insets.bottom + 76, opacity: pressed ? 0.85 : 1 },
+          { backgroundColor: brand.purpleCTA, bottom: insets.bottom + 56 + 16, opacity: pressed ? 0.85 : 1 },
         ]}
       >
         <Text style={[type.cardTitle, { color: '#FFFFFF' }]}>report something? →</Text>
