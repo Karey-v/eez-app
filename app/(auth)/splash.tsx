@@ -1,7 +1,9 @@
 // S01 — Splash Screen
 // Purple bg, EEZ logo centered, fade in 400ms → hold 1s → fade out 300ms → navigate
+// On web: skip animation entirely and navigate on next tick (root layout is not yet
+// mounted when the Reanimated callback fires, which crashes the web renderer).
 import { useEffect } from 'react'
-import { View, StyleSheet } from 'react-native'
+import { Platform, View, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import Animated, {
@@ -30,6 +32,14 @@ export default function SplashScreen() {
   }
 
   useEffect(() => {
+    if (Platform.OS === 'web') {
+      // On web the Reanimated worklet callback fires before the root layout is
+      // fully mounted, causing "Attempted to navigate before mounting Root Layout".
+      // Skip the animation and defer navigation to the next event-loop tick.
+      const id = setTimeout(navigate, 0)
+      return () => clearTimeout(id)
+    }
+
     // Fade in 400ms → hold 1000ms → fade out 300ms → navigate
     opacity.value = withSequence(
       withTiming(1, { duration: 400 }),

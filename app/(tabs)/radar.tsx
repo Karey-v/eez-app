@@ -1,7 +1,8 @@
 // S42 — Radar Feed
 // Blinking dot, search bar (visual), filter chips, 8 incident cards, FAB → report
 import { useEffect, useState } from 'react'
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
+import Svg, { Line as SvgLine } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -27,6 +28,26 @@ const CATEGORY_COLORS: Record<string, string> = {
   Payments: '#007549',
   Identity: '#CC0000',
   Phishing: '#602CFF',
+}
+
+// ─── Map icon ─────────────────────────────────────────────────────────────────
+
+function MapIcon({ color }: { color: string }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+      <SvgLine x1="6" y1="2" x2="2" y2="4" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="2" y1="4" x2="2" y2="15" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="2" y1="4" x2="6" y2="2" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="6" y1="2" x2="6" y2="13" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="6" y1="13" x2="2" y2="15" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="6" y1="13" x2="12" y2="15" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="6" y1="2" x2="12" y2="4" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="12" y1="4" x2="12" y2="15" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="12" y1="4" x2="16" y2="2" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="16" y1="2" x2="16" y2="13" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+      <SvgLine x1="16" y1="13" x2="12" y2="15" stroke={color} strokeWidth={1.2} strokeLinecap="round" />
+    </Svg>
+  )
 }
 
 // ─── Blinking dot ─────────────────────────────────────────────────────────────
@@ -168,9 +189,18 @@ export default function RadarScreen() {
         }}
       >
         {/* Header */}
-        <View style={styles.headerRow}>
-          <Text style={[type.heroTitle, { color: colors.textPrimary }]}>radar.</Text>
-          <BlinkDot />
+        <View style={[styles.headerRow, { justifyContent: 'space-between' }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={[type.heroTitle, { color: colors.textPrimary }]}>radar.</Text>
+            <BlinkDot />
+          </View>
+          <Pressable
+            onPress={() => router.push('/radar/map')}
+            hitSlop={8}
+            style={[styles.mapBtn, { backgroundColor: colors.bgSecondary }]}
+          >
+            <MapIcon color={colors.textSecondary} />
+          </Pressable>
         </View>
 
         {/* Search bar (visual only) */}
@@ -254,6 +284,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 14,
+  },
+  mapBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   blinkDot: {
     width: 8,
