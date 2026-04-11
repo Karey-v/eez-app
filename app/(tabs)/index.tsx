@@ -1,6 +1,14 @@
 // S10 — Home (first-time state) / S11 — Home (returning state)
 // Renders first-time or returning view based on userStore.score
+import { useEffect } from 'react'
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native'
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated'
 import { useRouter } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
@@ -89,6 +97,9 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
         </View>
       </Pressable>
 
+      {/* AI Fraud Detector */}
+      <FraudDetectorCard router={router} />
+
       {/* 3-feature row */}
       <View style={styles.featureRow}>
         <FeatureTile
@@ -149,7 +160,7 @@ function ReturningView({
     { label: 'retake test', onPress: () => router.push('/leakability/intro') },
     { label: 'continue learning', onPress: () => router.push('/(tabs)/learn') },
     { label: 'see radar', onPress: () => router.push('/(tabs)/radar') },
-    { label: 'safety check', onPress: () => router.push('/(tabs)/safety') },
+    { label: 'safety check', onPress: () => router.push('/safety-modal') },
   ]
 
   return (
@@ -180,6 +191,9 @@ function ReturningView({
           tap to see full breakdown →
         </Text>
       </Pressable>
+
+      {/* AI Fraud Detector */}
+      <FraudDetectorCard router={router} />
 
       {/* Quick actions */}
       <View style={{ marginTop: spacing.sectionTop }}>
@@ -221,6 +235,56 @@ function ReturningView({
         </Card>
       </View>
     </>
+  )
+}
+
+// ─── AI Fraud Detector card ──────────────────────────────────────────────────
+
+function HomePulseDot() {
+  const scale = useSharedValue(1)
+  useEffect(() => {
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(1.4, { duration: 700 }),
+        withTiming(1, { duration: 700 }),
+      ),
+      -1,
+      false,
+    )
+  }, [])
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }))
+  return (
+    <Animated.View
+      style={[{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#B1FF58' }, style]}
+    />
+  )
+}
+
+function FraudDetectorCard({ router }: { router: ReturnType<typeof useRouter> }) {
+  const { type, brand } = useTheme()
+  return (
+    <Pressable
+      onPress={() => router.push('/safety/detector')}
+      style={({ pressed }) => [
+        styles.detectorCard,
+        { backgroundColor: brand.darkGreen, opacity: pressed ? 0.92 : 1 },
+      ]}
+    >
+      <View style={styles.detectorTopRow}>
+        <View style={styles.detectorOnlineRow}>
+          <HomePulseDot />
+          <Text style={[type.label, { color: '#9FE8C4', marginLeft: 6 }]}>online</Text>
+        </View>
+        <ArrowIcon size={16} color="#9FE8C4" />
+      </View>
+      <Text style={[type.sectionHead, { color: '#FFFFFF', marginBottom: 6 }]}>
+        EEZ Fraud Detector
+      </Text>
+      <Text style={[type.body, { color: '#9FE8C4', lineHeight: 18 }]}>
+        paste a message, email, or describe a situation — we'll tell you if something's off.
+      </Text>
+      <Text style={[type.label, { color: '#B1FF58', marginTop: 14 }]}>try it now →</Text>
+    </Pressable>
   )
 }
 
@@ -300,5 +364,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     minHeight: 44,
     justifyContent: 'center',
+  },
+  detectorCard: {
+    borderRadius: 14,
+    padding: 16,
+  },
+  detectorTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  detectorOnlineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 })

@@ -3,6 +3,7 @@
 // Tap pin → 160px slide-up compact card. Tap map → dismiss.
 import { useState, useEffect } from 'react'
 import { View, Text, Pressable, StyleSheet, Dimensions, Image } from 'react-native'
+import Svg, { Line as SvgLine } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -15,6 +16,18 @@ import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
+
+// ─── List icon ────────────────────────────────────────────────────────────────
+
+function ListIcon({ color }: { color: string }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+      <SvgLine x1="3" y1="5" x2="15" y2="5" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+      <SvgLine x1="3" y1="9" x2="15" y2="9" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+      <SvgLine x1="3" y1="13" x2="15" y2="13" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+    </Svg>
+  )
+}
 
 // ─── OSM tile grid ────────────────────────────────────────────────────────────
 // Base tile: z=12, x=2048, y=1360 (as specified)
@@ -202,7 +215,7 @@ function BottomCard({
 
       {/* view report link */}
       <Pressable
-        onPress={() => router.push('/radar')}
+        onPress={() => router.push('/radar/feed')}
         hitSlop={10}
         style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, alignSelf: 'flex-start' })}
       >
@@ -244,7 +257,13 @@ export default function RadarMapScreen() {
           <Text style={styles.backText}>← back</Text>
         </Pressable>
         <Text style={styles.headerTitle}>incident map</Text>
-        <View style={{ width: 60 }} />
+        <Pressable
+          onPress={() => router.push('/radar/feed')}
+          hitSlop={8}
+          style={styles.feedBtn}
+        >
+          <ListIcon color="rgba(255,255,255,0.7)" />
+        </Pressable>
       </View>
 
       {/* ── Map area ── */}
@@ -336,6 +355,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
     color: 'rgba(255,255,255,0.55)',
+  },
+  feedBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
     fontFamily: 'Inter_600SemiBold',
