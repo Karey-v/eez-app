@@ -1,5 +1,5 @@
 // S03–05 — Welcome Carousel
-// 3 swipeable slides, dot indicators, skip button
+// 3 swipeable slides, per-slide backgrounds, line progress indicators, skip button
 import { useRef, useState } from 'react'
 import {
   View,
@@ -19,51 +19,57 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 type Slide = {
   id: string
-  overline: string
   headline: string
   body: string
   cta?: string
+  bgColor: string
+  textColor: string
+  subTextColor: string
 }
 
 const SLIDES: Slide[] = [
   {
     id: '1',
-    overline: 'the reality',
-    headline: '1 in 3 Gen Zers have been scammed online.',
-    body: 'It\'s not about being gullible. Scammers are sophisticated. The question is whether your habits make you an easy target.',
+    headline: '1 in 3 gen zers have been scammed online.',
+    body: "It's not about being gullible. Scammers are sophisticated. The question is whether your habits make you an easy target.",
+    bgColor: '#B1FF58',
+    textColor: '#1A4A00',
+    subTextColor: 'rgba(26,74,0,0.72)',
   },
   {
     id: '2',
-    overline: 'the truth',
     headline: 'your habits = your risk.',
     body: 'How you use passwords, who you trust, and how quickly you act online all affect how exposed you are. Most people have no idea.',
+    bgColor: '#FFFFFF',
+    textColor: '#0A0A0A',
+    subTextColor: '#5A5A5A',
   },
   {
     id: '3',
-    overline: 'find out',
     headline: 'so... how leakable are you?',
     body: 'Take a 5-minute test, get a personalised risk score, and learn exactly what to fix.',
     cta: "let's find out",
+    bgColor: '#602CFF',
+    textColor: '#FFFFFF',
+    subTextColor: 'rgba(255,255,255,0.72)',
   },
 ]
 
 export default function WelcomeScreen() {
-  const { colors, type, spacing, brand } = useTheme()
+  const { spacing } = useTheme()
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const flatListRef = useRef<FlatList>(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
+  const currentSlide = SLIDES[activeIndex]
+
   function handleSkip() {
     router.replace('/(auth)/sign-up')
   }
 
-  function handleNext() {
-    if (activeIndex < SLIDES.length - 1) {
-      flatListRef.current?.scrollToIndex({ index: activeIndex + 1, animated: true })
-    } else {
-      router.replace('/(auth)/sign-up')
-    }
+  function handleCTA() {
+    router.replace('/(auth)/sign-up')
   }
 
   function onViewableItemsChanged({ viewableItems }: any) {
@@ -74,14 +80,26 @@ export default function WelcomeScreen() {
 
   function renderSlide({ item }: ListRenderItemInfo<Slide>) {
     return (
-      <View style={[styles.slide, { width: SCREEN_WIDTH, paddingHorizontal: spacing.screenH }]}>
-        <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 12 }]}>
-          {item.overline}
-        </Text>
-        <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 16, lineHeight: 36 }]}>
+      <View
+        style={[
+          styles.slide,
+          { width: SCREEN_WIDTH, backgroundColor: item.bgColor, paddingHorizontal: spacing.screenH },
+        ]}
+      >
+        <Text
+          style={[
+            styles.headline,
+            { color: item.textColor },
+          ]}
+        >
           {item.headline}
         </Text>
-        <Text style={[type.body, { color: colors.textSecondary, lineHeight: 19 }]}>
+        <Text
+          style={[
+            styles.subtext,
+            { color: item.subTextColor },
+          ]}
+        >
           {item.body}
         </Text>
       </View>
@@ -89,25 +107,36 @@ export default function WelcomeScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
+    <View style={[styles.container, { backgroundColor: currentSlide.bgColor }]}>
       <StatusBar style="dark" />
 
-      {/* Skip button */}
-      <View style={[styles.topBar, { paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH }]}>
-        <View />
+      {/* Top bar: progress lines + skip */}
+      <View
+        style={[
+          styles.topBar,
+          { paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH },
+        ]}
+      >
+        {/* Progress lines */}
+        <View style={styles.progressLines}>
+          {SLIDES.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.progressLine,
+                { backgroundColor: i <= activeIndex ? '#0A0A0A' : 'rgba(0,0,0,0.15)' },
+              ]}
+            />
+          ))}
+        </View>
+
+        {/* Skip */}
         <Pressable
           onPress={handleSkip}
           hitSlop={16}
-          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+          style={({ pressed }) => [styles.skipBtn, { opacity: pressed ? 0.6 : 1 }]}
         >
-          <Text
-            style={[
-              type.body,
-              { color: colors.textSecondary, textDecorationLine: 'underline' },
-            ]}
-          >
-            skip
-          </Text>
+          <Text style={styles.skipText}>skip</Text>
         </Pressable>
       </View>
 
@@ -123,51 +152,25 @@ export default function WelcomeScreen() {
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
         style={styles.flatList}
-        contentContainerStyle={styles.flatListContent}
+        contentContainerStyle={{ alignItems: 'stretch' }}
       />
 
-      {/* Bottom: dots + CTA */}
+      {/* Bottom CTA — only on last slide */}
       <View
         style={[
           styles.bottom,
           { paddingBottom: insets.bottom + 32, paddingHorizontal: spacing.screenH },
         ]}
       >
-        {/* Dot indicators */}
-        <View style={styles.dots}>
-          {SLIDES.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.dot,
-                {
-                  backgroundColor:
-                    i === activeIndex ? brand.purpleCTA : colors.borderWeak,
-                  width: i === activeIndex ? 18 : 6,
-                },
-              ]}
-            />
-          ))}
-        </View>
-
-        {/* CTA / Next */}
-        {activeIndex === SLIDES.length - 1 ? (
+        {activeIndex === SLIDES.length - 1 && (
           <Pressable
-            onPress={handleNext}
+            onPress={handleCTA}
             style={({ pressed }) => [
               styles.ctaButton,
-              { backgroundColor: brand.purpleCTA, opacity: pressed ? 0.85 : 1 },
+              { opacity: pressed ? 0.85 : 1 },
             ]}
           >
             <Text style={styles.ctaText}>let's find out</Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            onPress={handleNext}
-            hitSlop={12}
-            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
-          >
-            <Text style={[type.body, { color: colors.textTertiary }]}>swipe or tap →</Text>
           </Pressable>
         )}
       </View>
@@ -180,46 +183,60 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
+    gap: 12,
+  },
+  progressLines: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    gap: 6,
+  },
+  progressLine: {
+    flex: 1,
+    height: 2,
+    borderRadius: 1,
+  },
+  skipBtn: {
+    alignSelf: 'flex-end',
+  },
+  skipText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    color: '#9A9A9A',
   },
   flatList: {
     flex: 1,
   },
-  flatListContent: {
-    alignItems: 'center',
-  },
   slide: {
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingTop: 48,
   },
+  headline: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: '400',
+    marginBottom: 16,
+  },
+  subtext: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    lineHeight: 21,
+  },
   bottom: {
-    alignItems: 'center',
-    gap: 24,
-    paddingTop: 24,
-  },
-  dots: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  dot: {
-    height: 6,
-    borderRadius: 3,
+    minHeight: 44 + 32,
+    justifyContent: 'flex-end',
   },
   ctaButton: {
+    backgroundColor: '#B1FF58',
     borderRadius: 50,
-    minHeight: 44,
-    paddingHorizontal: 32,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'stretch',
   },
   ctaText: {
     fontFamily: 'Inter_700Bold',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A4A00',
   },
 })

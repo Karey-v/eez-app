@@ -1,7 +1,7 @@
 // S13–S22 — Leakability Test Questions (dynamic, type-driven)
 // Handles: simulation-tap, slider, multiple-choice, scenario
-// Progress bar fills as questions advance. Auto-advances after feedback (except slider).
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+// Progress lines fill as questions advance. Auto-advances after selection (except slider).
+import React, { useState, useRef, useCallback } from 'react'
 import {
   View,
   Text,
@@ -19,7 +19,6 @@ import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
-import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Button } from '@/components/ui/Button'
 import { questions, getBand, scaleScore, Question } from '@/data/questions'
 import { useTestStore } from '@/store/testStore'
@@ -50,6 +49,24 @@ function computeResults(answers: { questionId: number; score: number; category: 
   }
 }
 
+// ─── Progress lines ───────────────────────────────────────────────────────────
+
+function ProgressLines({ total, current }: { total: number; current: number }) {
+  return (
+    <View style={styles.progressLines}>
+      {Array.from({ length: total }).map((_, i) => (
+        <View
+          key={i}
+          style={[
+            styles.progressLine,
+            { backgroundColor: i <= current ? '#0A0A0A' : 'rgba(0,0,0,0.15)' },
+          ]}
+        />
+      ))}
+    </View>
+  )
+}
+
 // ─── Root screen ─────────────────────────────────────────────────────────────
 
 export default function QuestionScreen() {
@@ -60,7 +77,6 @@ export default function QuestionScreen() {
   const setScore = useUserStore((s) => s.setScore)
 
   const question = questions[currentQuestionIndex]
-  const progress = (currentQuestionIndex + 1) / questions.length
 
   const handleAnswer = useCallback(
     (optionIndex: number) => {
@@ -75,7 +91,6 @@ export default function QuestionScreen() {
       nextQuestion()
     } else {
       completeTest()
-      // Compute results from all answers (last answer is already saved)
       const { answers: finalAnswers } = useTestStore.getState()
       const { scaledScore, band, categoryScores } = computeResults(finalAnswers)
       setScore(scaledScore, band.label, band.color, categoryScores)
@@ -84,32 +99,23 @@ export default function QuestionScreen() {
   }, [currentQuestionIndex, nextQuestion, completeTest, setScore, router])
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
       <StatusBar style="dark" />
 
       {/* ── Fixed header ── */}
-      <View
-        style={[
-          styles.header,
-          { paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH },
-        ]}
-      >
-        {/* Counter + category */}
-        <View style={styles.headerRow}>
-          <Text style={[type.meta, { color: colors.textTertiary }]}>
-            {currentQuestionIndex + 1} of {questions.length}
-          </Text>
-          <Text style={[type.label, { color: colors.textTertiary }]}>
-            {question.category}
-          </Text>
-        </View>
-        {/* Progress bar — 2px, spec */}
-        <ProgressBar
-          progress={progress}
-          height={2}
-          fillColor={brand.purpleCTA}
-          style={{ marginTop: 8 }}
-        />
+      <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
+        {/* Thin progress lines — very top */}
+        <ProgressLines total={questions.length} current={currentQuestionIndex} />
+
+        {/* Category label — lots of space above */}
+        <Text
+          style={[
+            type.label,
+            { color: colors.textTertiary, marginTop: 28 },
+          ]}
+        >
+          {question.category}
+        </Text>
       </View>
 
       {/* ── Question body — keyed so state fully resets each question ── */}
@@ -165,7 +171,7 @@ function QuestionBody({
         {
           paddingHorizontal: spacing.screenH,
           paddingBottom: insets.bottom + 24,
-          paddingTop: 24,
+          paddingTop: 32,
         },
       ]}
       keyboardShouldPersistTaps="handled"
@@ -173,7 +179,7 @@ function QuestionBody({
     >
       {/* Simulation card — shown for simulation-tap questions */}
       {question.type === 'simulation-tap' && question.simulation && (
-        <View style={{ marginBottom: 24 }}>
+        <View style={{ marginBottom: 28 }}>
           <Text style={[type.label, { color: colors.textTertiary, marginBottom: 10 }]}>
             {question.prompt}
           </Text>
@@ -186,7 +192,7 @@ function QuestionBody({
         <View
           style={[
             styles.scenarioCard,
-            { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak },
+            { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak },
           ]}
         >
           <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6 }]}>scenario</Text>
@@ -196,9 +202,14 @@ function QuestionBody({
         </View>
       )}
 
-      {/* Question prompt — for multiple-choice (not shown for simulation-tap/scenario since handled above) */}
-      {(question.type === 'multiple-choice') && (
-        <Text style={[type.screenTitle, { color: colors.textPrimary, marginBottom: 24, lineHeight: 30 }]}>
+      {/* Question prompt — multiple-choice */}
+      {question.type === 'multiple-choice' && (
+        <Text
+          style={[
+            styles.questionText,
+            { color: '#0A0A0A', marginBottom: 40 },
+          ]}
+        >
           {question.prompt}
         </Text>
       )}
@@ -206,7 +217,7 @@ function QuestionBody({
       {/* Slider question */}
       {question.type === 'slider' && (
         <>
-          <Text style={[type.screenTitle, { color: colors.textPrimary, marginBottom: 32, lineHeight: 30 }]}>
+          <Text style={[styles.questionText, { color: '#0A0A0A', marginBottom: 32 }]}>
             {question.prompt}
           </Text>
           <SliderQuestion
@@ -270,7 +281,7 @@ function SimulationCard({
 
   if (uiType === 'notification') {
     return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
+      <View style={[styles.simCard, { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak }]}>
         <View style={styles.notifRow}>
           <View style={[styles.notifIcon, { backgroundColor: '#5B5CF6' }]}>
             <Text style={{ color: '#fff', fontSize: 12, fontFamily: 'Inter_700Bold' }}>
@@ -298,7 +309,7 @@ function SimulationCard({
 
   if (uiType === 'message') {
     return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
+      <View style={[styles.simCard, { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak }]}>
         <View style={styles.messageHeader}>
           <View style={[styles.avatar, { backgroundColor: '#007549' }]}>
             <Text style={{ color: '#fff', fontSize: 11, fontFamily: 'Inter_700Bold' }}>
@@ -316,7 +327,7 @@ function SimulationCard({
 
   if (uiType === 'email') {
     return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
+      <View style={[styles.simCard, { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak }]}>
         <View style={styles.emailHeader}>
           <Text style={[type.meta, { color: colors.textTertiary, width: 40 }]}>FROM</Text>
           <Text style={[type.body, { color: colors.textPrimary, flex: 1, fontFamily: 'Inter_700Bold', fontWeight: '700' }]} numberOfLines={1}>
@@ -366,7 +377,7 @@ function OptionButton({
   showFeedback: boolean
   onPress: () => void
 }) {
-  const { colors, type, brand } = useTheme()
+  const { colors, type } = useTheme()
 
   const feedbackColor =
     score === 0 ? colors.successText : score === 1 ? colors.warningText : colors.dangerText
@@ -378,14 +389,23 @@ function OptionButton({
       style={({ pressed }) => [
         styles.optionBtn,
         {
-          borderColor: selected ? brand.purpleCTA : colors.borderWeak,
-          borderWidth: selected ? 1.5 : 0.5,
-          backgroundColor: selected ? colors.bgSecondary : colors.bgPrimary,
+          borderColor: selected ? '#5B5CF6' : 'rgba(0,0,0,0.2)',
+          borderWidth: selected ? 1.5 : 1,
+          backgroundColor: selected ? '#F0EEFF' : 'transparent',
           opacity: anySelected && !selected ? 0.45 : pressed ? 0.8 : 1,
         },
       ]}
     >
-      <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>{label}</Text>
+      <Text
+        style={{
+          fontFamily: 'Inter_400Regular',
+          fontSize: 14,
+          color: colors.textPrimary,
+          lineHeight: 20,
+        }}
+      >
+        {label}
+      </Text>
       {showFeedback && feedback && (
         <Animated.View entering={FadeIn.duration(200)}>
           <Text style={[type.bodySmall, { color: feedbackColor, marginTop: 6, lineHeight: 16 }]}>
@@ -510,7 +530,7 @@ function SliderQuestion({
 
       {/* Selected value display */}
       {selectedIndex !== null && (
-        <Animated.View entering={FadeIn.duration(200)} style={[styles.sliderValue, { backgroundColor: colors.bgSecondary }]}>
+        <Animated.View entering={FadeIn.duration(200)} style={[styles.sliderValue, { backgroundColor: colors.bgPrimary }]}>
           <Text style={[type.label, { color: brand.purpleCTA }]}>
             {selectedIndex === 0
               ? 'great — unique passwords are the strongest foundation.'
@@ -529,16 +549,24 @@ function SliderQuestion({
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  header: {
-    paddingBottom: 12,
-  },
-  headerRow: {
+  progressLines: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    gap: 4,
+    marginTop: 8,
+  },
+  progressLine: {
+    flex: 1,
+    height: 2,
+    borderRadius: 1,
   },
   body: {
     flexGrow: 1,
+  },
+  questionText: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 28,
+    lineHeight: 36,
+    fontWeight: '400',
   },
   scenarioCard: {
     borderRadius: 12,
@@ -547,12 +575,15 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   options: {
-    gap: 8,
+    gap: 12,
   },
   optionBtn: {
-    borderRadius: 12,
-    padding: 14,
-    minHeight: 44,
+    borderRadius: 50,
+    minHeight: 64,
+    paddingLeft: 20,
+    paddingRight: 14,
+    paddingVertical: 12,
+    justifyContent: 'center',
   },
   simCard: {
     borderRadius: 14,
@@ -586,7 +617,6 @@ const styles = StyleSheet.create({
   },
   messageBubble: {
     backgroundColor: 'rgba(0,0,0,0.04)',
-    borderRadius: 0,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 12,
     borderBottomLeftRadius: 12,

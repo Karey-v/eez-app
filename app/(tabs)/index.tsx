@@ -16,9 +16,6 @@ import { useTheme } from '@/theme'
 import { useUserStore } from '@/store/userStore'
 import { EezLogo } from '@/components/icons/EezLogo'
 import { BellIcon } from '@/components/icons/Bell'
-import { ShieldIcon } from '@/components/icons/Shield'
-import { LearnIcon } from '@/components/icons/Learn'
-import { RadarIcon } from '@/components/icons/Radar'
 import { ArrowIcon } from '@/components/icons/Arrow'
 import { Card } from '@/components/ui/Card'
 import { radarFeed } from '@/data/radarFeed'
@@ -27,14 +24,11 @@ export default function HomeScreen() {
   const { colors, type, spacing, brand } = useTheme()
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  // Individual selectors ensure the component re-renders only when each
-  // specific value changes, and avoids any stale-closure risk with the full store.
   const score = useUserStore((s) => s.score)
   const band = useUserStore((s) => s.band)
   const bandColor = useUserStore((s) => s.bandColor)
   const name = useUserStore((s) => s.name)
 
-  // score is number | null — null means the test has never been completed.
   const hasScore = score !== null
 
   return (
@@ -76,69 +70,58 @@ export default function HomeScreen() {
 // ─── First-time view (S10) ───────────────────────────────────────────────────
 
 function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
-  const { colors, type, spacing, brand } = useTheme()
+  const { type, spacing, brand } = useTheme()
 
   return (
     <>
       {/* Hero card */}
-      <Pressable
-        onPress={() => router.push('/leakability/intro')}
-        style={({ pressed }) => [
-          styles.heroCard,
-          { backgroundColor: brand.purple, opacity: pressed ? 0.92 : 1 },
-        ]}
-      >
-        <Text style={[type.label, { color: 'rgba(255,255,255,0.7)', marginBottom: 10 }]}>
-          your risk score
-        </Text>
-        <Text style={[type.screenTitle, { color: '#FFFFFF', lineHeight: 30, marginBottom: 6 }]}>
+      <View style={[styles.heroCard, { backgroundColor: brand.lime }]}>
+        <Text style={styles.heroHeadline}>
           so... how leakable{'\n'}are you?
         </Text>
-        <Text style={[type.body, { color: 'rgba(255,255,255,0.75)', marginBottom: 20, lineHeight: 18 }]}>
+        <Text style={styles.heroSubtext}>
           1 in 3 Gen Zers have been scammed online. take the 5-min test and find out where you stand.
         </Text>
-        <View style={styles.limeButton}>
-          <Text style={[type.cardTitle, { color: '#1A4A00' }]}>take the test</Text>
-          <ArrowIcon size={14} color="#1A4A00" />
+
+        {/* Stat chips */}
+        <View style={styles.statChipRow}>
+          <View style={styles.statChip}>
+            <Text style={styles.statChipText}>5 mins</Text>
+          </View>
+          <View style={styles.statChip}>
+            <Text style={styles.statChipText}>totally private</Text>
+          </View>
         </View>
-      </Pressable>
+
+        {/* CTA */}
+        <Pressable
+          onPress={() => router.push('/leakability/intro')}
+          style={({ pressed }) => [styles.heroCTA, { opacity: pressed ? 0.88 : 1 }]}
+        >
+          <Text style={styles.heroCTAText}>take the test</Text>
+        </Pressable>
+      </View>
 
       {/* AI Fraud Detector */}
       <FraudDetectorCard router={router} />
 
-      {/* 3-feature row */}
-      <View style={styles.featureRow}>
-        <FeatureTile
-          icon={<ShieldIcon size={24} color={brand.purpleCTA} />}
-          label="know your risk"
-        />
-        <FeatureTile
-          icon={<LearnIcon size={24} color={brand.purpleCTA} />}
-          label="learn to protect"
-        />
-        <FeatureTile
-          icon={<RadarIcon size={24} color={brand.purpleCTA} />}
-          label="stay on radar"
-        />
-      </View>
-
       {/* Latest radar snippet */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: colors.textTertiary, marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: '#9A9A9A', marginBottom: spacing.sectionBottom }]}>
           latest from radar
         </Text>
         <Card onPress={() => router.push('/(tabs)/radar')} style={styles.radarSnippet}>
           <View style={styles.radarRow}>
             <View style={[styles.categoryDot, { backgroundColor: brand.purpleCTA }]} />
             <Text style={[type.label, { color: brand.purpleCTA }]}>phishing</Text>
-            <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
+            <Text style={[type.meta, { color: '#9A9A9A', marginLeft: 'auto' as any }]}>
               {radarFeed[0].timestamp}
             </Text>
           </View>
-          <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 6 }]}>
+          <Text style={[type.cardTitle, { color: '#0A0A0A', marginTop: 6 }]}>
             {radarFeed[0].headline}
           </Text>
-          <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
+          <Text style={[type.bodySmall, { color: '#5A5A5A', marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
             {radarFeed[0].preview}
           </Text>
         </Card>
@@ -294,20 +277,6 @@ function FraudDetectorCard({ router }: { router: ReturnType<typeof useRouter> })
   )
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function FeatureTile({ icon, label }: { icon: React.ReactNode; label: string }) {
-  const { colors, type } = useTheme()
-  return (
-    <View style={[styles.featureTile, { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak }]}>
-      {icon}
-      <Text style={[type.label, { color: colors.textSecondary, textAlign: 'center', marginTop: 8 }]}>
-        {label}
-      </Text>
-    </View>
-  )
-}
-
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
@@ -318,29 +287,55 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   heroCard: {
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
   },
-  limeButton: {
+  heroHeadline: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: '400',
+    color: '#1A4A00',
+    marginBottom: 10,
+  },
+  heroSubtext: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#2D6A00',
+    marginBottom: 20,
+  },
+  statChipRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#B8F04A',
-    borderRadius: 50,
-    alignSelf: 'flex-start',
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+    gap: 10,
+    marginBottom: 20,
   },
-  featureRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  featureTile: {
+  statChip: {
     flex: 1,
-    borderRadius: 14,
-    borderWidth: 0.5,
-    padding: 14,
+    backgroundColor: '#D2D9FF',
+    borderRadius: 50,
+    paddingVertical: 14,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statChipText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: '#0A0A0A',
+    letterSpacing: 0.2,
+  },
+  heroCTA: {
+    backgroundColor: '#5B5CF6',
+    borderRadius: 50,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroCTAText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   radarSnippet: {},
   radarRow: {
