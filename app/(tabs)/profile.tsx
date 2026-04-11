@@ -9,14 +9,13 @@ import { useUserStore } from '@/store/userStore'
 import { useLearnStore } from '@/store/learnStore'
 import { badges as ALL_BADGES } from '@/data/badges'
 
-// ─── Stat cell ────────────────────────────────────────────────────────────────
+// ─── Stat card ────────────────────────────────────────────────────────────────
 
-function StatCell({ value, label }: { value: string | number; label: string }) {
-  const { colors, type } = useTheme()
+function StatCard({ value, label }: { value: string | number; label: string }) {
   return (
-    <View style={styles.statCell}>
-      <Text style={[type.screenTitle, { color: colors.textPrimary }]}>{value}</Text>
-      <Text style={[type.meta, { color: colors.textTertiary, marginTop: 2 }]}>{label}</Text>
+    <View style={styles.statCard}>
+      <Text style={styles.statNumber}>{value}</Text>
+      <Text style={styles.statLabel}>{label.toUpperCase()}</Text>
     </View>
   )
 }
@@ -34,7 +33,6 @@ function SettingsRow({
   danger?: boolean
   last?: boolean
 }) {
-  const { colors, type } = useTheme()
   return (
     <Pressable
       onPress={onPress}
@@ -42,22 +40,15 @@ function SettingsRow({
         styles.settingsRow,
         {
           borderBottomWidth: last ? 0 : 0.5,
-          borderBottomColor: colors.borderWeak,
+          borderBottomColor: 'rgba(0,0,0,0.08)',
           opacity: pressed ? 0.65 : 1,
         },
       ]}
     >
-      <Text
-        style={[
-          type.body,
-          { color: danger ? '#CC0000' : colors.textPrimary, fontSize: 13 },
-        ]}
-      >
+      <Text style={[styles.settingsLabel, danger && styles.settingsLabelDanger]}>
         {label}
       </Text>
-      {!danger && (
-        <Text style={[type.body, { color: colors.textTertiary, fontSize: 16 }]}>›</Text>
-      )}
+      {!danger && <Text style={styles.settingsChevron}>›</Text>}
     </Pressable>
   )
 }
@@ -95,7 +86,7 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
+    <View style={styles.root}>
       <StatusBar style="dark" />
 
       <ScrollView
@@ -103,7 +94,7 @@ export default function ProfileScreen() {
         contentContainerStyle={{
           paddingTop: insets.top + 24,
           paddingBottom: insets.bottom + 100,
-          paddingHorizontal: spacing.screenH,
+          paddingHorizontal: 24,
         }}
       >
         {/* Header */}
@@ -113,17 +104,13 @@ export default function ProfileScreen() {
 
         {/* Avatar + name block */}
         <View style={styles.avatarSection}>
-          <View style={[styles.avatar, { backgroundColor: brand.purpleCTA }]}>
+          <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials || '?'}</Text>
           </View>
-          <Text style={[type.screenTitle, { color: colors.textPrimary, marginTop: 14 }]}>
-            {name.toLowerCase()}
-          </Text>
+          <Text style={styles.userName}>{name.toLowerCase()}</Text>
           {band ? (
-            <View
-              style={[styles.bandChip, { backgroundColor: bandColor ?? brand.purpleCTA }]}
-            >
-              <Text style={[type.meta, { color: '#FFFFFF' }]}>{band.toLowerCase()}</Text>
+            <View style={[styles.bandBadge, { backgroundColor: bandColor ?? '#5B5CF6' }]}>
+              <Text style={styles.bandBadgeText}>{band.toUpperCase()}</Text>
             </View>
           ) : (
             <Text style={[type.body, { color: colors.textTertiary, marginTop: 6, textAlign: 'center' }]}>
@@ -132,20 +119,12 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Stats row */}
-        <View
-          style={[
-            styles.statsRow,
-            { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak },
-          ]}
-        >
-          <StatCell value={score ?? '—'} label="score" />
-          <View style={[styles.statDivider, { backgroundColor: colors.borderWeak }]} />
-          <StatCell value={completedModules.length} label="modules" />
-          <View style={[styles.statDivider, { backgroundColor: colors.borderWeak }]} />
-          <StatCell value={earnedBadgeIds.length} label="badges" />
-          <View style={[styles.statDivider, { backgroundColor: colors.borderWeak }]} />
-          <StatCell value={streak} label="streak" />
+        {/* Stats row — 4 equal white cards */}
+        <View style={styles.statsRow}>
+          <StatCard value={score ?? '—'} label="score" />
+          <StatCard value={completedModules.length} label="modules" />
+          <StatCard value={earnedBadgeIds.length} label="badges" />
+          <StatCard value={streak} label="streak" />
         </View>
 
         {/* Badge shelf */}
@@ -210,12 +189,7 @@ export default function ProfileScreen() {
         >
           settings
         </Text>
-        <View
-          style={[
-            styles.settingsCard,
-            { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak },
-          ]}
-        >
+        <View style={styles.settingsCard}>
           <SettingsRow
             label="all my badges"
             onPress={() => router.push('/profile/badges')}
@@ -233,6 +207,10 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#F5F5F7',
+  },
   avatarSection: {
     alignItems: 'center',
     marginBottom: 24,
@@ -241,34 +219,59 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
+    backgroundColor: '#5B5CF6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 30,
+    fontSize: 32,
     color: '#FFFFFF',
   },
-  bandChip: {
+  userName: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 24,
+    lineHeight: 30,
+    color: '#0A0A0A',
+    textAlign: 'center',
+    marginTop: 14,
+  },
+  bandBadge: {
     borderRadius: 20,
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 5,
     marginTop: 8,
+  },
+  bandBadgeText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 10,
+    letterSpacing: 0.6,
+    color: '#FFFFFF',
   },
   statsRow: {
     flexDirection: 'row',
-    borderRadius: 14,
-    borderWidth: 0.5,
-    paddingVertical: 18,
-    alignItems: 'center',
+    gap: 8,
   },
-  statCell: {
+  statCard: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 4,
     alignItems: 'center',
   },
-  statDivider: {
-    width: 0.5,
-    height: 32,
+  statNumber: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 22,
+    lineHeight: 26,
+    color: '#0A0A0A',
+  },
+  statLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 9,
+    letterSpacing: 0.5,
+    color: '#9A9A9A',
+    marginTop: 3,
   },
   badgeShelf: {
     flexDirection: 'row',
@@ -285,15 +288,27 @@ const styles = StyleSheet.create({
   },
   settingsCard: {
     borderRadius: 14,
-    borderWidth: 0.5,
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
   },
   settingsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    minHeight: 44,
+    paddingHorizontal: 16,
+    height: 52,
+  },
+  settingsLabel: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#0A0A0A',
+  },
+  settingsLabelDanger: {
+    color: '#CC0000',
+  },
+  settingsChevron: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 16,
+    color: '#9A9A9A',
   },
 })

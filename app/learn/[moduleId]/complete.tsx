@@ -1,5 +1,5 @@
 // S39 — Module Completion
-// Confetti burst, badge with glow ring, XP count-up, summary bullets, CTAs
+// Confetti burst, badge, XP count-up, summary bullets, CTAs
 import { useEffect, useRef, useState } from 'react'
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
 import Animated, {
@@ -22,7 +22,7 @@ import { badges } from '@/data/badges'
 
 // ─── Confetti particle ────────────────────────────────────────────────────────
 
-const CONFETTI_COLORS = ['#5B5CF6', '#B8F04A', '#FF732E', '#007549', '#602CFF', '#D2D9FF', '#FFD700']
+const CONFETTI_COLORS = ['#5B5CF6', '#602CFF', '#0A0A0A', '#1A4A00', '#FFFFFF', '#FF732E', '#FFD700']
 
 type ParticleConfig = {
   tx: number
@@ -95,23 +95,17 @@ function ConfettiParticle({ config }: { config: ParticleConfig }) {
   )
 }
 
-// ─── Badge with glow ring ─────────────────────────────────────────────────────
+// ─── Badge display ────────────────────────────────────────────────────────────
 
-function BadgeDisplay({ icon, color }: { icon: string; color: string }) {
+function BadgeDisplay({ icon }: { icon: string }) {
   const scale = useSharedValue(0.4)
-  const glowOpacity = useSharedValue(0)
 
   useEffect(() => {
     scale.value = withDelay(200, withTiming(1, { duration: 500, easing: Easing.out(Easing.back(1.5)) }))
-    glowOpacity.value = withDelay(600, withTiming(1, { duration: 400 }))
   }, [])
 
   const badgeStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-  }))
-
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: glowOpacity.value,
   }))
 
   return (
@@ -123,20 +117,9 @@ function BadgeDisplay({ icon, color }: { icon: string; color: string }) {
         ))}
       </View>
 
-      {/* Glow ring */}
-      <Animated.View
-        style={[
-          styles.glowRing,
-          { borderColor: color, backgroundColor: `${color}22` },
-          glowStyle,
-        ]}
-      />
-
-      {/* Badge circle */}
-      <Animated.View
-        style={[styles.badgeCircle, { backgroundColor: color }, badgeStyle]}
-      >
-        <Text style={{ fontSize: 38 }}>{icon}</Text>
+      {/* Badge circle — white bg, flat */}
+      <Animated.View style={[styles.badgeCircle, badgeStyle]}>
+        <Text style={{ fontSize: 42 }}>{icon}</Text>
       </Animated.View>
     </View>
   )
@@ -145,7 +128,6 @@ function BadgeDisplay({ icon, color }: { icon: string; color: string }) {
 // ─── XP count-up ─────────────────────────────────────────────────────────────
 
 function XPCounter({ target }: { target: number }) {
-  const { colors, brand } = useTheme()
   const [display, setDisplay] = useState(0)
   const rafRef = useRef<number | null>(null)
 
@@ -160,7 +142,6 @@ function XPCounter({ target }: { target: number }) {
       if (t < 1) rafRef.current = requestAnimationFrame(frame)
     }
 
-    // Delay start to let badge animation play first
     const timeout = setTimeout(() => {
       rafRef.current = requestAnimationFrame(frame)
     }, 700)
@@ -173,28 +154,8 @@ function XPCounter({ target }: { target: number }) {
 
   return (
     <View style={styles.xpRow}>
-      <Text
-        style={{
-          fontFamily: 'DMSerifDisplay_400Regular',
-          fontSize: 52,
-          lineHeight: 56,
-          color: brand.purpleCTA,
-        }}
-      >
-        +{display}
-      </Text>
-      <Text
-        style={{
-          fontFamily: 'Inter_700Bold',
-          fontSize: 20,
-          color: brand.purpleCTA,
-          alignSelf: 'flex-end',
-          marginBottom: 6,
-          marginLeft: 4,
-        }}
-      >
-        XP
-      </Text>
+      <Text style={styles.xpNumber}>+{display}</Text>
+      <Text style={styles.xpUnit}>XP</Text>
     </View>
   )
 }
@@ -202,7 +163,7 @@ function XPCounter({ target }: { target: number }) {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function CompleteScreen() {
-  const { colors, type, spacing, brand } = useTheme()
+  const { type, spacing } = useTheme()
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const { moduleId } = useLocalSearchParams<{ moduleId: string }>()
@@ -213,7 +174,6 @@ export default function CompleteScreen() {
   const module = modules.find((m) => m.id === moduleId)
   const badge = badges.find((b) => b.id === module?.badgeId)
 
-  // Mark complete on mount (idempotent — completeModule checks for duplicates)
   useEffect(() => {
     if (!module) return
     completeModule(moduleId)
@@ -224,35 +184,31 @@ export default function CompleteScreen() {
 
   if (!module || !badge) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.bgPrimary, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={[type.body, { color: colors.textSecondary }]}>Loading…</Text>
+      <View style={[styles.root, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={[type.body, { color: '#2D6A00' }]}>Loading…</Text>
       </View>
     )
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
+    <View style={styles.root}>
       <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: insets.top + 40,
+          paddingTop: insets.top + 48,
           paddingBottom: insets.bottom + 40,
-          paddingHorizontal: spacing.screenH,
+          paddingHorizontal: 24,
           alignItems: 'center',
         }}
       >
         {/* Badge with confetti */}
-        <BadgeDisplay icon={badge.icon} color={badge.color} />
+        <BadgeDisplay icon={badge.icon} />
 
         {/* Badge name */}
         <Animated.View entering={FadeInUp.delay(400).duration(400)} style={{ alignItems: 'center' }}>
-          <Text style={[type.label, { color: colors.textTertiary, marginTop: 20, marginBottom: 4 }]}>
-            badge unlocked
-          </Text>
-          <Text style={[type.heroTitle, { color: colors.textPrimary, textAlign: 'center' }]}>
-            {badge.name.toLowerCase()}.
-          </Text>
+          <Text style={styles.badgeUnlockedLabel}>badge unlocked</Text>
+          <Text style={styles.badgeName}>{badge.name.toLowerCase()}.</Text>
         </Animated.View>
 
         {/* XP counter */}
@@ -263,26 +219,22 @@ export default function CompleteScreen() {
         {/* Streak */}
         <Animated.View
           entering={FadeInUp.delay(700).duration(400)}
-          style={[styles.streakChip, { backgroundColor: colors.bgSecondary }]}
+          style={styles.streakChip}
         >
           <Text style={{ fontSize: 14 }}>🔥</Text>
-          <Text style={[type.cardTitle, { color: colors.textPrimary }]}>streak extended!</Text>
+          <Text style={styles.streakText}>streak extended!</Text>
         </Animated.View>
 
         {/* Summary card */}
         <Animated.View
           entering={FadeInUp.delay(900).duration(400)}
-          style={[styles.summaryCard, { backgroundColor: colors.bgSecondary, width: '100%' }]}
+          style={[styles.summaryCard, { width: '100%' }]}
         >
-          <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 12 }]}>
-            what you learned
-          </Text>
+          <Text style={styles.summaryTitle}>what you learned</Text>
           {module.whatYoullLearn.map((item) => (
             <View key={item} style={styles.summaryRow}>
-              <View style={[styles.summaryDot, { backgroundColor: badge.color }]} />
-              <Text style={[type.body, { color: colors.textSecondary, flex: 1, lineHeight: 18 }]}>
-                {item}
-              </Text>
+              <View style={styles.summaryDot} />
+              <Text style={styles.summaryText}>{item}</Text>
             </View>
           ))}
         </Animated.View>
@@ -292,25 +244,27 @@ export default function CompleteScreen() {
           entering={FadeInUp.delay(1100).duration(400)}
           style={[styles.ctas, { width: '100%' }]}
         >
-          {/* Next module — locked */}
-          <View style={[styles.lockedNextCard, { backgroundColor: colors.bgSecondary }]}>
-            <Text style={[type.label, { color: colors.textTertiary, marginBottom: 4 }]}>
-              next module 🔒
-            </Text>
-            <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 2 }]}>
-              Link & Message Hygiene
-            </Text>
-            <Text style={[type.bodySmall, { color: colors.textTertiary }]}>coming soon</Text>
+          {/* Locked next module */}
+          <View style={styles.lockedNextCard}>
+            <Text style={styles.lockedLabel}>next module 🔒</Text>
+            <Text style={styles.lockedTitle}>Link & Message Hygiene</Text>
+            <Text style={styles.lockedSub}>coming soon</Text>
           </View>
 
+          {/* Primary CTA */}
           <Pressable
             onPress={() => router.replace('/(tabs)/learn')}
-            style={({ pressed }) => [
-              styles.homeBtn,
-              { backgroundColor: brand.purpleCTA, opacity: pressed ? 0.85 : 1 },
-            ]}
+            style={({ pressed }) => [styles.ctaPrimary, { opacity: pressed ? 0.85 : 1 }]}
           >
-            <Text style={[type.cardTitle, { color: '#FFFFFF' }]}>back to learning home</Text>
+            <Text style={styles.ctaPrimaryText}>back to learning home</Text>
+          </Pressable>
+
+          {/* Secondary CTA */}
+          <Pressable
+            onPress={() => router.replace('/(tabs)/profile')}
+            style={({ pressed }) => [styles.ctaSecondary, { opacity: pressed ? 0.7 : 1 }]}
+          >
+            <Text style={styles.ctaSecondaryText}>view my badges</Text>
           </Pressable>
         </Animated.View>
       </ScrollView>
@@ -319,11 +273,16 @@ export default function CompleteScreen() {
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#B1FF58',
+  },
   badgeWrapper: {
-    width: 96,
-    height: 96,
+    width: 100,
+    height: 100,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 24,
   },
   confettiContainer: {
     position: 'absolute',
@@ -332,25 +291,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  glowRing: {
-    position: 'absolute',
-    width: 108,
-    height: 108,
-    borderRadius: 54,
-    borderWidth: 2,
-  },
   badgeCircle: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  badgeUnlockedLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: '#2D6A00',
+    marginBottom: 6,
+  },
+  badgeName: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 28,
+    lineHeight: 34,
+    color: '#1A4A00',
+    textAlign: 'center',
+  },
   xpRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 4,
+    alignItems: 'flex-end',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  xpNumber: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 48,
+    lineHeight: 52,
+    color: '#1A4A00',
+  },
+  xpUnit: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 20,
+    color: '#1A4A00',
+    marginBottom: 5,
+    marginLeft: 4,
   },
   streakChip: {
     flexDirection: 'row',
@@ -361,37 +342,96 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 28,
     marginTop: 4,
+    backgroundColor: 'rgba(0,0,0,0.08)',
+  },
+  streakText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#1A4A00',
   },
   summaryCard: {
     borderRadius: 14,
-    padding: 16,
+    padding: 20,
     marginBottom: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  summaryTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 13,
+    color: '#1A4A00',
+    marginBottom: 14,
   },
   summaryRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   summaryDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    marginTop: 6,
+    marginTop: 5,
     flexShrink: 0,
+    backgroundColor: '#1A4A00',
+  },
+  summaryText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#2D6A00',
+    flex: 1,
   },
   ctas: {
-    gap: 10,
+    gap: 12,
   },
   lockedNextCard: {
     borderRadius: 14,
-    padding: 14,
+    padding: 16,
+    backgroundColor: 'rgba(0,0,0,0.06)',
   },
-  homeBtn: {
+  lockedLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    letterSpacing: 0.5,
+    color: '#2D6A00',
+    marginBottom: 4,
+  },
+  lockedTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#1A4A00',
+    marginBottom: 2,
+  },
+  lockedSub: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: '#2D6A00',
+  },
+  ctaPrimary: {
     borderRadius: 50,
-    minHeight: 44,
+    height: 56,
+    backgroundColor: '#5B5CF6',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+  },
+  ctaPrimaryText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  ctaSecondary: {
+    borderRadius: 50,
+    height: 56,
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctaSecondaryText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
   },
 })

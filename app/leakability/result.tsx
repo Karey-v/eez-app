@@ -29,7 +29,7 @@ const BAND_DESCRIPTIONS: Record<string, string> = {
 }
 
 export default function ResultScreen() {
-  const { colors, type, spacing, brand } = useTheme()
+  const { colors, type, spacing } = useTheme()
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const { score, band, bandColor } = useUserStore()
@@ -51,7 +51,6 @@ export default function ResultScreen() {
     function frame(now: number) {
       const elapsed = now - startTime
       const t = Math.min(elapsed / duration, 1)
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - t, 3)
       setDisplayScore(Math.round(eased * safeScore))
       if (t < 1) rafRef.current = requestAnimationFrame(frame)
@@ -87,106 +86,90 @@ export default function ResultScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
+    <View style={styles.root}>
       <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: insets.top + 32, paddingBottom: insets.bottom + 32, paddingHorizontal: spacing.screenH },
+          { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 40, paddingHorizontal: 24 },
         ]}
       >
         {/* ── Score section ── */}
         <View style={styles.scoreSection}>
-          <Text style={[type.label, { color: colors.textTertiary, marginBottom: 8 }]}>
-            your leakability score
-          </Text>
+          <Text style={styles.scoreLabel}>your leakability score</Text>
 
           {/* Count-up number */}
-          <Text
-            style={{
-              fontFamily: 'DMSerifDisplay_400Regular',
-              fontSize: 96,
-              lineHeight: 100,
-              color: safeColor,
-            }}
-          >
+          <Text style={[styles.scoreNumber, { color: safeColor }]}>
             {displayScore}
           </Text>
 
-          {/* Band label — fades in */}
-          <Animated.View style={[styles.bandRow, bandLabelStyle]}>
-            <View style={[styles.bandPill, { backgroundColor: safeColor }]}>
-              <Text style={[type.label, { color: '#FFFFFF' }]}>{safeBand}</Text>
-            </View>
-            <Text style={[type.body, { color: colors.textTertiary }]}>out of 48</Text>
-          </Animated.View>
+          {/* Band label — fades in, no pill */}
+          <Animated.Text style={[styles.bandLabel, { color: safeColor }, bandLabelStyle]}>
+            {safeBand.toUpperCase()}
+          </Animated.Text>
 
-          {/* Personality */}
+          {/* Personality title */}
           <Animated.Text
             entering={FadeInUp.delay(1600).duration(400)}
-            style={[type.sectionHead, { color: colors.textPrimary, marginTop: 8, lineHeight: 26 }]}
+            style={styles.personalityTitle}
           >
             {bandData.personality}
           </Animated.Text>
 
           <Animated.Text
             entering={FadeInUp.delay(1800).duration(400)}
-            style={[type.body, { color: colors.textSecondary, marginTop: 8, lineHeight: 20 }]}
+            style={[type.body, { color: colors.textSecondary, marginTop: 10, lineHeight: 21 }]}
           >
             {description}
           </Animated.Text>
         </View>
 
-        {/* ── Risk gauge bar ── */}
-        <Animated.View entering={FadeInUp.delay(1700).duration(300)}>
-          <View style={[styles.gaugeCard, { backgroundColor: colors.bgSecondary }]}>
-            <View style={styles.gaugeHeader}>
-              <Text style={[type.meta, { color: colors.textTertiary }]}>risk level</Text>
-              <Text style={[type.meta, { color: colors.textTertiary }]}>
-                0 ←――――――――→ 48
-              </Text>
-            </View>
-            {/* Track */}
-            <View style={[styles.gaugeTrack, { backgroundColor: colors.bgTertiary }]}>
-              {/* Fill */}
-              <Animated.View
-                style={[styles.gaugeFill, { backgroundColor: safeColor }, barStyle]}
+        {/* ── Risk gauge ── */}
+        <Animated.View entering={FadeInUp.delay(1700).duration(300)} style={styles.gaugeSection}>
+          <View style={styles.gaugeHeader}>
+            <Text style={[type.meta, { color: colors.textTertiary }]}>risk level</Text>
+            <Text style={[type.meta, { color: colors.textTertiary }]}>0 — 48</Text>
+          </View>
+          {/* Track */}
+          <View style={styles.gaugeTrack}>
+            {/* Fill */}
+            <Animated.View
+              style={[styles.gaugeFill, { backgroundColor: safeColor }, barStyle]}
+            />
+            {/* Band threshold markers */}
+            {[12 / 48, 24 / 48, 36 / 48].map((pct, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.gaugeMarker,
+                  { left: `${pct * 100}%` as any },
+                ]}
               />
-              {/* Band threshold markers */}
-              {[12 / 48, 24 / 48, 36 / 48].map((pct, i) => (
-                <View
-                  key={i}
-                  style={[
-                    styles.gaugeMarker,
-                    { left: `${pct * 100}%` as any, backgroundColor: colors.bgPrimary },
-                  ]}
-                />
-              ))}
-            </View>
-            {/* Band labels */}
-            <View style={styles.gaugeBandRow}>
-              {['On Lock', 'Fast Lane', 'Main Character', 'Loose Link'].map((b, i) => (
-                <Text
-                  key={b}
-                  style={[
-                    type.meta,
-                    {
-                      flex: 1,
-                      textAlign: i === 0 ? 'left' : i === 3 ? 'right' : 'center',
-                      color: b === safeBand ? safeColor : colors.textTertiary,
-                      fontFamily: b === safeBand ? 'Inter_700Bold' : 'Inter_600SemiBold',
-                    },
-                  ]}
-                >
-                  {b}
-                </Text>
-              ))}
-            </View>
+            ))}
+          </View>
+          {/* Band labels */}
+          <View style={styles.gaugeBandRow}>
+            {['On Lock', 'Fast Lane', 'Main Character', 'Loose Link'].map((b, i) => (
+              <Text
+                key={b}
+                style={[
+                  type.meta,
+                  {
+                    flex: 1,
+                    textAlign: i === 0 ? 'left' : i === 3 ? 'right' : 'center',
+                    color: b === safeBand ? safeColor : colors.textTertiary,
+                    fontFamily: b === safeBand ? 'Inter_700Bold' : 'Inter_600SemiBold',
+                  },
+                ]}
+              >
+                {b}
+              </Text>
+            ))}
           </View>
         </Animated.View>
 
-        {/* ── CTAs ── */}
+        {/* ── CTAs — 3 stacked full width ── */}
         <Animated.View entering={FadeInUp.delay(2000).duration(400)} style={styles.ctas}>
           <Pressable
             onPress={() => router.push('/leakability/breakdown')}
@@ -195,34 +178,32 @@ export default function ResultScreen() {
               { backgroundColor: safeColor, opacity: pressed ? 0.85 : 1 },
             ]}
           >
-            <Text style={[type.cardTitle, { color: '#FFFFFF' }]}>see breakdown →</Text>
+            <Text style={styles.ctaPrimaryText}>see breakdown →</Text>
           </Pressable>
 
-          <View style={styles.ctaRow}>
-            <Pressable
-              onPress={() => router.push('/learn/password-glow-up')}
-              style={({ pressed }) => [
-                styles.ctaSecondary,
-                { borderColor: colors.borderMid, opacity: pressed ? 0.7 : 1 },
-              ]}
-            >
-              <Text style={[type.body, { color: colors.textPrimary, fontFamily: 'Inter_700Bold', fontWeight: '700' }]}>
-                start learning
-              </Text>
-            </Pressable>
+          <Pressable
+            onPress={() => router.push('/learn/password-glow-up')}
+            style={({ pressed }) => [
+              styles.ctaSecondary,
+              { borderColor: colors.borderMid, opacity: pressed ? 0.7 : 1 },
+            ]}
+          >
+            <Text style={[styles.ctaSecondaryText, { color: colors.textPrimary }]}>
+              start learning
+            </Text>
+          </Pressable>
 
-            <Pressable
-              onPress={handleShare}
-              style={({ pressed }) => [
-                styles.ctaSecondary,
-                { borderColor: colors.borderMid, opacity: pressed ? 0.7 : 1 },
-              ]}
-            >
-              <Text style={[type.body, { color: colors.textPrimary, fontFamily: 'Inter_700Bold', fontWeight: '700' }]}>
-                share score
-              </Text>
-            </Pressable>
-          </View>
+          <Pressable
+            onPress={handleShare}
+            style={({ pressed }) => [
+              styles.ctaSecondary,
+              { borderColor: colors.borderMid, opacity: pressed ? 0.7 : 1 },
+            ]}
+          >
+            <Text style={[styles.ctaSecondaryText, { color: colors.textPrimary }]}>
+              share score
+            </Text>
+          </Pressable>
         </Animated.View>
       </ScrollView>
     </View>
@@ -230,28 +211,49 @@ export default function ResultScreen() {
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
   content: {
     flexGrow: 1,
   },
   scoreSection: {
-    marginBottom: 24,
+    marginBottom: 36,
   },
-  bandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+  scoreLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: '#9A9A9A',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  scoreNumber: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 80,
+    lineHeight: 84,
+    textAlign: 'center',
+  },
+  bandLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    letterSpacing: 0.8,
+    textAlign: 'center',
     marginTop: 8,
-    marginBottom: 16,
+    marginBottom: 4,
   },
-  bandPill: {
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+  personalityTitle: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 24,
+    lineHeight: 30,
+    color: '#0A0A0A',
+    textAlign: 'left',
+    marginTop: 32,
   },
-  gaugeCard: {
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 28,
+  gaugeSection: {
+    marginBottom: 36,
   },
   gaugeHeader: {
     flexDirection: 'row',
@@ -260,14 +262,15 @@ const styles = StyleSheet.create({
   },
   gaugeTrack: {
     height: 8,
-    borderRadius: 4,
+    borderRadius: 0,
+    backgroundColor: '#EBEBEB',
     overflow: 'visible',
-    marginBottom: 8,
+    marginBottom: 10,
     position: 'relative',
   },
   gaugeFill: {
     height: 8,
-    borderRadius: 4,
+    borderRadius: 0,
     position: 'absolute',
     left: 0,
     top: 0,
@@ -277,31 +280,35 @@ const styles = StyleSheet.create({
     width: 2,
     height: 8,
     top: 0,
+    backgroundColor: '#FFFFFF',
   },
   gaugeBandRow: {
     flexDirection: 'row',
-    marginTop: 8,
+    marginTop: 6,
   },
   ctas: {
-    gap: 10,
+    gap: 12,
   },
   ctaPrimary: {
     borderRadius: 50,
-    minHeight: 44,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
   },
-  ctaRow: {
-    flexDirection: 'row',
-    gap: 10,
+  ctaPrimaryText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
   },
   ctaSecondary: {
-    flex: 1,
     borderRadius: 50,
-    minHeight: 44,
+    height: 56,
     borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  ctaSecondaryText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
   },
 })
