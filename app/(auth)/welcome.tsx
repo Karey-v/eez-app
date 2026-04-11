@@ -15,7 +15,7 @@ import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window')
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 type Slide = {
   id: string
@@ -62,8 +62,6 @@ export default function WelcomeScreen() {
   const flatListRef = useRef<FlatList>(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
-  const currentSlide = SLIDES[activeIndex]
-
   function handleSkip() {
     router.replace('/(auth)/sign-up')
   }
@@ -78,69 +76,81 @@ export default function WelcomeScreen() {
     }
   }
 
-  function renderSlide({ item }: ListRenderItemInfo<Slide>) {
+  function renderSlide({ item, index }: ListRenderItemInfo<Slide>) {
     return (
       <View
         style={[
           styles.slide,
-          { width: SCREEN_WIDTH, backgroundColor: item.bgColor, paddingHorizontal: spacing.screenH },
+          { width: SCREEN_WIDTH, height: SCREEN_HEIGHT, backgroundColor: item.bgColor },
         ]}
       >
-        <Text
+        {/* Top bar: progress lines + skip — inside the slide so it inherits bgColor */}
+        <View
           style={[
-            styles.headline,
-            { color: item.textColor },
+            styles.topBar,
+            { paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH },
           ]}
         >
-          {item.headline}
-        </Text>
-        <Text
+          <View style={styles.progressLines}>
+            {SLIDES.map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.progressLine,
+                  {
+                    backgroundColor:
+                      i <= activeIndex ? item.textColor : 'rgba(128,128,128,0.3)',
+                  },
+                ]}
+              />
+            ))}
+          </View>
+
+          <Pressable
+            onPress={handleSkip}
+            hitSlop={16}
+            style={({ pressed }) => [styles.skipBtn, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <Text style={[styles.skipText, { color: item.subTextColor }]}>skip</Text>
+          </Pressable>
+        </View>
+
+        {/* Slide content */}
+        <View style={[styles.slideContent, { paddingHorizontal: spacing.screenH }]}>
+          <Text style={[styles.headline, { color: item.textColor }]}>
+            {item.headline}
+          </Text>
+          <Text style={[styles.subtext, { color: item.subTextColor }]}>
+            {item.body}
+          </Text>
+        </View>
+
+        {/* Bottom CTA — only on last slide, always reserves space */}
+        <View
           style={[
-            styles.subtext,
-            { color: item.subTextColor },
+            styles.bottom,
+            { paddingBottom: insets.bottom + 32, paddingHorizontal: spacing.screenH },
           ]}
         >
-          {item.body}
-        </Text>
+          {index === SLIDES.length - 1 && (
+            <Pressable
+              onPress={handleCTA}
+              style={({ pressed }) => [
+                styles.ctaButton,
+                { opacity: pressed ? 0.85 : 1 },
+              ]}
+            >
+              <Text style={styles.ctaText}>let's find out</Text>
+            </Pressable>
+          )}
+        </View>
       </View>
     )
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: currentSlide.bgColor }]}>
+    <View style={styles.container}>
       <StatusBar style="dark" />
-
-      {/* Top bar: progress lines + skip */}
-      <View
-        style={[
-          styles.topBar,
-          { paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH },
-        ]}
-      >
-        {/* Progress lines */}
-        <View style={styles.progressLines}>
-          {SLIDES.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.progressLine,
-                { backgroundColor: i <= activeIndex ? '#0A0A0A' : 'rgba(0,0,0,0.15)' },
-              ]}
-            />
-          ))}
-        </View>
-
-        {/* Skip */}
-        <Pressable
-          onPress={handleSkip}
-          hitSlop={16}
-          style={({ pressed }) => [styles.skipBtn, { opacity: pressed ? 0.6 : 1 }]}
-        >
-          <Text style={styles.skipText}>skip</Text>
-        </Pressable>
-      </View>
-
-      {/* Slides */}
       <FlatList
         ref={flatListRef}
         data={SLIDES}
@@ -152,28 +162,7 @@ export default function WelcomeScreen() {
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
         style={styles.flatList}
-        contentContainerStyle={{ alignItems: 'stretch' }}
       />
-
-      {/* Bottom CTA — only on last slide */}
-      <View
-        style={[
-          styles.bottom,
-          { paddingBottom: insets.bottom + 32, paddingHorizontal: spacing.screenH },
-        ]}
-      >
-        {activeIndex === SLIDES.length - 1 && (
-          <Pressable
-            onPress={handleCTA}
-            style={({ pressed }) => [
-              styles.ctaButton,
-              { opacity: pressed ? 0.85 : 1 },
-            ]}
-          >
-            <Text style={styles.ctaText}>let's find out</Text>
-          </Pressable>
-        )}
-      </View>
     </View>
   )
 }
@@ -181,6 +170,13 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#000',
+  },
+  flatList: {
+    flex: 1,
+  },
+  slide: {
+    // width + height set inline; backgroundColor set inline
   },
   topBar: {
     gap: 12,
@@ -200,12 +196,9 @@ const styles = StyleSheet.create({
   skipText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
-    color: '#9A9A9A',
   },
-  flatList: {
+  slideContent: {
     flex: 1,
-  },
-  slide: {
     justifyContent: 'flex-start',
     paddingTop: 48,
   },
