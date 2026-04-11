@@ -6,7 +6,9 @@
       "Bash(node -e \"require\\('./node_modules/react-native-svg'\\)\")",
       "Bash(npx tsc:*)",
       "Bash(echo \"exit:$?\")",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); deps={**d.get\\('dependencies',{}\\),**d.get\\('devDependencies',{}\\)}; [print\\(k,v\\) for k,v in sorted\\(deps.items\\(\\)\\) if any\\(x in k.lower\\(\\) for x in ['storage','store','persist','mmkv','secure']\\)]\")",
+      "Bash(node:*)"
     ]
   }
 }

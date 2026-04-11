@@ -27,8 +27,14 @@ export default function HomeScreen() {
   const { colors, type, spacing, brand } = useTheme()
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const { score, band, bandColor, name } = useUserStore()
+  // Individual selectors ensure the component re-renders only when each
+  // specific value changes, and avoids any stale-closure risk with the full store.
+  const score = useUserStore((s) => s.score)
+  const band = useUserStore((s) => s.band)
+  const bandColor = useUserStore((s) => s.bandColor)
+  const name = useUserStore((s) => s.name)
 
+  // score is number | null — null means the test has never been completed.
   const hasScore = score !== null
 
   return (

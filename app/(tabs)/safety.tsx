@@ -156,24 +156,28 @@ export default function SafetyScreen() {
           onPress={() => router.push('/safety/detector')}
           style={({ pressed }) => [
             styles.detectorCard,
-            { backgroundColor: brand.darkGreen, opacity: pressed ? 0.92 : 1 },
+            {
+              backgroundColor: colors.bgSecondary,
+              borderColor: colors.borderWeak,
+              opacity: pressed ? 0.85 : 1,
+            },
           ]}
         >
           <View style={styles.detectorTopRow}>
             <View style={styles.onlineRow}>
-              <PulseDot color="#B1FF58" size={8} />
-              <Text style={[type.label, { color: '#9FE8C4', marginLeft: 6 }]}>online</Text>
+              <PulseDot color={brand.purpleCTA} size={7} />
+              <Text style={[type.label, { color: colors.textTertiary, marginLeft: 6 }]}>online</Text>
             </View>
-            <ArrowIcon size={16} color="#9FE8C4" />
+            <ArrowIcon size={16} color={colors.textSecondary} />
           </View>
 
-          <Text style={[type.sectionHead, { color: '#FFFFFF', marginBottom: 6 }]}>
+          <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 4, fontSize: 14 }]}>
             EEZ Fraud Detector
           </Text>
-          <Text style={[type.body, { color: '#9FE8C4', lineHeight: 18 }]}>
+          <Text style={[type.body, { color: colors.textSecondary, lineHeight: 18 }]}>
             paste a message, email, or describe a situation — we'll tell you if something's off.
           </Text>
-          <Text style={[type.label, { color: '#B1FF58', marginTop: 14 }]}>try it now →</Text>
+          <Text style={[type.label, { color: brand.purpleCTA, marginTop: 12 }]}>try it now →</Text>
         </Pressable>
 
         {/* Emergency helplines */}
@@ -231,6 +235,7 @@ const styles = StyleSheet.create({
   },
   detectorCard: {
     borderRadius: 14,
+    borderWidth: 0.5,
     padding: 16,
   },
   detectorTopRow: {
