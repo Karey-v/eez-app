@@ -1,9 +1,8 @@
-// app/radar/map.tsx — Radar Map View (Skyview edition)
-// Real OSM tiles tiled to fill screen. 4 pulsing incident pins over NYC.
-// Tap pin → 160px slide-up compact card. Tap map → dismiss.
+// app/radar/map.tsx — Radar Map (stack route version)
+// Same visual as the tab default. Back navigation via header arrow.
 import { useState, useEffect } from 'react'
-import { View, Text, Pressable, StyleSheet, Dimensions, Image } from 'react-native'
-import Svg, { Line as SvgLine } from 'react-native-svg'
+import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native'
+import Svg, { Line as SvgLine, Circle, Path } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -17,7 +16,62 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
 
-// ─── List icon ────────────────────────────────────────────────────────────────
+// ─── SVG grid background ──────────────────────────────────────────────────────
+
+function GridBackground() {
+  const STEP = 48
+  const vLines: JSX.Element[] = []
+  const hLines: JSX.Element[] = []
+  for (let x = 0; x <= SCREEN_W; x += STEP) {
+    vLines.push(
+      <SvgLine key={`v${x}`} x1={x} y1={0} x2={x} y2={SCREEN_H}
+        stroke="rgba(255,255,255,0.045)" strokeWidth={0.5} />,
+    )
+  }
+  for (let y = 0; y <= SCREEN_H; y += STEP) {
+    hLines.push(
+      <SvgLine key={`h${y}`} x1={0} y1={y} x2={SCREEN_W} y2={y}
+        stroke="rgba(255,255,255,0.045)" strokeWidth={0.5} />,
+    )
+  }
+  return (
+    <Svg
+      width={SCREEN_W}
+      height={SCREEN_H}
+      style={StyleSheet.absoluteFillObject}
+      pointerEvents="none"
+    >
+      {vLines}
+      {hLines}
+    </Svg>
+  )
+}
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
+function SearchIcon({ color }: { color: string }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+      <Circle cx="8" cy="8" r="5" stroke={color} strokeWidth={1.5} />
+      <SvgLine x1="12" y1="12" x2="15.5" y2="15.5"
+        stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+    </Svg>
+  )
+}
+
+function MapPinIcon({ color }: { color: string }) {
+  return (
+    <Svg width={16} height={18} viewBox="0 0 16 18" fill="none">
+      <Path
+        d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5z"
+        stroke={color}
+        strokeWidth={1.4}
+        strokeLinejoin="round"
+      />
+      <Circle cx="8" cy="6" r="1.8" stroke={color} strokeWidth={1.2} />
+    </Svg>
+  )
+}
 
 function ListIcon({ color }: { color: string }) {
   return (
@@ -29,154 +83,122 @@ function ListIcon({ color }: { color: string }) {
   )
 }
 
-// ─── OSM tile grid ────────────────────────────────────────────────────────────
-// Base tile: z=12, x=2048, y=1360 (as specified)
-// Scale 3 columns to fill screen width; compute enough rows to fill height.
-
-const COLS = 3
-const BASE_X = 2047                      // left column (2047, 2048, 2049)
-const BASE_Y = 1356                      // start row — enough rows above center
-const TILE_PX = SCREEN_W / COLS         // each tile's rendered pixel size
-const ROWS = Math.ceil(SCREEN_H / TILE_PX) + 2  // fill height + buffer
-
-function tileUri(x: number, y: number) {
-  return `https://tile.openstreetmap.org/12/${x}/${y}.png`
-}
-
-// ─── Category → color map ────────────────────────────────────────────────────
-
-const CAT_COLOR: Record<string, string> = {
-  Phishing: '#602CFF',
-  Jobs:     '#FF732E',
-  Banks:    '#5B5CF6',
-  Identity: '#CC0000',
-  Payments: '#007549',
-}
-
-// ─── 4 fixed NYC incident pins ────────────────────────────────────────────────
+// ─── Pins ─────────────────────────────────────────────────────────────────────
 
 type Pin = {
   id: string
-  label: string        // label shown above dot
   category: string
   headline: string
   location: string
-  nx: number           // 0–1 across SCREEN_W, dot-center x
-  ny: number           // 0–1 across map height, dot-center y
+  time: string
+  nx: number
+  ny: number
+  size: 8 | 10 | 14
 }
 
 const PINS: Pin[] = [
   {
     id: 'p1',
-    label: 'Phishing',
     category: 'Phishing',
     headline: 'fake apple support email almost got me',
     location: 'Midtown, Manhattan',
+    time: '2h ago',
     nx: 0.50,
     ny: 0.28,
+    size: 14,
   },
   {
     id: 'p2',
-    label: 'Job Scam',
     category: 'Jobs',
     headline: 'linkedin job offer turned into a crypto trap',
     location: 'Brooklyn, NYC',
+    time: '5h ago',
     nx: 0.33,
     ny: 0.60,
+    size: 10,
   },
   {
     id: 'p3',
-    label: 'Bank Fraud',
     category: 'Banks',
     headline: '"fraud team" called and emptied my account',
     location: 'Harlem, Manhattan',
+    time: '1d ago',
     nx: 0.68,
     ny: 0.18,
+    size: 8,
   },
   {
     id: 'p4',
-    label: 'ID Theft',
     category: 'Identity',
     headline: 'my instagram got hacked after a "brand deal"',
     location: 'Queens, NYC',
+    time: '3h ago',
     nx: 0.80,
     ny: 0.47,
+    size: 10,
   },
 ]
 
 // ─── Pulsing dot ──────────────────────────────────────────────────────────────
 
 function PulsingDot({
-  color,
-  label,
+  size,
   active,
   onPress,
 }: {
-  color: string
-  label: string
+  size: number
   active: boolean
   onPress: () => void
 }) {
-  const ringScale = useSharedValue(1)
-  const ringOpacity = useSharedValue(0.8)
+  const opacity = useSharedValue(0.85)
 
   useEffect(() => {
-    ringScale.value = withRepeat(
+    opacity.value = withRepeat(
       withSequence(
-        withTiming(2.8, { duration: 1000 }),
-        withTiming(1,   { duration: 1000 }),
-      ),
-      -1,
-      false,
-    )
-    ringOpacity.value = withRepeat(
-      withSequence(
-        withTiming(0,   { duration: 1000 }),
-        withTiming(0.8, { duration: 1000 }),
+        withTiming(0.45, { duration: 900 }),
+        withTiming(0.85, { duration: 900 }),
       ),
       -1,
       false,
     )
   }, [])
 
-  const ringStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: ringScale.value }],
-    opacity: ringOpacity.value,
-  }))
+  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }))
+  const dotSize = active ? size + 4 : size
 
   return (
-    <View style={styles.pinStack}>
-      {/* Label chip */}
-      <View style={[styles.labelChip, active && { backgroundColor: color, borderColor: color }]}>
-        <Text style={[styles.labelText, active && { color: '#FFFFFF' }]}>
-          {label}
-        </Text>
-      </View>
-
-      {/* Dot + pulse ring */}
-      <Pressable onPress={onPress} hitSlop={16} style={styles.dotPressable}>
-        <Animated.View style={[styles.ring, { backgroundColor: color }, ringStyle]} />
-        <View style={[styles.core, { backgroundColor: color }, active && styles.coreActive]} />
-      </Pressable>
-    </View>
+    <Pressable onPress={onPress} hitSlop={20}>
+      <Animated.View
+        style={[
+          {
+            width: dotSize,
+            height: dotSize,
+            borderRadius: dotSize / 2,
+            backgroundColor: '#B1FF58',
+          },
+          active && styles.dotActive,
+          !active && animStyle,
+        ]}
+      />
+    </Pressable>
   )
 }
 
-// ─── Compact bottom card (160px, slides up) ───────────────────────────────────
+// ─── Popup card ───────────────────────────────────────────────────────────────
 
 const CARD_H = 160
+const CARD_BOTTOM_OFFSET = 88
 
 function BottomCard({
   pin,
-  bottomInset,
+  cardBottom,
 }: {
   pin: Pin | null
-  bottomInset: number
+  cardBottom: number
 }) {
   const router = useRouter()
-  const SLIDE_OFFSET = CARD_H + bottomInset + 32
+  const SLIDE_OFFSET = CARD_H + 60
   const translateY = useSharedValue(SLIDE_OFFSET)
-  // Keep last content so card retains content during slide-out
   const [content, setContent] = useState<Pin | null>(null)
 
   useEffect(() => {
@@ -194,33 +216,29 @@ function BottomCard({
 
   if (!content) return null
 
-  const color = CAT_COLOR[content.category] ?? '#5B5CF6'
-
   return (
-    <Animated.View
-      style={[styles.card, { paddingBottom: bottomInset + 14, borderTopColor: color }, cardStyle]}
-    >
-      {/* Pill + location */}
-      <View style={styles.cardTopRow}>
-        <View style={[styles.pill, { backgroundColor: color }]}>
-          <Text style={styles.pillText}>{content.category}</Text>
+    <Animated.View style={[styles.card, { bottom: cardBottom }, cardStyle]}>
+      <View style={styles.cardAccent} />
+      <View style={styles.cardBody}>
+        <View style={styles.cardTopRow}>
+          <View style={styles.cardPill}>
+            <Text style={styles.cardPillText}>{content.category}</Text>
+          </View>
+          <Text style={styles.cardMeta} numberOfLines={1}>
+            {content.location} · {content.time}
+          </Text>
         </View>
-        <Text style={styles.cardLoc} numberOfLines={1}>{content.location}</Text>
+        <Text style={styles.cardHeadline} numberOfLines={2}>
+          {content.headline}
+        </Text>
+        <Pressable
+          onPress={() => router.push('/radar/feed')}
+          hitSlop={10}
+          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, alignSelf: 'flex-start' })}
+        >
+          <Text style={styles.viewLink}>view report →</Text>
+        </Pressable>
       </View>
-
-      {/* Headline */}
-      <Text style={styles.cardHeadline} numberOfLines={2}>
-        {content.headline}
-      </Text>
-
-      {/* view report link */}
-      <Pressable
-        onPress={() => router.push('/radar/feed')}
-        hitSlop={10}
-        style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, alignSelf: 'flex-start' })}
-      >
-        <Text style={[styles.viewLink, { color }]}>view report →</Text>
-      </Pressable>
     </Animated.View>
   )
 }
@@ -234,84 +252,41 @@ export default function RadarMapScreen() {
 
   const HEADER_H = insets.top + 56
   const MAP_H = SCREEN_H - HEADER_H
-
-  // Build tile grid
-  const tiles: { key: string; uri: string; col: number; row: number }[] = []
-  for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLS; col++) {
-      const x = BASE_X + col
-      const y = BASE_Y + row
-      tiles.push({ key: `${x}/${y}`, uri: tileUri(x, y), col, row })
-    }
-  }
-
-  const handleMapPress = () => setSelected(null)
+  const cardBottom = insets.bottom + CARD_BOTTOM_OFFSET
 
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
 
-      {/* ── Header ── */}
+      <GridBackground />
+
+      {/* Header — "radar." + back arrow */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.backBtn}>
-          <Text style={styles.backText}>← back</Text>
+        <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backBtn}>
+          <Text style={styles.backText}>←</Text>
         </Pressable>
-        <Text style={styles.headerTitle}>incident map</Text>
-        <Pressable
-          onPress={() => router.push('/radar/feed')}
-          hitSlop={8}
-          style={styles.feedBtn}
-        >
-          <ListIcon color="rgba(255,255,255,0.7)" />
+        <Text style={styles.headerTitle}>radar.</Text>
+        <Pressable hitSlop={12} style={styles.searchBtn}>
+          <SearchIcon color="rgba(255,255,255,0.5)" />
         </Pressable>
       </View>
 
-      {/* ── Map area ── */}
-      <Pressable style={styles.mapArea} onPress={handleMapPress}>
-
-        {/* OSM tile grid */}
-        <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-          {tiles.map(({ key, uri, col, row }) => (
-            <Image
-              key={key}
-              source={{ uri }}
-              style={{
-                position: 'absolute',
-                left: col * TILE_PX,
-                top:  row * TILE_PX,
-                width:  TILE_PX + 1,   // +1 closes seam between tiles
-                height: TILE_PX + 1,
-              }}
-              resizeMode="cover"
-            />
-          ))}
-        </View>
-
-        {/* Dark Skyview overlay */}
-        <View style={styles.overlay} pointerEvents="none" />
-
-        {/* Pins — pointer-events pass through to map except on dot itself */}
+      {/* Map area */}
+      <Pressable style={{ flex: 1 }} onPress={() => setSelected(null)}>
         {PINS.map((pin) => {
-          const color = CAT_COLOR[pin.category]
-          // Position so the dot core center lands at (nx, ny) of map area.
-          // pinStack is ~(label chip ~22px) + gap 5 + (dot 32px) tall.
-          // Offset top so the dot center (32/2=16 below label+gap) aligns with ny*MAP_H.
-          const CHIP_H = 22
-          const CHIP_GAP = 5
-          const DOT_HALF = 16
+          const half = pin.size / 2 + 2
           return (
             <View
               key={pin.id}
               pointerEvents="box-none"
               style={{
                 position: 'absolute',
-                left:  pin.nx * SCREEN_W - DOT_HALF,
-                top:   pin.ny * MAP_H - CHIP_H - CHIP_GAP - DOT_HALF,
+                left: pin.nx * SCREEN_W - half,
+                top: pin.ny * MAP_H - half,
               }}
             >
               <PulsingDot
-                color={color}
-                label={pin.label}
+                size={pin.size}
                 active={selected?.id === pin.id}
                 onPress={() => setSelected(selected?.id === pin.id ? null : pin)}
               />
@@ -320,8 +295,25 @@ export default function RadarMapScreen() {
         })}
       </Pressable>
 
-      {/* ── Compact slide-up card ── */}
-      <BottomCard pin={selected} bottomInset={insets.bottom} />
+      <BottomCard pin={selected} cardBottom={cardBottom} />
+
+      {/* Bottom toggle pill */}
+      <View
+        style={[styles.toggleContainer, { bottom: insets.bottom + 20 }]}
+        pointerEvents="box-none"
+      >
+        <View style={styles.togglePill}>
+          <Pressable style={styles.toggleOption}>
+            <MapPinIcon color="#FFFFFF" />
+          </Pressable>
+          <Pressable
+            style={styles.toggleOption}
+            onPress={() => router.push('/radar/feed')}
+          >
+            <ListIcon color="#666666" />
+          </Pressable>
+        </View>
+      </View>
     </View>
   )
 }
@@ -331,143 +323,121 @@ export default function RadarMapScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#1A2332',
   },
-
-  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 12,
-    paddingHorizontal: 14,
-    backgroundColor: '#0A0A0A',
-    borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(255,255,255,0.08)',
+    paddingBottom: 14,
+    paddingHorizontal: 20,
     zIndex: 10,
   },
   backBtn: {
-    width: 60,
-    minHeight: 44,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   backText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 14,
+    fontSize: 18,
     color: 'rgba(255,255,255,0.55)',
   },
-  feedBtn: {
+  headerTitle: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 22,
+    color: '#FFFFFF',
+  },
+  searchBtn: {
     width: 36,
     height: 36,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 15,
-    color: '#F5F5F5',
-    letterSpacing: 0.2,
+  dotActive: {
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
-
-  // Map
-  mapArea: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(4,4,8,0.52)',
-  },
-
-  // Pin
-  pinStack: {
-    alignItems: 'center',
-    gap: 5,
-  },
-  labelChip: {
-    backgroundColor: 'rgba(10,10,10,0.72)',
-    borderRadius: 7,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.18)',
-  },
-  labelText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 10,
-    color: '#E8E8E8',
-    letterSpacing: 0.3,
-  },
-  dotPressable: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ring: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-  },
-  core: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  coreActive: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-
-  // Bottom card
   card: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: CARD_H + 40,   // CARD_H + max bottom inset buffer
-    backgroundColor: '#111114',
-    borderTopWidth: 2,
-    paddingTop: 14,
-    paddingHorizontal: 20,
-    gap: 8,
+    left: 20,
+    right: 20,
+    height: CARD_H,
+    backgroundColor: '#1A2332',
+    borderRadius: 14,
+    overflow: 'hidden',
     zIndex: 20,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  cardAccent: {
+    height: 2,
+    backgroundColor: '#B1FF58',
+  },
+  cardBody: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 14,
+    justifyContent: 'space-between',
   },
   cardTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  pill: {
+  cardPill: {
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 3,
+    backgroundColor: '#B1FF58',
   },
-  pillText: {
+  cardPillText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
-    color: '#FFFFFF',
+    color: '#1A4A00',
     letterSpacing: 0.2,
   },
-  cardLoc: {
+  cardMeta: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.45)',
+    fontSize: 11,
+    color: '#666666',
     flex: 1,
   },
   cardHeadline: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 15,
-    color: '#F0F0F0',
-    lineHeight: 22,
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: '#FFFFFF',
+    lineHeight: 20,
   },
   viewLink: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
+    fontSize: 12,
+    color: '#B1FF58',
     letterSpacing: 0.2,
+  },
+  toggleContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 30,
+  },
+  togglePill: {
+    flexDirection: 'row',
+    backgroundColor: '#0A0A0A',
+    height: 56,
+    borderRadius: 28,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    gap: 4,
+  },
+  toggleOption: {
+    width: 56,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })

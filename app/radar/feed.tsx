@@ -1,7 +1,7 @@
-// Radar Feed — secondary view accessed from the incident map
-// Full incident feed with filters, upvotes, and report FAB.
+// Radar Feed — incident list with filters, upvotes, report FAB, bottom toggle pill.
 import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
+import Svg, { Line as SvgLine, Circle, Path } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -15,7 +15,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { useRadarStore } from '@/store/radarStore'
 import { Toast } from '@/components/ui/Toast'
-import { ArrowIcon } from '@/components/icons/Arrow'
 import type { IncidentCard } from '@/data/radarFeed'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -30,7 +29,33 @@ const CATEGORY_COLORS: Record<string, string> = {
   Phishing: '#602CFF',
 }
 
-// ─── Blinking dot ─────────────────────────────────────────────────────────────
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
+function MapPinIcon({ color }: { color: string }) {
+  return (
+    <Svg width={16} height={18} viewBox="0 0 16 18" fill="none">
+      <Path
+        d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5z"
+        stroke={color}
+        strokeWidth={1.4}
+        strokeLinejoin="round"
+      />
+      <Circle cx="8" cy="6" r="1.8" stroke={color} strokeWidth={1.2} />
+    </Svg>
+  )
+}
+
+function ListIcon({ color }: { color: string }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+      <SvgLine x1="3" y1="5" x2="15" y2="5" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+      <SvgLine x1="3" y1="9" x2="15" y2="9" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+      <SvgLine x1="3" y1="13" x2="15" y2="13" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+    </Svg>
+  )
+}
+
+// ─── Blinking live dot ────────────────────────────────────────────────────────
 
 function BlinkDot() {
   const opacity = useSharedValue(1)
@@ -51,12 +76,11 @@ function BlinkDot() {
 // ─── Category tag ─────────────────────────────────────────────────────────────
 
 function CategoryTag({ category, avoided }: { category: string; avoided: boolean }) {
-  const { type } = useTheme()
   const bg = avoided ? '#B8F04A' : (CATEGORY_COLORS[category] ?? '#5B5CF6')
   const color = avoided ? '#1A4A00' : '#FFFFFF'
   return (
     <View style={[styles.tag, { backgroundColor: bg }]}>
-      <Text style={[type.meta, { color }]}>{avoided ? 'avoided' : category}</Text>
+      <Text style={[styles.tagText, { color }]}>{avoided ? 'avoided' : category}</Text>
     </View>
   )
 }
@@ -74,51 +98,47 @@ function IncidentCardView({
   onPress: () => void
   onUpvote: () => void
 }) {
-  const { colors, type } = useTheme()
-
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.card,
-        { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak, opacity: pressed ? 0.9 : 1 },
-      ]}
+      style={({ pressed }) => [styles.card, { opacity: pressed ? 0.9 : 1 }]}
     >
       <View style={styles.tagRow}>
         <CategoryTag category={card.category} avoided={card.variant === 'avoided'} />
         {card.verified && (
-          <View style={[styles.verifiedBadge, { backgroundColor: colors.bgSecondary }]}>
-            <Text style={[type.meta, { color: colors.successText }]}>✓ verified</Text>
+          <View style={styles.verifiedBadge}>
+            <Text style={styles.verifiedText}>✓ verified</Text>
           </View>
         )}
       </View>
-      <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 8, lineHeight: 18 }]}>
+
+      <Text style={styles.cardHeadline} numberOfLines={2}>
         {card.headline}
       </Text>
-      <Text style={[type.meta, { color: colors.textTertiary, marginTop: 4 }]}>
-        {card.location} · {card.timestamp}
+
+      <Text style={styles.cardMeta}>
+        {card.location.toUpperCase()} · {card.timestamp.toUpperCase()}
       </Text>
-      <Text
-        style={[type.body, { color: colors.textSecondary, marginTop: 8, lineHeight: 18 }]}
-        numberOfLines={3}
-      >
+
+      <Text style={styles.cardPreview} numberOfLines={3}>
         {card.preview}
       </Text>
+
       <View style={styles.engagementRow}>
         <Pressable
           onPress={(e) => { e.stopPropagation?.(); onUpvote() }}
           hitSlop={8}
           style={styles.engagementItem}
         >
-          <Text style={[type.meta, { color: upvoted ? '#5B5CF6' : colors.textTertiary }]}>
+          <Text style={[styles.engagementText, upvoted && styles.engagementActive]}>
             ▲ {card.upvotes + (upvoted ? 1 : 0)}
           </Text>
         </Pressable>
         <View style={styles.engagementItem}>
-          <Text style={[type.meta, { color: colors.textTertiary }]}>💬 {card.comments}</Text>
+          <Text style={styles.engagementText}>💬 {card.comments}</Text>
         </View>
         <View style={styles.engagementItem}>
-          <Text style={[type.meta, { color: colors.textTertiary }]}>👁 seen this</Text>
+          <Text style={styles.engagementText}>👁 seen this</Text>
         </View>
       </View>
     </Pressable>
@@ -128,7 +148,7 @@ function IncidentCardView({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function RadarFeedScreen() {
-  const { colors, type, spacing, brand } = useTheme()
+  const { brand } = useTheme()
   const insets = useSafeAreaInsets()
   const router = useRouter()
 
@@ -147,7 +167,7 @@ export default function RadarFeedScreen() {
     activeFilter === 'All' ? feed : feed.filter((c) => c.category === activeFilter)
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
+    <View style={styles.root}>
       <StatusBar style="dark" />
 
       <ScrollView
@@ -155,27 +175,20 @@ export default function RadarFeedScreen() {
         contentContainerStyle={{
           paddingTop: insets.top + 20,
           paddingBottom: insets.bottom + 100,
-          paddingHorizontal: spacing.screenH,
+          paddingHorizontal: 24,
         }}
       >
         {/* Header */}
-        <View style={[styles.headerRow, { justifyContent: 'space-between' }]}>
+        <View style={styles.headerRow}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Text style={[type.heroTitle, { color: colors.textPrimary }]}>radar.</Text>
+            <Text style={styles.headerTitle}>radar.</Text>
             <BlinkDot />
           </View>
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={8}
-            style={[styles.backBtn, { backgroundColor: colors.bgSecondary }]}
-          >
-            <ArrowIcon size={16} color={colors.textSecondary} direction="left" />
-          </Pressable>
         </View>
 
         {/* Search bar (visual only) */}
-        <View style={[styles.searchBar, { backgroundColor: colors.bgSecondary }]}>
-          <Text style={[type.body, { color: colors.textTertiary }]}>search incidents…</Text>
+        <View style={styles.searchBar}>
+          <Text style={styles.searchPlaceholder}>search incidents…</Text>
         </View>
 
         {/* Filter chips */}
@@ -190,15 +203,13 @@ export default function RadarFeedScreen() {
               onPress={() => setActiveFilter(f)}
               style={[
                 styles.filterChip,
-                {
-                  backgroundColor: activeFilter === f ? brand.purpleCTA : colors.bgSecondary,
-                },
+                activeFilter === f && styles.filterChipActive,
               ]}
             >
               <Text
                 style={[
-                  type.label,
-                  { color: activeFilter === f ? '#FFFFFF' : colors.textTertiary },
+                  styles.filterChipText,
+                  activeFilter === f && styles.filterChipTextActive,
                 ]}
               >
                 {f}
@@ -210,11 +221,11 @@ export default function RadarFeedScreen() {
         {/* Feed */}
         {filteredFeed.length === 0 ? (
           <View style={{ alignItems: 'center', marginTop: 48 }}>
-            <Text style={[type.body, { color: colors.textTertiary }]}>no reports in this category yet.</Text>
+            <Text style={styles.emptyText}>no reports in this category yet.</Text>
           </View>
         ) : (
           filteredFeed.map((card) => (
-            <View key={card.id} style={{ marginBottom: spacing.cardGap }}>
+            <View key={card.id} style={styles.cardGap}>
               <IncidentCardView
                 card={card}
                 upvoted={upvoted.includes(card.id)}
@@ -226,16 +237,36 @@ export default function RadarFeedScreen() {
         )}
       </ScrollView>
 
-      {/* FAB */}
+      {/* FAB — report */}
       <Pressable
         onPress={() => router.push('/radar/report')}
         style={({ pressed }) => [
           styles.fab,
-          { backgroundColor: brand.purpleCTA, bottom: insets.bottom + 16, opacity: pressed ? 0.85 : 1 },
+          { backgroundColor: brand.purpleCTA, bottom: insets.bottom + 90, opacity: pressed ? 0.85 : 1 },
         ]}
       >
-        <Text style={[type.cardTitle, { color: '#FFFFFF' }]}>report something? →</Text>
+        <Text style={styles.fabText}>report something? →</Text>
       </Pressable>
+
+      {/* Bottom toggle pill — list active, map inactive */}
+      <View
+        style={[styles.toggleContainer, { bottom: insets.bottom + 20 }]}
+        pointerEvents="box-none"
+      >
+        <View style={styles.togglePill}>
+          {/* Map — inactive */}
+          <Pressable
+            style={styles.toggleOption}
+            onPress={() => router.replace('/(tabs)/radar')}
+          >
+            <MapPinIcon color="#666666" />
+          </Pressable>
+          {/* List — active */}
+          <Pressable style={styles.toggleOption}>
+            <ListIcon color="#FFFFFF" />
+          </Pressable>
+        </View>
+      </View>
 
       {/* Toast */}
       <Toast
@@ -248,19 +279,23 @@ export default function RadarFeedScreen() {
   )
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#F5F5F7',
+  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
     marginBottom: 14,
   },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+  headerTitle: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 28,
+    color: '#0A0A0A',
   },
   blinkDot: {
     width: 8,
@@ -272,8 +307,14 @@ const styles = StyleSheet.create({
   searchBar: {
     borderRadius: 12,
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     marginBottom: 14,
+    backgroundColor: '#EBEBEB',
+  },
+  searchPlaceholder: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#9A9A9A',
   },
   filterRow: {
     gap: 8,
@@ -284,42 +325,134 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 6,
     paddingHorizontal: 12,
+    backgroundColor: '#EBEBEB',
+  },
+  filterChipActive: {
+    backgroundColor: '#0A0A0A',
+  },
+  filterChipText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: '#5A5A5A',
+  },
+  filterChipTextActive: {
+    color: '#FFFFFF',
+  },
+  // ── Incident card ──
+  cardGap: {
+    marginBottom: 10,
   },
   card: {
     borderRadius: 14,
     borderWidth: 0.5,
-    padding: 14,
+    borderColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: '#FFFFFF',
+    padding: 16,
   },
   tagRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginBottom: 8,
   },
   tag: {
     borderRadius: 20,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
+  tagText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    letterSpacing: 0.2,
+  },
   verifiedBadge: {
     borderRadius: 20,
     paddingHorizontal: 8,
     paddingVertical: 3,
+    backgroundColor: '#F0F0F0',
+  },
+  verifiedText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    color: '#007549',
+  },
+  cardHeadline: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#0A0A0A',
+    marginBottom: 5,
+  },
+  cardMeta: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 10,
+    letterSpacing: 0.4,
+    color: '#9A9A9A',
+    marginBottom: 8,
+  },
+  cardPreview: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#5A5A5A',
+    marginBottom: 12,
   },
   engagementRow: {
     flexDirection: 'row',
     gap: 16,
-    marginTop: 12,
   },
   engagementItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  engagementText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 10,
+    color: '#9A9A9A',
+  },
+  engagementActive: {
+    color: '#5B5CF6',
+  },
+  emptyText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#9A9A9A',
+  },
+  // ── FAB ──
   fab: {
     position: 'absolute',
-    right: 14,
+    right: 20,
     borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 18,
-    shadowColor: 'transparent',
+  },
+  fabText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 13,
+    color: '#FFFFFF',
+  },
+  // ── Toggle pill ──
+  toggleContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 30,
+  },
+  togglePill: {
+    flexDirection: 'row',
+    backgroundColor: '#0A0A0A',
+    height: 56,
+    borderRadius: 28,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    gap: 4,
+  },
+  toggleOption: {
+    width: 56,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })
