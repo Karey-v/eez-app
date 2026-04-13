@@ -2,6 +2,7 @@
 // Renders first-time or returning view based on userStore.score
 import { useEffect } from 'react'
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native'
+import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -17,8 +18,29 @@ import { useUserStore } from '@/store/userStore'
 import { EezLogo } from '@/components/icons/EezLogo'
 import { BellIcon } from '@/components/icons/Bell'
 import { ArrowIcon } from '@/components/icons/Arrow'
+import { ShieldIcon } from '@/components/icons/Shield'
 import { Card } from '@/components/ui/Card'
 import { radarFeed } from '@/data/radarFeed'
+
+const BAND_PERSONALITY: Record<string, string> = {
+  'On Lock':        "You're a Vault.",
+  'Fast Lane':      "You're a Quick Check.",
+  'Main Character': "You're an Open Book.",
+  'Loose Link':     "You're a Wide Open Tab.",
+}
+
+const BAND_RANK: Record<string, number> = {
+  'On Lock': 1,
+  'Fast Lane': 2,
+  'Main Character': 3,
+  'Loose Link': 4,
+}
+
+function formatTestDate(isoString: string | null): string {
+  if (!isoString) return '—'
+  const date = new Date(isoString)
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
 
 export default function HomeScreen() {
   const { colors, type, spacing, brand } = useTheme()
@@ -28,6 +50,7 @@ export default function HomeScreen() {
   const band = useUserStore((s) => s.band)
   const bandColor = useUserStore((s) => s.bandColor)
   const name = useUserStore((s) => s.name)
+  const lastTestDate = useUserStore((s) => s.lastTestDate)
 
   const hasScore = score !== null
 
@@ -60,7 +83,17 @@ export default function HomeScreen() {
         </View>
 
         <View style={{ paddingHorizontal: spacing.screenH, gap: spacing.cardGap }}>
-          {hasScore ? <ReturningView score={score!} band={band!} bandColor={bandColor!} router={router} /> : <FirstTimeView router={router} />}
+          {hasScore ? (
+            <ReturningView
+              score={score!}
+              band={band!}
+              bandColor={bandColor!}
+              lastTestDate={lastTestDate}
+              router={router}
+            />
+          ) : (
+            <FirstTimeView router={router} />
+          )}
         </View>
       </ScrollView>
     </View>
@@ -70,58 +103,47 @@ export default function HomeScreen() {
 // ─── First-time view (S10) ───────────────────────────────────────────────────
 
 function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
-  const { type, spacing, brand } = useTheme()
+  const { spacing, brand } = useTheme()
 
   return (
     <>
-      {/* Hero card */}
+      {/* Hero card — lime, centered score placeholder */}
       <View style={[styles.heroCard, { backgroundColor: brand.lime }]}>
-        <Text style={styles.heroHeadline}>
-          so... how leakable{'\n'}are you?
-        </Text>
-        <Text style={styles.heroSubtext}>
-          1 in 3 Gen Zers have been scammed online. take the 5-min test and find out where you stand.
-        </Text>
-
-        {/* Stat chips */}
-        <View style={styles.statChipRow}>
-          <View style={styles.statChip}>
-            <Text style={styles.statChipText}>5 mins</Text>
-          </View>
-          <View style={styles.statChip}>
-            <Text style={styles.statChipText}>totally private</Text>
-          </View>
+        <View style={styles.heroCardInner}>
+          <ShieldIcon size={48} color="#1A4A00" strokeWidth={1.5} />
+          <Text style={styles.heroQuestion}>?</Text>
+          <Text style={styles.heroHint}>take the test to find out</Text>
         </View>
-
-        {/* CTA */}
-        <Pressable
-          onPress={() => router.push('/leakability/intro')}
-          style={({ pressed }) => [styles.heroCTA, { opacity: pressed ? 0.88 : 1 }]}
-        >
-          <Text style={styles.heroCTAText}>take the test</Text>
-        </Pressable>
       </View>
+
+      {/* CTA below card */}
+      <Pressable
+        onPress={() => router.push('/leakability/intro')}
+        style={({ pressed }) => [styles.heroCTA, { opacity: pressed ? 0.88 : 1 }]}
+      >
+        <Text style={styles.heroCTAText}>take the test</Text>
+      </Pressable>
 
       {/* AI Fraud Detector */}
       <FraudDetectorCard router={router} />
 
       {/* Latest radar snippet */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#9A9A9A', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[{ fontFamily: 'Inter_600SemiBold', fontSize: 11, letterSpacing: 0.4, textTransform: 'uppercase' as const }, { color: '#9A9A9A', marginBottom: spacing.sectionBottom }]}>
           latest from radar
         </Text>
         <Card onPress={() => router.push('/(tabs)/radar')} style={styles.radarSnippet}>
           <View style={styles.radarRow}>
-            <View style={[styles.categoryDot, { backgroundColor: brand.purpleCTA }]} />
-            <Text style={[type.label, { color: brand.purpleCTA }]}>phishing</Text>
-            <Text style={[type.meta, { color: '#9A9A9A', marginLeft: 'auto' as any }]}>
+            <View style={[styles.categoryDot, { backgroundColor: '#5B5CF6' }]} />
+            <Text style={[{ fontFamily: 'Inter_600SemiBold', fontSize: 11, letterSpacing: 0.4, textTransform: 'uppercase' as const }, { color: '#5B5CF6' }]}>phishing</Text>
+            <Text style={[{ fontFamily: 'Inter_400Regular', fontSize: 11, color: '#9A9A9A' }, { marginLeft: 'auto' as any }]}>
               {radarFeed[0].timestamp}
             </Text>
           </View>
-          <Text style={[type.cardTitle, { color: '#0A0A0A', marginTop: 6 }]}>
+          <Text style={[{ fontFamily: 'Inter_600SemiBold', fontSize: 15, lineHeight: 21 }, { color: '#0A0A0A', marginTop: 6 }]}>
             {radarFeed[0].headline}
           </Text>
-          <Text style={[type.bodySmall, { color: '#5A5A5A', marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
+          <Text style={[{ fontFamily: 'Inter_400Regular', fontSize: 13, lineHeight: 19 }, { color: '#5A5A5A', marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
             {radarFeed[0].preview}
           </Text>
         </Card>
@@ -132,18 +154,90 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
 
 // ─── Returning view (S11) ────────────────────────────────────────────────────
 
+function BandIllustration({ band }: { band: string }) {
+  const stroke = 'rgba(255,255,255,0.9)'
+  const sw = 1.5
+  const size = 44
+
+  if (band === 'On Lock') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
+        <Rect x={8} y={22} width={28} height={18} rx={4} stroke={stroke} strokeWidth={sw} />
+        <Path
+          d="M13 22V17C13 9 31 9 31 17V22"
+          stroke={stroke}
+          strokeWidth={sw}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <Circle cx={22} cy={31} r={3} stroke={stroke} strokeWidth={sw} />
+      </Svg>
+    )
+  }
+
+  if (band === 'Fast Lane') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
+        <Path
+          d="M25 4L11 24H21L19 40L33 20H23L25 4Z"
+          stroke={stroke}
+          strokeWidth={sw}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </Svg>
+    )
+  }
+
+  if (band === 'Main Character') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
+        <Path
+          d="M22 4L25.5 14H36L27.5 20L30.5 30L22 24L13.5 30L16.5 20L8 14H18.5L22 4Z"
+          stroke={stroke}
+          strokeWidth={sw}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </Svg>
+    )
+  }
+
+  // Loose Link — two chain ovals offset
+  return (
+    <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
+      <Path
+        d="M4 18C4 13 8 10 13 10H20C25 10 29 13 29 18C29 23 25 26 20 26H13C8 26 4 23 4 18Z"
+        stroke={stroke}
+        strokeWidth={sw}
+      />
+      <Path
+        d="M15 26C15 21 19 18 24 18H31C36 18 40 21 40 26C40 31 36 34 31 34H24C19 34 15 31 15 26Z"
+        stroke={stroke}
+        strokeWidth={sw}
+      />
+    </Svg>
+  )
+}
+
 function ReturningView({
   score,
   band,
   bandColor,
+  lastTestDate,
   router,
 }: {
   score: number
   band: string
   bandColor: string
+  lastTestDate: string | null
   router: ReturnType<typeof useRouter>
 }) {
   const { colors, type, spacing } = useTheme()
+
+  const personality = BAND_PERSONALITY[band] ?? ''
+  const rank = BAND_RANK[band] ?? '—'
+  const testDate = formatTestDate(lastTestDate)
 
   const quickActions = [
     { label: 'retake test', onPress: () => router.push('/leakability/intro') },
@@ -162,24 +256,32 @@ function ReturningView({
           { backgroundColor: bandColor, opacity: pressed ? 0.92 : 1 },
         ]}
       >
-        <Text style={[type.label, { color: 'rgba(255,255,255,0.7)', marginBottom: 4 }]}>
-          your leakability score
-        </Text>
-        <Text style={{ fontFamily: 'DMSerifDisplay_400Regular', fontSize: 64, color: '#FFFFFF', lineHeight: 72 }}>
-          {score}
-        </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-          <Text style={[type.cardTitle, { color: '#FFFFFF', textTransform: 'uppercase', letterSpacing: 0.6 }]}>
-            {band}
-          </Text>
-          <View style={styles.outOf}>
-            <Text style={[type.bodySmall, { color: 'rgba(255,255,255,0.6)' }]}>out of 48</Text>
+        <View style={styles.scoreRow}>
+          <BandIllustration band={band} />
+          <View style={styles.scoreCenter}>
+            <Text style={styles.scoreBig}>{score}</Text>
+            <Text style={styles.scoreBandLabel}>{band.toUpperCase()}</Text>
           </View>
         </View>
-        <Text style={[type.bodySmall, { color: 'rgba(255,255,255,0.65)', marginTop: 12 }]}>
-          tap to see full breakdown →
-        </Text>
+        <Text style={styles.scorePersonality}>{personality}</Text>
+        <Text style={styles.scoreTapHint}>tap to see full breakdown →</Text>
       </Pressable>
+
+      {/* Stats row */}
+      <View style={styles.statsRow}>
+        <View style={[styles.statCard, { backgroundColor: colors.bgPrimary }]}>
+          <Text style={[styles.statValue, { color: colors.textPrimary }]}>{score}</Text>
+          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>out of 48</Text>
+        </View>
+        <View style={[styles.statCard, { backgroundColor: colors.bgPrimary }]}>
+          <Text style={[styles.statValue, { color: colors.textPrimary }]}>#{rank}</Text>
+          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>band rank</Text>
+        </View>
+        <View style={[styles.statCard, { backgroundColor: colors.bgPrimary }]}>
+          <Text style={[styles.statValue, { color: colors.textPrimary }]}>{testDate}</Text>
+          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>last tested</Text>
+        </View>
+      </View>
 
       {/* AI Fraud Detector */}
       <FraudDetectorCard router={router} />
@@ -286,43 +388,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 16,
   },
+  // First-time
   heroCard: {
     borderRadius: 20,
     padding: 24,
   },
-  heroHeadline: {
+  heroCardInner: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    gap: 12,
+  },
+  heroQuestion: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 32,
-    lineHeight: 38,
+    fontSize: 64,
+    lineHeight: 72,
     fontWeight: '400',
     color: '#1A4A00',
-    marginBottom: 10,
   },
-  heroSubtext: {
+  heroHint: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#2D6A00',
-    marginBottom: 20,
-  },
-  statChipRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 20,
-  },
-  statChip: {
-    flex: 1,
-    backgroundColor: '#D2D9FF',
-    borderRadius: 50,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statChipText: {
-    fontFamily: 'Inter_600SemiBold',
     fontSize: 12,
-    color: '#0A0A0A',
-    letterSpacing: 0.2,
+    color: '#2D6A00',
   },
   heroCTA: {
     backgroundColor: '#5B5CF6',
@@ -348,15 +434,70 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
+  // Returning
   scoreCard: {
     borderRadius: 16,
     padding: 20,
   },
-  outOf: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 20,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+  scoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  scoreCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  scoreBig: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 72,
+    lineHeight: 80,
+    fontWeight: '400',
+    color: '#FFFFFF',
+  },
+  scoreBandLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginTop: 2,
+  },
+  scorePersonality: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.85)',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  scoreTapHint: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  statCard: {
+    flex: 1,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    gap: 2,
+  },
+  statValue: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 20,
+    fontWeight: '400',
+  },
+  statLabel: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
   },
   quickActionCard: {
     borderRadius: 12,
