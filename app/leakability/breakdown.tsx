@@ -90,7 +90,7 @@ export default function BreakdownScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -133,7 +133,7 @@ export default function BreakdownScreen() {
               <View
                 style={[
                   styles.categoryCard,
-                  { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak },
+                  { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak },
                 ]}
               >
                 {/* Header row */}
@@ -163,6 +163,7 @@ export default function BreakdownScreen() {
                   fillColor={
                     rawScore <= 2 ? colors.successText : rawScore <= 4 ? colors.warningText : colors.dangerText
                   }
+                  trackColor="rgba(255,255,255,0.1)"
                   delay={index * 100}
                   style={{ marginBottom: 10, marginTop: 10 }}
                 />

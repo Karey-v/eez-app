@@ -7,11 +7,12 @@ type Props = {
   progress: number   // 0–1
   height?: number
   fillColor?: string
+  trackColor?: string
   delay?: number     // ms delay before animating (for staggered reveals)
   style?: object
 }
 
-export function ProgressBar({ progress, height = 2, fillColor = '#5B5CF6', delay = 0, style }: Props) {
+export function ProgressBar({ progress, height = 2, fillColor = '#5B5CF6', trackColor, delay = 0, style }: Props) {
   const { colors } = useTheme()
   const width = useSharedValue(0)
 
@@ -35,7 +36,7 @@ export function ProgressBar({ progress, height = 2, fillColor = '#5B5CF6', delay
         {
           height,
           borderRadius: height / 2,
-          backgroundColor: colors.bgSecondary,
+          backgroundColor: trackColor ?? colors.bgSecondary,
           overflow: 'hidden',
         },
         style,

@@ -66,7 +66,7 @@ function ScenarioCard({
       style={({ pressed }) => [
         styles.scenarioCard,
         {
-          backgroundColor: colors.bgPrimary,
+          backgroundColor: colors.bgSecondary,
           borderColor: colors.borderWeak,
           opacity: pressed && !disabled ? 0.85 : disabled ? 0.45 : 1,
         },
@@ -97,7 +97,7 @@ export default function SafetyScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -124,7 +124,7 @@ export default function SafetyScreen() {
 
         <ScenarioCard
           icon="⚠️"
-          iconBg="#FFF0E6"
+          iconBg="rgba(255,115,46,0.12)"
           title="I think I'm being scammed right now."
           subtitle="coming soon"
           disabled
@@ -141,7 +141,7 @@ export default function SafetyScreen() {
 
         <ScenarioCard
           icon="👥"
-          iconBg={brand.lavender}
+          iconBg="rgba(91,92,246,0.12)"
           title="Someone I know needs help."
           subtitle="coming soon"
           disabled

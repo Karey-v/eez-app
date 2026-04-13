@@ -40,7 +40,7 @@ function SettingsRow({
         styles.settingsRow,
         {
           borderBottomWidth: last ? 0 : 0.5,
-          borderBottomColor: 'rgba(0,0,0,0.08)',
+          borderBottomColor: 'rgba(255,255,255,0.06)',
           opacity: pressed ? 0.65 : 1,
         },
       ]}
@@ -87,7 +87,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -209,7 +209,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#F5F5F7',
+    backgroundColor: '#0A0A0A',
   },
   avatarSection: {
     alignItems: 'center',
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 24,
     lineHeight: 30,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
     textAlign: 'center',
     marginTop: 14,
   },
@@ -254,17 +254,19 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 4,
     alignItems: 'center',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   statNumber: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 22,
     lineHeight: 26,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
   },
   statLabel: {
     fontFamily: 'Inter_600SemiBold',
@@ -288,8 +290,10 @@ const styles = StyleSheet.create({
   },
   settingsCard: {
     borderRadius: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   settingsRow: {
     flexDirection: 'row',
@@ -301,14 +305,14 @@ const styles = StyleSheet.create({
   settingsLabel: {
     fontFamily: 'Inter_400Regular',
     fontSize: 13,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
   },
   settingsLabelDanger: {
-    color: '#CC0000',
+    color: '#F87171',
   },
   settingsChevron: {
     fontFamily: 'Inter_400Regular',
     fontSize: 16,
-    color: '#9A9A9A',
+    color: '#666666',
   },
 })

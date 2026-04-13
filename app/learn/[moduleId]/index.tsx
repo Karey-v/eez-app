@@ -34,7 +34,7 @@ export default function ModuleIntroScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -54,10 +54,10 @@ export default function ModuleIntroScreen() {
 
         {/* Tag + duration chips */}
         <View style={styles.chips}>
-          <View style={[styles.chip, { backgroundColor: brand.lavender }]}>
+          <View style={[styles.chip, { backgroundColor: colors.bgSecondary }]}>
             <Text style={[type.label, { color: colors.textPrimary }]}>{module.tag}</Text>
           </View>
-          <View style={[styles.chip, { backgroundColor: brand.lavender }]}>
+          <View style={[styles.chip, { backgroundColor: colors.bgSecondary }]}>
             <Text style={[type.label, { color: colors.textPrimary }]}>⏱ {module.duration}</Text>
           </View>
         </View>

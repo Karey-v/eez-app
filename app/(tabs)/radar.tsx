@@ -359,7 +359,7 @@ export default function RadarScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#1A2332',
+    backgroundColor: '#0A0A0A',
   },
   header: {
     flexDirection: 'row',
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     height: CARD_H,
-    backgroundColor: '#1A2332',
+    backgroundColor: '#1A1A1A',
     borderRadius: 14,
     overflow: 'hidden',
     zIndex: 20,

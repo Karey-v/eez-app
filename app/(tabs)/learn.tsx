@@ -19,7 +19,7 @@ export default function LearnScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -57,7 +57,7 @@ export default function LearnScreen() {
               style={[
                 styles.moduleCard,
                 {
-                  backgroundColor: colors.bgPrimary,
+                  backgroundColor: colors.bgSecondary,
                   borderColor: colors.borderWeak,
                   opacity: isLocked ? 0.45 : 1,
                   marginBottom: spacing.cardGap,

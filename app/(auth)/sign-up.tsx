@@ -54,7 +54,7 @@ export default function SignUpScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
 
         {/* Logo */}
         <View style={styles.logoRow}>

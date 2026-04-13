@@ -22,7 +22,7 @@ import { badges } from '@/data/badges'
 
 // ─── Confetti particle ────────────────────────────────────────────────────────
 
-const CONFETTI_COLORS = ['#5B5CF6', '#602CFF', '#0A0A0A', '#1A4A00', '#FFFFFF', '#FF732E', '#FFD700']
+const CONFETTI_COLORS = ['#5B5CF6', '#602CFF', '#B1FF58', '#FFFFFF', '#FF732E', '#FFD700', '#4ADE80']
 
 type ParticleConfig = {
   tx: number
@@ -110,14 +110,11 @@ function BadgeDisplay({ icon }: { icon: string }) {
 
   return (
     <View style={styles.badgeWrapper}>
-      {/* Confetti burst — centered on badge */}
       <View style={styles.confettiContainer} pointerEvents="none">
         {PARTICLES.map((config, i) => (
           <ConfettiParticle key={i} config={config} />
         ))}
       </View>
-
-      {/* Badge circle — white bg, flat */}
       <Animated.View style={[styles.badgeCircle, badgeStyle]}>
         <Text style={{ fontSize: 42 }}>{icon}</Text>
       </Animated.View>
@@ -185,14 +182,14 @@ export default function CompleteScreen() {
   if (!module || !badge) {
     return (
       <View style={[styles.root, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={[type.body, { color: '#2D6A00' }]}>Loading…</Text>
+        <Text style={[type.body, { color: '#AAAAAA' }]}>Loading…</Text>
       </View>
     )
   }
 
   return (
     <View style={styles.root}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -217,10 +214,7 @@ export default function CompleteScreen() {
         </Animated.View>
 
         {/* Streak */}
-        <Animated.View
-          entering={FadeInUp.delay(700).duration(400)}
-          style={styles.streakChip}
-        >
+        <Animated.View entering={FadeInUp.delay(700).duration(400)} style={styles.streakChip}>
           <Text style={{ fontSize: 14 }}>🔥</Text>
           <Text style={styles.streakText}>streak extended!</Text>
         </Animated.View>
@@ -275,7 +269,7 @@ export default function CompleteScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#B1FF58',
+    backgroundColor: '#0A0A0A',
   },
   badgeWrapper: {
     width: 100,
@@ -295,23 +289,25 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   badgeUnlockedLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
-    color: '#2D6A00',
+    color: '#AAAAAA',
     marginBottom: 6,
   },
   badgeName: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 28,
     lineHeight: 34,
-    color: '#1A4A00',
+    color: '#FFFFFF',
     textAlign: 'center',
   },
   xpRow: {
@@ -324,12 +320,12 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 48,
     lineHeight: 52,
-    color: '#1A4A00',
+    color: '#B1FF58',
   },
   xpUnit: {
     fontFamily: 'Inter_700Bold',
     fontSize: 20,
-    color: '#1A4A00',
+    color: '#B1FF58',
     marginBottom: 5,
     marginLeft: 4,
   },
@@ -342,23 +338,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 28,
     marginTop: 4,
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: '#1A1A1A',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   streakText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
-    color: '#1A4A00',
+    color: '#FFFFFF',
   },
   summaryCard: {
     borderRadius: 14,
     padding: 20,
     marginBottom: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   summaryTitle: {
     fontFamily: 'Inter_700Bold',
     fontSize: 13,
-    color: '#1A4A00',
+    color: '#FFFFFF',
     marginBottom: 14,
   },
   summaryRow: {
@@ -373,13 +373,13 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginTop: 5,
     flexShrink: 0,
-    backgroundColor: '#1A4A00',
+    backgroundColor: '#AAAAAA',
   },
   summaryText: {
     fontFamily: 'Inter_400Regular',
     fontSize: 13,
     lineHeight: 19,
-    color: '#2D6A00',
+    color: '#AAAAAA',
     flex: 1,
   },
   ctas: {
@@ -388,25 +388,27 @@ const styles = StyleSheet.create({
   lockedNextCard: {
     borderRadius: 14,
     padding: 16,
-    backgroundColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: '#1A1A1A',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   lockedLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
     letterSpacing: 0.5,
-    color: '#2D6A00',
+    color: '#666666',
     marginBottom: 4,
   },
   lockedTitle: {
     fontFamily: 'Inter_700Bold',
     fontSize: 14,
-    color: '#1A4A00',
+    color: '#FFFFFF',
     marginBottom: 2,
   },
   lockedSub: {
     fontFamily: 'Inter_400Regular',
     fontSize: 12,
-    color: '#2D6A00',
+    color: '#666666',
   },
   ctaPrimary: {
     borderRadius: 50,
@@ -423,11 +425,11 @@ const styles = StyleSheet.create({
   ctaSecondary: {
     borderRadius: 50,
     height: 56,
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
-    backgroundColor: 'transparent',
+    backgroundColor: '#1A1A1A',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   ctaSecondaryText: {
     fontFamily: 'Inter_700Bold',

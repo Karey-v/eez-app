@@ -29,7 +29,7 @@ export default function TestIntroScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -66,7 +66,7 @@ export default function TestIntroScreen() {
           {INFO_CHIPS.map((chip) => (
             <View
               key={chip.label}
-              style={[styles.chip, { backgroundColor: brand.lavender }]}
+              style={[styles.chip, { backgroundColor: colors.bgSecondary }]}
             >
               <Text style={{ fontSize: 12 }}>{chip.icon}</Text>
               <Text style={[type.label, { color: colors.textPrimary }]}>{chip.label}</Text>
@@ -75,7 +75,7 @@ export default function TestIntroScreen() {
         </View>
 
         {/* What to expect */}
-        <View style={[styles.expectCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
+        <View style={[styles.expectCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak, borderWidth: 0.5 }]}>
           <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 12 }]}>
             what to expect
           </Text>

@@ -29,13 +29,6 @@ const BAND_PERSONALITY: Record<string, string> = {
   'Loose Link':     "You're a Wide Open Tab.",
 }
 
-const BAND_RANK: Record<string, number> = {
-  'On Lock': 1,
-  'Fast Lane': 2,
-  'Main Character': 3,
-  'Loose Link': 4,
-}
-
 function formatTestDate(isoString: string | null): string {
   if (!isoString) return '—'
   const date = new Date(isoString)
@@ -55,8 +48,8 @@ export default function HomeScreen() {
   const hasScore = score !== null
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -103,7 +96,7 @@ export default function HomeScreen() {
 // ─── First-time view (S10) ───────────────────────────────────────────────────
 
 function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
-  const { spacing, brand } = useTheme()
+  const { spacing, brand, type, colors } = useTheme()
 
   return (
     <>
@@ -129,21 +122,21 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
 
       {/* Latest radar snippet */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[{ fontFamily: 'Inter_600SemiBold', fontSize: 11, letterSpacing: 0.4, textTransform: 'uppercase' as const }, { color: '#9A9A9A', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: colors.textTertiary, marginBottom: spacing.sectionBottom }]}>
           latest from radar
         </Text>
-        <Card onPress={() => router.push('/(tabs)/radar')} style={styles.radarSnippet}>
+        <Card onPress={() => router.push('/(tabs)/radar')}>
           <View style={styles.radarRow}>
-            <View style={[styles.categoryDot, { backgroundColor: '#5B5CF6' }]} />
-            <Text style={[{ fontFamily: 'Inter_600SemiBold', fontSize: 11, letterSpacing: 0.4, textTransform: 'uppercase' as const }, { color: '#5B5CF6' }]}>phishing</Text>
-            <Text style={[{ fontFamily: 'Inter_400Regular', fontSize: 11, color: '#9A9A9A' }, { marginLeft: 'auto' as any }]}>
+            <View style={[styles.categoryDot, { backgroundColor: brand.purpleCTA }]} />
+            <Text style={[type.label, { color: brand.purpleCTA }]}>phishing</Text>
+            <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
               {radarFeed[0].timestamp}
             </Text>
           </View>
-          <Text style={[{ fontFamily: 'Inter_600SemiBold', fontSize: 15, lineHeight: 21 }, { color: '#0A0A0A', marginTop: 6 }]}>
+          <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 6 }]}>
             {radarFeed[0].headline}
           </Text>
-          <Text style={[{ fontFamily: 'Inter_400Regular', fontSize: 13, lineHeight: 19 }, { color: '#5A5A5A', marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
+          <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
             {radarFeed[0].preview}
           </Text>
         </Card>
@@ -155,7 +148,7 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
 // ─── Returning view (S11) ────────────────────────────────────────────────────
 
 function BandIllustration({ band }: { band: string }) {
-  const stroke = 'rgba(255,255,255,0.9)'
+  const stroke = 'rgba(255,255,255,0.85)'
   const sw = 1.5
   const size = 44
 
@@ -165,57 +158,36 @@ function BandIllustration({ band }: { band: string }) {
         <Rect x={8} y={22} width={28} height={18} rx={4} stroke={stroke} strokeWidth={sw} />
         <Path
           d="M13 22V17C13 9 31 9 31 17V22"
-          stroke={stroke}
-          strokeWidth={sw}
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
         />
         <Circle cx={22} cy={31} r={3} stroke={stroke} strokeWidth={sw} />
       </Svg>
     )
   }
-
   if (band === 'Fast Lane') {
     return (
       <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
         <Path
           d="M25 4L11 24H21L19 40L33 20H23L25 4Z"
-          stroke={stroke}
-          strokeWidth={sw}
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
         />
       </Svg>
     )
   }
-
   if (band === 'Main Character') {
     return (
       <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
         <Path
           d="M22 4L25.5 14H36L27.5 20L30.5 30L22 24L13.5 30L16.5 20L8 14H18.5L22 4Z"
-          stroke={stroke}
-          strokeWidth={sw}
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
         />
       </Svg>
     )
   }
-
-  // Loose Link — two chain ovals offset
   return (
     <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
-      <Path
-        d="M4 18C4 13 8 10 13 10H20C25 10 29 13 29 18C29 23 25 26 20 26H13C8 26 4 23 4 18Z"
-        stroke={stroke}
-        strokeWidth={sw}
-      />
-      <Path
-        d="M15 26C15 21 19 18 24 18H31C36 18 40 21 40 26C40 31 36 34 31 34H24C19 34 15 31 15 26Z"
-        stroke={stroke}
-        strokeWidth={sw}
-      />
+      <Path d="M4 18C4 13 8 10 13 10H20C25 10 29 13 29 18C29 23 25 26 20 26H13C8 26 4 23 4 18Z" stroke={stroke} strokeWidth={sw} />
+      <Path d="M15 26C15 21 19 18 24 18H31C36 18 40 21 40 26C40 31 36 34 31 34H24C19 34 15 31 15 26Z" stroke={stroke} strokeWidth={sw} />
     </Svg>
   )
 }
@@ -236,7 +208,6 @@ function ReturningView({
   const { colors, type, spacing } = useTheme()
 
   const personality = BAND_PERSONALITY[band] ?? ''
-  const rank = BAND_RANK[band] ?? '—'
   const testDate = formatTestDate(lastTestDate)
 
   const quickActions = [
@@ -248,38 +219,37 @@ function ReturningView({
 
   return (
     <>
-      {/* Score card */}
-      <Pressable
-        onPress={() => router.push('/leakability/breakdown')}
-        style={({ pressed }) => [
-          styles.scoreCard,
-          { backgroundColor: bandColor, opacity: pressed ? 0.92 : 1 },
-        ]}
-      >
-        <View style={styles.scoreRow}>
+      {/* Hero area — full width, unboxed, purple overlay */}
+      <View style={[styles.heroArea, { marginHorizontal: -spacing.screenH }]}>
+        <View style={styles.heroOverlay} pointerEvents="none" />
+        <View style={[styles.heroContent, { paddingHorizontal: spacing.screenH }]}>
           <BandIllustration band={band} />
-          <View style={styles.scoreCenter}>
-            <Text style={styles.scoreBig}>{score}</Text>
-            <Text style={styles.scoreBandLabel}>{band.toUpperCase()}</Text>
-          </View>
+          <Text style={[styles.heroScore, { color: bandColor }]}>{score}</Text>
+          <Text style={styles.heroBandLabel}>{band.toUpperCase()}</Text>
+          <Text style={styles.heroPersonality}>{personality}</Text>
+          <Pressable
+            onPress={() => router.push('/leakability/breakdown')}
+            hitSlop={12}
+            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, marginTop: 12 })}
+          >
+            <Text style={[type.label, { color: colors.textTertiary }]}>see full breakdown →</Text>
+          </Pressable>
         </View>
-        <Text style={styles.scorePersonality}>{personality}</Text>
-        <Text style={styles.scoreTapHint}>tap to see full breakdown →</Text>
-      </Pressable>
+      </View>
 
       {/* Stats row */}
       <View style={styles.statsRow}>
-        <View style={[styles.statCard, { backgroundColor: colors.bgPrimary }]}>
+        <View style={[styles.statCard, { backgroundColor: colors.bgSecondary }]}>
           <Text style={[styles.statValue, { color: colors.textPrimary }]}>{score}</Text>
           <Text style={[styles.statLabel, { color: colors.textTertiary }]}>out of 48</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: colors.bgPrimary }]}>
-          <Text style={[styles.statValue, { color: colors.textPrimary }]}>#{rank}</Text>
-          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>band rank</Text>
+        <View style={[styles.statCard, { backgroundColor: colors.bgSecondary }]}>
+          <Text style={[styles.statValue, { color: bandColor }]}>{band.split(' ')[0]}</Text>
+          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>band</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: colors.bgPrimary }]}>
+        <View style={[styles.statCard, { backgroundColor: colors.bgSecondary }]}>
           <Text style={[styles.statValue, { color: colors.textPrimary }]}>{testDate}</Text>
-          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>last tested</Text>
+          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>last test</Text>
         </View>
       </View>
 
@@ -291,14 +261,23 @@ function ReturningView({
         <Text style={[type.label, { color: colors.textTertiary, marginBottom: spacing.sectionBottom }]}>
           quick actions
         </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -14 }} contentContainerStyle={{ paddingHorizontal: 14, gap: 8 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ marginHorizontal: -spacing.screenH }}
+          contentContainerStyle={{ paddingHorizontal: spacing.screenH, gap: 8 }}
+        >
           {quickActions.map((action) => (
             <Pressable
               key={action.label}
               onPress={action.onPress}
               style={({ pressed }) => [
                 styles.quickActionCard,
-                { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak, opacity: pressed ? 0.7 : 1 },
+                {
+                  backgroundColor: colors.bgSecondary,
+                  borderColor: colors.borderWeak,
+                  opacity: pressed ? 0.7 : 1,
+                },
               ]}
             >
               <Text style={[type.body, { color: colors.textPrimary }]}>{action.label}</Text>
@@ -352,26 +331,26 @@ function HomePulseDot() {
 }
 
 function FraudDetectorCard({ router }: { router: ReturnType<typeof useRouter> }) {
-  const { type, brand } = useTheme()
+  const { type, colors } = useTheme()
   return (
     <Pressable
       onPress={() => router.push('/safety/detector')}
       style={({ pressed }) => [
         styles.detectorCard,
-        { backgroundColor: brand.darkGreen, opacity: pressed ? 0.92 : 1 },
+        { backgroundColor: colors.bgSecondary, opacity: pressed ? 0.92 : 1 },
       ]}
     >
       <View style={styles.detectorTopRow}>
         <View style={styles.detectorOnlineRow}>
           <HomePulseDot />
-          <Text style={[type.label, { color: '#9FE8C4', marginLeft: 6 }]}>online</Text>
+          <Text style={[type.label, { color: '#4ADE80', marginLeft: 6 }]}>online</Text>
         </View>
-        <ArrowIcon size={16} color="#9FE8C4" />
+        <ArrowIcon size={16} color={colors.textTertiary} />
       </View>
-      <Text style={[type.sectionHead, { color: '#FFFFFF', marginBottom: 6 }]}>
+      <Text style={[type.sectionHead, { color: colors.textPrimary, marginBottom: 6 }]}>
         EEZ Fraud Detector
       </Text>
-      <Text style={[type.body, { color: '#9FE8C4', lineHeight: 18 }]}>
+      <Text style={[type.body, { color: colors.textSecondary, lineHeight: 18 }]}>
         paste a message, email, or describe a situation — we'll tell you if something's off.
       </Text>
       <Text style={[type.label, { color: '#B1FF58', marginTop: 14 }]}>try it now →</Text>
@@ -423,7 +402,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
-  radarSnippet: {},
   radarRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -434,53 +412,51 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
-  // Returning
-  scoreCard: {
-    borderRadius: 16,
-    padding: 20,
+  // Returning — hero area
+  heroArea: {
+    paddingTop: 36,
+    paddingBottom: 28,
+    position: 'relative',
   },
-  scoreRow: {
-    flexDirection: 'row',
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(98,44,255,0.08)',
+  },
+  heroContent: {
     alignItems: 'center',
-    gap: 16,
   },
-  scoreCenter: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  scoreBig: {
+  heroScore: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 72,
-    lineHeight: 80,
+    fontSize: 80,
+    lineHeight: 88,
     fontWeight: '400',
-    color: '#FFFFFF',
+    marginTop: 8,
   },
-  scoreBandLabel: {
+  heroBandLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
+    color: '#AAAAAA',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginTop: 2,
   },
-  scorePersonality: {
+  heroPersonality: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
+    color: '#AAAAAA',
     fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 12,
+    marginTop: 4,
   },
-  scoreTapHint: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
-    textAlign: 'center',
-    marginTop: 8,
-  },
+  // Stats row
   statsRow: {
     flexDirection: 'row',
     gap: 8,
+    marginTop: 4,
   },
   statCard: {
     flex: 1,
@@ -489,15 +465,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignItems: 'center',
     gap: 2,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   statValue: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '400',
   },
   statLabel: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 11,
+    fontSize: 10,
   },
   quickActionCard: {
     borderRadius: 12,
@@ -510,6 +488,8 @@ const styles = StyleSheet.create({
   detectorCard: {
     borderRadius: 14,
     padding: 16,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   detectorTopRow: {
     flexDirection: 'row',

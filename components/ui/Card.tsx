@@ -14,7 +14,7 @@ export function Card({ children, style, onPress, brandColor, noBorder }: Props) 
   const { colors, spacing } = useTheme()
 
   const cardStyle: ViewStyle = {
-    backgroundColor: brandColor ?? colors.bgPrimary,
+    backgroundColor: brandColor ?? colors.bgSecondary,
     borderRadius: 14,
     borderWidth: brandColor || noBorder ? 0 : 0.5,
     borderColor: colors.borderWeak,

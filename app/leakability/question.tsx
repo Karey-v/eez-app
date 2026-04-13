@@ -59,7 +59,7 @@ function ProgressLines({ total, current }: { total: number; current: number }) {
           key={i}
           style={[
             styles.progressLine,
-            { backgroundColor: i <= current ? '#0A0A0A' : 'rgba(0,0,0,0.15)' },
+            { backgroundColor: i <= current ? '#FFFFFF' : 'rgba(255,255,255,0.15)' },
           ]}
         />
       ))}
@@ -99,8 +99,8 @@ export default function QuestionScreen() {
   }, [currentQuestionIndex, nextQuestion, completeTest, setScore, router])
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
+      <StatusBar style="light" />
 
       {/* ── Fixed header ── */}
       <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
@@ -192,7 +192,7 @@ function QuestionBody({
         <View
           style={[
             styles.scenarioCard,
-            { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak },
+            { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak },
           ]}
         >
           <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6 }]}>scenario</Text>
@@ -207,7 +207,7 @@ function QuestionBody({
         <Text
           style={[
             styles.questionText,
-            { color: '#0A0A0A', marginBottom: 40 },
+            { color: '#FFFFFF', marginBottom: 40 },
           ]}
         >
           {question.prompt}
@@ -217,7 +217,7 @@ function QuestionBody({
       {/* Slider question */}
       {question.type === 'slider' && (
         <>
-          <Text style={[styles.questionText, { color: '#0A0A0A', marginBottom: 32 }]}>
+          <Text style={[styles.questionText, { color: '#FFFFFF', marginBottom: 32 }]}>
             {question.prompt}
           </Text>
           <SliderQuestion
@@ -281,7 +281,7 @@ function SimulationCard({
 
   if (uiType === 'notification') {
     return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak }]}>
+      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
         <View style={styles.notifRow}>
           <View style={[styles.notifIcon, { backgroundColor: '#5B5CF6' }]}>
             <Text style={{ color: '#fff', fontSize: 12, fontFamily: 'Inter_700Bold' }}>
@@ -309,7 +309,7 @@ function SimulationCard({
 
   if (uiType === 'message') {
     return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak }]}>
+      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
         <View style={styles.messageHeader}>
           <View style={[styles.avatar, { backgroundColor: '#007549' }]}>
             <Text style={{ color: '#fff', fontSize: 11, fontFamily: 'Inter_700Bold' }}>
@@ -327,7 +327,7 @@ function SimulationCard({
 
   if (uiType === 'email') {
     return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgPrimary, borderColor: colors.borderWeak }]}>
+      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
         <View style={styles.emailHeader}>
           <Text style={[type.meta, { color: colors.textTertiary, width: 40 }]}>FROM</Text>
           <Text style={[type.body, { color: colors.textPrimary, flex: 1, fontFamily: 'Inter_700Bold', fontWeight: '700' }]} numberOfLines={1}>
@@ -389,9 +389,9 @@ function OptionButton({
       style={({ pressed }) => [
         styles.optionBtn,
         {
-          borderColor: selected ? '#5B5CF6' : 'rgba(0,0,0,0.2)',
-          borderWidth: selected ? 1.5 : 1,
-          backgroundColor: selected ? '#F0EEFF' : 'transparent',
+          borderColor: selected ? '#5B5CF6' : 'rgba(255,255,255,0.08)',
+          borderWidth: selected ? 1.5 : 0.5,
+          backgroundColor: selected ? 'rgba(91,92,246,0.15)' : '#1A1A1A',
           opacity: anySelected && !selected ? 0.45 : pressed ? 0.8 : 1,
         },
       ]}
@@ -530,7 +530,7 @@ function SliderQuestion({
 
       {/* Selected value display */}
       {selectedIndex !== null && (
-        <Animated.View entering={FadeIn.duration(200)} style={[styles.sliderValue, { backgroundColor: colors.bgPrimary }]}>
+        <Animated.View entering={FadeIn.duration(200)} style={[styles.sliderValue, { backgroundColor: colors.bgSecondary }]}>
           <Text style={[type.label, { color: brand.purpleCTA }]}>
             {selectedIndex === 0
               ? 'great — unique passwords are the strongest foundation.'
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   messageBubble: {
-    backgroundColor: 'rgba(0,0,0,0.04)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
     borderTopLeftRadius: 0,
     borderTopRightRadius: 12,
     borderBottomLeftRadius: 12,

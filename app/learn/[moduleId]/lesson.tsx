@@ -66,7 +66,7 @@ function TextVisualLesson({ lesson }: { lesson: Lesson }) {
         </Text>
       )}
       {lesson.insight && (
-        <View style={[styles.insightCard, { backgroundColor: brand.lavender }]}>
+        <View style={[styles.insightCard, { backgroundColor: colors.bgSecondary }]}>
           <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6 }]}>EEZ insight</Text>
           <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
             {lesson.insight}
@@ -262,7 +262,7 @@ function TapUncoverLesson({
         <Animated.View
           key={activeSpot.id}
           entering={FadeIn.duration(200)}
-          style={[styles.explanationCard, { backgroundColor: brand.lavender }]}
+          style={[styles.explanationCard, { backgroundColor: colors.bgSecondary }]}
         >
           <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6 }]}>
             {activeSpot.label}
@@ -344,7 +344,7 @@ function ChoiceLesson({
                 {
                   borderColor: isSelected ? brand.purpleCTA : colors.borderWeak,
                   borderWidth: isSelected ? 1.5 : 0.5,
-                  backgroundColor: isSelected ? colors.bgSecondary : colors.bgPrimary,
+                  backgroundColor: isSelected ? 'rgba(91,92,246,0.15)' : colors.bgSecondary,
                   opacity: selected !== null && !isSelected ? 0.45 : 1,
                 },
               ]}
@@ -418,7 +418,7 @@ export default function LessonScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       {/* Fixed header */}
       <View
@@ -440,7 +440,7 @@ export default function LessonScreen() {
             <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
           </Pressable>
 
-          <View style={[styles.typeChip, { backgroundColor: brand.lavender }]}>
+          <View style={[styles.typeChip, { backgroundColor: colors.bgSecondary }]}>
             <Text style={[type.label, { color: brand.purpleCTA }]}>
               {TYPE_LABELS[lesson.type] ?? lesson.type}
             </Text>

@@ -87,7 +87,7 @@ export default function ResultScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -185,7 +185,7 @@ export default function ResultScreen() {
             onPress={() => router.push('/learn/password-glow-up')}
             style={({ pressed }) => [
               styles.ctaSecondary,
-              { borderColor: colors.borderMid, opacity: pressed ? 0.7 : 1 },
+              { backgroundColor: '#1A1A1A', opacity: pressed ? 0.7 : 1 },
             ]}
           >
             <Text style={[styles.ctaSecondaryText, { color: colors.textPrimary }]}>
@@ -197,7 +197,7 @@ export default function ResultScreen() {
             onPress={handleShare}
             style={({ pressed }) => [
               styles.ctaSecondary,
-              { borderColor: colors.borderMid, opacity: pressed ? 0.7 : 1 },
+              { backgroundColor: '#1A1A1A', opacity: pressed ? 0.7 : 1 },
             ]}
           >
             <Text style={[styles.ctaSecondaryText, { color: colors.textPrimary }]}>
@@ -213,7 +213,7 @@ export default function ResultScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#0A0A0A',
   },
   content: {
     flexGrow: 1,
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 24,
     lineHeight: 30,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
     textAlign: 'left',
     marginTop: 32,
   },
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   gaugeTrack: {
     height: 8,
     borderRadius: 0,
-    backgroundColor: '#EBEBEB',
+    backgroundColor: 'rgba(255,255,255,0.1)',
     overflow: 'visible',
     marginBottom: 10,
     position: 'relative',
@@ -303,7 +303,6 @@ const styles = StyleSheet.create({
   ctaSecondary: {
     borderRadius: 50,
     height: 56,
-    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
   },

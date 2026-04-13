@@ -16,13 +16,16 @@ import 'react-native-reanimated'
 
 SplashScreen.preventAutoHideAsync()
 
-// Floating SOS button — rendered inside the Stack so useRouter/useSegments work.
+// Floating SOS button — only shown on tab screens, not stack screens.
 function SOSButton() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const isSignedIn = useUserStore((s) => s.isSignedIn)
+  const segments = useSegments()
 
-  if (!isSignedIn) return null
+  const isTabScreen = segments[0] === '(tabs)'
+
+  if (!isSignedIn || !isTabScreen) return null
 
   return (
     <Pressable
