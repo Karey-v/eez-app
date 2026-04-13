@@ -100,22 +100,21 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
 
   return (
     <>
-      {/* Hero card — lime, centered score placeholder */}
-      <View style={[styles.heroCard, { backgroundColor: brand.lime }]}>
-        <View style={styles.heroCardInner}>
-          <ShieldIcon size={48} color="#1A4A00" strokeWidth={1.5} />
-          <Text style={styles.heroQuestion}>?</Text>
-          <Text style={styles.heroHint}>take the test to find out</Text>
+      {/* Hero section — unboxed, directly on dark bg */}
+      <View style={styles.heroSection}>
+        <View style={styles.firstTimeGlowWrapper} pointerEvents="none">
+          <View style={styles.firstTimeGlow} />
         </View>
+        <Text style={styles.heroHeadline}>so... how leakable are you?</Text>
+        <Text style={styles.heroSubtext}>find out in 5 minutes.</Text>
+        <View style={{ height: 24 }} />
+        <Pressable
+          onPress={() => router.push('/leakability/intro')}
+          style={({ pressed }) => [styles.heroCTA, { opacity: pressed ? 0.88 : 1 }]}
+        >
+          <Text style={styles.heroCTAText}>start the test</Text>
+        </Pressable>
       </View>
-
-      {/* CTA below card */}
-      <Pressable
-        onPress={() => router.push('/leakability/intro')}
-        style={({ pressed }) => [styles.heroCTA, { opacity: pressed ? 0.88 : 1 }]}
-      >
-        <Text style={styles.heroCTAText}>take the test</Text>
-      </Pressable>
 
       {/* AI Fraud Detector */}
       <FraudDetectorCard router={router} />
@@ -219,22 +218,21 @@ function ReturningView({
 
   return (
     <>
-      {/* Hero area — full width, unboxed, purple overlay */}
-      <View style={[styles.heroArea, { marginHorizontal: -spacing.screenH }]}>
-        <View style={styles.heroOverlay} pointerEvents="none" />
-        <View style={[styles.heroContent, { paddingHorizontal: spacing.screenH }]}>
-          <BandIllustration band={band} />
-          <Text style={[styles.heroScore, { color: bandColor }]}>{score}</Text>
-          <Text style={styles.heroBandLabel}>{band.toUpperCase()}</Text>
-          <Text style={styles.heroPersonality}>{personality}</Text>
-          <Pressable
-            onPress={() => router.push('/leakability/breakdown')}
-            hitSlop={12}
-            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, marginTop: 12 })}
-          >
-            <Text style={[type.label, { color: colors.textTertiary }]}>see full breakdown →</Text>
-          </Pressable>
+      {/* Hero area — unboxed, score on dark bg with lime glow */}
+      <View style={styles.heroArea}>
+        <View style={styles.returningGlowWrapper} pointerEvents="none">
+          <View style={styles.returningGlow} />
         </View>
+        <Text style={[styles.heroScore, { color: bandColor }]}>{score}</Text>
+        <Text style={styles.heroBandLabel}>{band.toUpperCase()}</Text>
+        <Text style={styles.heroPersonality}>{personality}</Text>
+        <Pressable
+          onPress={() => router.push('/leakability/breakdown')}
+          hitSlop={12}
+          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, marginTop: 12 })}
+        >
+          <Text style={styles.heroBreakdownLink}>tap to see breakdown →</Text>
+        </Pressable>
       </View>
 
       {/* Stats row */}
@@ -368,33 +366,47 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   // First-time
-  heroCard: {
-    borderRadius: 20,
-    padding: 24,
-  },
-  heroCardInner: {
+  heroSection: {
+    paddingVertical: 40,
     alignItems: 'center',
-    paddingVertical: 20,
-    gap: 12,
   },
-  heroQuestion: {
+  firstTimeGlowWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    height: 280,
+  },
+  firstTimeGlow: {
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: 'rgba(98,44,255,0.1)',
+  },
+  heroHeadline: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 64,
-    lineHeight: 72,
+    fontSize: 32,
+    lineHeight: 38,
     fontWeight: '400',
-    color: '#1A4A00',
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
-  heroHint: {
+  heroSubtext: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    color: '#2D6A00',
+    fontSize: 14,
+    lineHeight: 21,
+    color: '#AAAAAA',
+    textAlign: 'center',
+    marginTop: 12,
   },
   heroCTA: {
     backgroundColor: '#5B5CF6',
     borderRadius: 50,
-    height: 52,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'stretch',
   },
   heroCTAText: {
     fontFamily: 'Inter_700Bold',
@@ -416,18 +428,22 @@ const styles = StyleSheet.create({
   heroArea: {
     paddingTop: 36,
     paddingBottom: 28,
-    position: 'relative',
+    alignItems: 'center',
   },
-  heroOverlay: {
+  returningGlowWrapper: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(98,44,255,0.08)',
-  },
-  heroContent: {
     alignItems: 'center',
+    justifyContent: 'center',
+    height: 240,
+  },
+  returningGlow: {
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: 'rgba(177,255,88,0.06)',
   },
   heroScore: {
     fontFamily: 'DMSerifDisplay_400Regular',
@@ -451,6 +467,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: 4,
+  },
+  heroBreakdownLink: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#666666',
   },
   // Stats row
   statsRow: {

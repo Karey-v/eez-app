@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
-import { Stack, useRouter, useSegments } from 'expo-router'
+import { Stack, useRouter, useSegments, usePathname } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useFonts } from 'expo-font'
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display'
@@ -21,11 +21,9 @@ function SOSButton() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const isSignedIn = useUserStore((s) => s.isSignedIn)
-  const segments = useSegments()
+  const pathname = usePathname()
 
-  const isTabScreen = segments[0] === '(tabs)'
-
-  if (!isSignedIn || !isTabScreen) return null
+  if (!isSignedIn || pathname !== '/') return null
 
   return (
     <Pressable

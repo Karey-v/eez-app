@@ -107,8 +107,8 @@ export default function WelcomeScreen() {
   function renderSlide({ item, index }: ListRenderItemInfo<Slide>) {
     return (
       <View style={[styles.slide, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }]}>
-        {/* Purple tint overlay — flat, no gradient */}
-        <View style={styles.purpleTint} pointerEvents="none" />
+        {/* Purple radial glow — centered circle behind illustration */}
+        <View style={styles.purpleGlow} pointerEvents="none" />
 
         {/* Top bar: progress lines + skip */}
         <View
@@ -205,13 +205,14 @@ const styles = StyleSheet.create({
   slide: {
     backgroundColor: '#0A0A0A',
   },
-  purpleTint: {
+  purpleGlow: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    width: 300,
     height: 300,
-    backgroundColor: 'rgba(98,44,255,0.15)',
+    borderRadius: 150,
+    backgroundColor: 'rgba(98,44,255,0.12)',
+    top: 180,
+    left: (SCREEN_WIDTH - 300) / 2,
   },
   topBar: {
     flexDirection: 'row',
