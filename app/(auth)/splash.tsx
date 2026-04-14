@@ -1,9 +1,9 @@
 // S01 — Splash Screen
 // Purple bg, EEZ logo centered, fade in 400ms → hold 1s → fade out 300ms → navigate
-// On web: skip animation entirely and navigate on next tick (root layout is not yet
-// mounted when the Reanimated callback fires, which crashes the web renderer).
-import { useEffect } from 'react'
-import { Platform, View, StyleSheet } from 'react-native'
+// Tappable — user can skip immediately. Auto-advance still fires.
+// On web: skip animation entirely and navigate on next tick.
+import { useEffect, useRef } from 'react'
+import { Platform, View, Text, Pressable, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import Animated, {
@@ -22,8 +22,11 @@ export default function SplashScreen() {
   const router = useRouter()
   const isSignedIn = useUserStore((s) => s.isSignedIn)
   const opacity = useSharedValue(0)
+  const navigated = useRef(false)
 
   function navigate() {
+    if (navigated.current) return
+    navigated.current = true
     if (isSignedIn) {
       router.replace('/(tabs)')
     } else {
@@ -33,9 +36,6 @@ export default function SplashScreen() {
 
   useEffect(() => {
     if (Platform.OS === 'web') {
-      // On web the Reanimated worklet callback fires before the root layout is
-      // fully mounted, causing "Attempted to navigate before mounting Root Layout".
-      // Skip the animation and defer navigation to the next event-loop tick.
       const id = setTimeout(navigate, 0)
       return () => clearTimeout(id)
     }
@@ -52,12 +52,13 @@ export default function SplashScreen() {
   }))
 
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={navigate}>
       <StatusBar style="light" />
       <Animated.View style={[styles.content, animatedStyle]}>
-        <EezLogo width={140} height={140} color="#FFFFFF" />
+        <EezLogo width={140} height={140} color="#B1FF58" />
       </Animated.View>
-    </View>
+      <Text style={styles.tapHint}>tap to continue</Text>
+    </Pressable>
   )
 }
 
@@ -71,5 +72,13 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  tapHint: {
+    position: 'absolute',
+    bottom: 48,
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#AAAAAA',
+    textAlign: 'center',
   },
 })

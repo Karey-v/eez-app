@@ -30,7 +30,7 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     id: '1',
-    headline: '1 in 3 gen zers have been scammed online.',
+    headline: '1 in 3 young adults have been scammed online.',
     body: "It's not about being gullible. Scammers are sophisticated. The question is whether your habits make you an easy target.",
     illustration: 'eye',
   },
@@ -108,12 +108,20 @@ export default function WelcomeScreen() {
   function renderSlide({ item, index }: ListRenderItemInfo<Slide>) {
     return (
       <View style={[styles.slide, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }]}>
-        {/* Purple radial glow — centered behind illustration */}
+        {/* Layer 1: dark purple at top fading to near-black — full screen base */}
         <LinearGradient
-          colors={['rgba(98,44,255,0.2)', 'transparent']}
+          colors={['#1a0a2e', '#0a0a0a']}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
-          style={styles.purpleGlow}
+          style={styles.gradientLayer1}
+          pointerEvents="none"
+        />
+        {/* Layer 2: bright purple glow from top center fading out over 60% */}
+        <LinearGradient
+          colors={['rgba(98,44,255,0.6)', 'rgba(98,44,255,0)']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.gradientLayer2}
           pointerEvents="none"
         />
 
@@ -212,12 +220,19 @@ const styles = StyleSheet.create({
   slide: {
     backgroundColor: '#0A0A0A',
   },
-  purpleGlow: {
+  gradientLayer1: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 400,
+    bottom: 0,
+  },
+  gradientLayer2: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
   },
   topBar: {
     flexDirection: 'row',
