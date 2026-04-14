@@ -2,7 +2,8 @@
 // Renders first-time or returning view based on userStore.score
 import { useEffect } from 'react'
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native'
-import Svg, { Circle, Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg'
+import { LinearGradient } from 'expo-linear-gradient'
+import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -21,26 +22,6 @@ import { ArrowIcon } from '@/components/icons/Arrow'
 import { ShieldIcon } from '@/components/icons/Shield'
 import { Card } from '@/components/ui/Card'
 import { radarFeed } from '@/data/radarFeed'
-
-// ─── Hero radial gradient — radiates from top center ────────────────────────
-
-function HeroGradient({ style }: { style: any }) {
-  return (
-    <View style={style} pointerEvents="none">
-      <Svg width="100%" height="100%">
-        <Defs>
-          <RadialGradient id="bg" cx="50%" cy="0%" r="100%">
-            <Stop offset="0%" stopColor="#7828FF" stopOpacity="0.95" />
-            <Stop offset="35%" stopColor="#4a1a99" stopOpacity="0.7" />
-            <Stop offset="65%" stopColor="#1a0533" stopOpacity="0.5" />
-            <Stop offset="100%" stopColor="#0a0a0a" stopOpacity="1" />
-          </RadialGradient>
-        </Defs>
-        <Rect width="100%" height="100%" fill="url(#bg)" />
-      </Svg>
-    </View>
-  )
-}
 
 const BAND_PERSONALITY: Record<string, string> = {
   'On Lock':        "You're a Vault.",
@@ -122,7 +103,13 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
     <>
       {/* Hero section — unboxed, directly on dark bg */}
       <View style={styles.heroSection}>
-        <HeroGradient style={styles.firstTimeGlow} />
+        <LinearGradient
+          colors={['rgba(98,44,255,0.25)', 'transparent']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.firstTimeGlow}
+          pointerEvents="none"
+        />
         <Text style={styles.heroHeadline}>so... how leakable are you?</Text>
         <Text style={styles.heroSubtext}>find out in 5 minutes.</Text>
         <View style={{ height: 24 }} />
@@ -238,7 +225,13 @@ function ReturningView({
     <>
       {/* Hero area — unboxed, score on dark bg with lime glow */}
       <View style={styles.heroArea}>
-        <HeroGradient style={styles.returningGlow} />
+        <LinearGradient
+          colors={['rgba(177,255,88,0.15)', 'transparent']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.returningGlow}
+          pointerEvents="none"
+        />
         <Text style={[styles.heroScore, { color: bandColor }]}>{score}</Text>
         <Text style={styles.heroBandLabel}>{band.toUpperCase()}</Text>
         <Text style={styles.heroPersonality}>{personality}</Text>

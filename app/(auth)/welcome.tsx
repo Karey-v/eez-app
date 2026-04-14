@@ -10,7 +10,8 @@ import {
   Dimensions,
   ListRenderItemInfo,
 } from 'react-native'
-import Svg, { Circle, Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg'
+import Svg, { Circle, Path, Rect } from 'react-native-svg'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -47,26 +48,6 @@ const SLIDES: Slide[] = [
     illustration: 'lock',
   },
 ]
-
-// ─── Background radial gradient — radiates from top center ──────────────────
-
-function BackgroundGradient() {
-  return (
-    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      <Svg width="100%" height="100%">
-        <Defs>
-          <RadialGradient id="bg" cx="50%" cy="0%" r="100%">
-            <Stop offset="0%" stopColor="#7828FF" stopOpacity="0.95" />
-            <Stop offset="35%" stopColor="#4a1a99" stopOpacity="0.7" />
-            <Stop offset="65%" stopColor="#1a0533" stopOpacity="0.5" />
-            <Stop offset="100%" stopColor="#0a0a0a" stopOpacity="1" />
-          </RadialGradient>
-        </Defs>
-        <Rect width="100%" height="100%" fill="url(#bg)" />
-      </Svg>
-    </View>
-  )
-}
 
 function SlideIllustration({ type }: { type: Slide['illustration'] }) {
   if (type === 'eye') {
@@ -127,7 +108,22 @@ export default function WelcomeScreen() {
   function renderSlide({ item, index }: ListRenderItemInfo<Slide>) {
     return (
       <View style={[styles.slide, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }]}>
-        <BackgroundGradient />
+        {/* Layer 1: dark purple at top fading to near-black — full screen base */}
+        <LinearGradient
+          colors={['#1a0a2e', '#0a0a0a']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.gradientLayer1}
+          pointerEvents="none"
+        />
+        {/* Layer 2: bright purple glow from top center fading out over 60% */}
+        <LinearGradient
+          colors={['rgba(98,44,255,0.6)', 'rgba(98,44,255,0)']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.gradientLayer2}
+          pointerEvents="none"
+        />
 
         {/* Top bar: progress lines + skip */}
         <View
@@ -223,6 +219,20 @@ const styles = StyleSheet.create({
   },
   slide: {
     backgroundColor: '#0A0A0A',
+  },
+  gradientLayer1: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  gradientLayer2: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
   },
   topBar: {
     flexDirection: 'row',
