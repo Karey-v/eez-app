@@ -103,14 +103,13 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
     <>
       {/* Hero section — unboxed, directly on dark bg */}
       <View style={styles.heroSection}>
-        <View style={styles.firstTimeGlowWrapper} pointerEvents="none">
-          <LinearGradient
-            colors={['rgba(98,44,255,0.3)', 'transparent']}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-            style={styles.firstTimeGlow}
-          />
-        </View>
+        <LinearGradient
+          colors={['rgba(98,44,255,0.25)', 'transparent']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.firstTimeGlow}
+          pointerEvents="none"
+        />
         <Text style={styles.heroHeadline}>so... how leakable are you?</Text>
         <Text style={styles.heroSubtext}>find out in 5 minutes.</Text>
         <View style={{ height: 24 }} />
@@ -226,14 +225,13 @@ function ReturningView({
     <>
       {/* Hero area — unboxed, score on dark bg with lime glow */}
       <View style={styles.heroArea}>
-        <View style={styles.returningGlowWrapper} pointerEvents="none">
-          <LinearGradient
-            colors={['rgba(177,255,88,0.15)', 'transparent']}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-            style={styles.returningGlow}
-          />
-        </View>
+        <LinearGradient
+          colors={['rgba(177,255,88,0.15)', 'transparent']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.returningGlow}
+          pointerEvents="none"
+        />
         <Text style={[styles.heroScore, { color: bandColor }]}>{score}</Text>
         <Text style={styles.heroBandLabel}>{band.toUpperCase()}</Text>
         <Text style={styles.heroPersonality}>{personality}</Text>
@@ -381,19 +379,12 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     alignItems: 'center',
   },
-  firstTimeGlowWrapper: {
+  firstTimeGlow: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    alignItems: 'center',
-    height: 280,
-  },
-  firstTimeGlow: {
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    backgroundColor: 'rgba(98,44,255,0.1)',
+    height: 350,
   },
   heroHeadline: {
     fontFamily: 'DMSerifDisplay_400Regular',
@@ -441,20 +432,12 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     alignItems: 'center',
   },
-  returningGlowWrapper: {
+  returningGlow: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 240,
-  },
-  returningGlow: {
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: 'rgba(177,255,88,0.06)',
+    height: 350,
   },
   heroScore: {
     fontFamily: 'DMSerifDisplay_400Regular',

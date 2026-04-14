@@ -214,12 +214,10 @@ const styles = StyleSheet.create({
   },
   purpleGlow: {
     position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: 'rgba(98,44,255,0.12)',
-    top: 180,
-    left: (SCREEN_WIDTH - 300) / 2,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 400,
   },
   topBar: {
     flexDirection: 'row',
