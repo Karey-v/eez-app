@@ -18,6 +18,7 @@ import { useTheme } from '@/theme'
 import { useLearnStore } from '@/store/learnStore'
 import { modules, type Lesson, type Hotspot } from '@/data/modules'
 import { ArrowIcon } from '@/components/icons/Arrow'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Type chip labels ────────────────────────────────────────────────────────
 
@@ -455,7 +456,7 @@ export default function LessonScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 24,
-          paddingBottom: insets.bottom + 110,
+          paddingBottom: 110,
           paddingHorizontal: spacing.screenH,
         }}
       >
@@ -483,7 +484,7 @@ export default function LessonScreen() {
           style={[
             styles.bottomBar,
             {
-              paddingBottom: insets.bottom + 16,
+              paddingBottom: 16,
               paddingHorizontal: spacing.screenH,
               backgroundColor: colors.bgPrimary,
               borderTopColor: colors.borderWeak,
@@ -503,6 +504,7 @@ export default function LessonScreen() {
           </Pressable>
         </Animated.View>
       )}
+      <BottomNav activeTab="learn" />
     </View>
   )
 }

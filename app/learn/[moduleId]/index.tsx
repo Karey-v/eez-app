@@ -9,6 +9,7 @@ import { useLearnStore } from '@/store/learnStore'
 import { modules } from '@/data/modules'
 import { Button } from '@/components/ui/Button'
 import { ArrowIcon } from '@/components/icons/Arrow'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 export default function ModuleIntroScreen() {
   const { colors, type, spacing, brand } = useTheme()
@@ -39,7 +40,7 @@ export default function ModuleIntroScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + 16,
-          paddingBottom: insets.bottom + 40,
+          paddingBottom: 40,
           paddingHorizontal: spacing.screenH,
         }}
       >
@@ -103,6 +104,7 @@ export default function ModuleIntroScreen() {
 
         <Button label="Start module" onPress={handleStart} variant="purple" fullWidth />
       </ScrollView>
+      <BottomNav activeTab="learn" />
     </View>
   )
 }

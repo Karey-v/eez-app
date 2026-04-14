@@ -111,7 +111,7 @@ export default function QuestionScreen() {
         <Text
           style={[
             type.label,
-            { color: colors.textTertiary, marginTop: 28 },
+            { color: '#888888', marginTop: 28 },
           ]}
         >
           {question.category}
@@ -180,7 +180,7 @@ function QuestionBody({
       {/* Simulation card — shown for simulation-tap questions */}
       {question.type === 'simulation-tap' && question.simulation && (
         <View style={{ marginBottom: 28 }}>
-          <Text style={[type.label, { color: colors.textTertiary, marginBottom: 10 }]}>
+          <Text style={[styles.questionText, { marginBottom: 24 }]}>
             {question.prompt}
           </Text>
           <SimulationCard simulation={question.simulation} />
@@ -196,7 +196,7 @@ function QuestionBody({
           ]}
         >
           <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6 }]}>scenario</Text>
-          <Text style={[type.body, { color: colors.textPrimary, lineHeight: 20 }]}>
+          <Text style={styles.questionText}>
             {question.prompt}
           </Text>
         </View>
@@ -399,8 +399,8 @@ function OptionButton({
       <Text
         style={{
           fontFamily: 'Inter_400Regular',
-          fontSize: 14,
-          color: colors.textPrimary,
+          fontSize: 15,
+          color: '#FFFFFF',
           lineHeight: 20,
         }}
       >
@@ -564,9 +564,11 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 28,
-    lineHeight: 36,
+    fontSize: 26,
+    lineHeight: 34,
     fontWeight: '400',
+    color: '#FFFFFF',
+    textAlign: 'left',
   },
   scenarioCard: {
     borderRadius: 12,

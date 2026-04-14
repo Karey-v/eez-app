@@ -45,9 +45,9 @@ const sosStyles = StyleSheet.create({
   btn: {
     position: 'absolute',
     right: 16,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: '#CC0000',
     alignItems: 'center',
     justifyContent: 'center',
@@ -60,7 +60,7 @@ const sosStyles = StyleSheet.create({
   },
   label: {
     fontFamily: 'Inter_700Bold',
-    fontSize: 13,
+    fontSize: 16,
     color: '#FFFFFF',
     letterSpacing: 0.5,
   },

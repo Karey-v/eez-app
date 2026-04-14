@@ -19,6 +19,7 @@ import { useUserStore } from '@/store/userStore'
 import { useLearnStore } from '@/store/learnStore'
 import { modules } from '@/data/modules'
 import { badges } from '@/data/badges'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Confetti particle ────────────────────────────────────────────────────────
 
@@ -194,7 +195,7 @@ export default function CompleteScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + 48,
-          paddingBottom: insets.bottom + 40,
+          paddingBottom: 40,
           paddingHorizontal: 24,
           alignItems: 'center',
         }}
@@ -262,6 +263,7 @@ export default function CompleteScreen() {
           </Pressable>
         </Animated.View>
       </ScrollView>
+      <BottomNav activeTab="learn" />
     </View>
   )
 }

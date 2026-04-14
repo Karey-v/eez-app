@@ -11,6 +11,7 @@ import {
   ListRenderItemInfo,
 } from 'react-native'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -107,8 +108,14 @@ export default function WelcomeScreen() {
   function renderSlide({ item, index }: ListRenderItemInfo<Slide>) {
     return (
       <View style={[styles.slide, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }]}>
-        {/* Purple radial glow — centered circle behind illustration */}
-        <View style={styles.purpleGlow} pointerEvents="none" />
+        {/* Purple radial glow — centered behind illustration */}
+        <LinearGradient
+          colors={['rgba(98,44,255,0.2)', 'transparent']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.purpleGlow}
+          pointerEvents="none"
+        />
 
         {/* Top bar: progress lines + skip */}
         <View

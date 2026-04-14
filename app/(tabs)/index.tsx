@@ -2,6 +2,7 @@
 // Renders first-time or returning view based on userStore.score
 import { useEffect } from 'react'
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import Animated, {
   useSharedValue,
@@ -103,7 +104,12 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
       {/* Hero section — unboxed, directly on dark bg */}
       <View style={styles.heroSection}>
         <View style={styles.firstTimeGlowWrapper} pointerEvents="none">
-          <View style={styles.firstTimeGlow} />
+          <LinearGradient
+            colors={['rgba(98,44,255,0.3)', 'transparent']}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={styles.firstTimeGlow}
+          />
         </View>
         <Text style={styles.heroHeadline}>so... how leakable are you?</Text>
         <Text style={styles.heroSubtext}>find out in 5 minutes.</Text>
@@ -221,7 +227,12 @@ function ReturningView({
       {/* Hero area — unboxed, score on dark bg with lime glow */}
       <View style={styles.heroArea}>
         <View style={styles.returningGlowWrapper} pointerEvents="none">
-          <View style={styles.returningGlow} />
+          <LinearGradient
+            colors={['rgba(177,255,88,0.15)', 'transparent']}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={styles.returningGlow}
+          />
         </View>
         <Text style={[styles.heroScore, { color: bandColor }]}>{score}</Text>
         <Text style={styles.heroBandLabel}>{band.toUpperCase()}</Text>
