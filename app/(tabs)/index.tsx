@@ -65,7 +65,7 @@ export default function HomeScreen() {
               hey {name?.split(' ')[0]?.toLowerCase() || 'you'}.
             </Text>
           ) : (
-            <EezLogo width={44} height={44} color={brand.purple} />
+            <EezLogo width={44} height={44} color="#B1FF58" />
           )}
           <Pressable
             onPress={() => router.push('/notifications/')}
@@ -104,7 +104,7 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
       {/* Hero section — unboxed, directly on dark bg */}
       <View style={styles.heroSection}>
         <LinearGradient
-          colors={['rgba(98,44,255,0.25)', 'transparent']}
+          colors={['rgba(98,44,255,0.5)', 'rgba(98,44,255,0.2)', 'transparent']}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.firstTimeGlow}
@@ -132,12 +132,12 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
         <Card onPress={() => router.push('/(tabs)/radar')}>
           <View style={styles.radarRow}>
             <View style={[styles.categoryDot, { backgroundColor: brand.purpleCTA }]} />
-            <Text style={[type.label, { color: brand.purpleCTA }]}>phishing</Text>
+            <Text style={[type.label, { color: '#8B8CF8', fontFamily: 'Inter_700Bold', fontWeight: '700' }]}>phishing</Text>
             <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
               {radarFeed[0].timestamp}
             </Text>
           </View>
-          <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 6 }]}>
+          <Text style={[type.cardTitle, { color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontWeight: '700', marginTop: 6 }]}>
             {radarFeed[0].headline}
           </Text>
           <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
@@ -223,15 +223,9 @@ function ReturningView({
 
   return (
     <>
-      {/* Hero area — unboxed, score on dark bg with lime glow */}
-      <View style={styles.heroArea}>
-        <LinearGradient
-          colors={['rgba(177,255,88,0.15)', 'transparent']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.returningGlow}
-          pointerEvents="none"
-        />
+      {/* Hero area — deep purple card with lime accent strip */}
+      <View style={[styles.heroArea, { backgroundColor: '#1E1433' }]}>
+        <View style={styles.heroAccentStrip} />
         <Text style={[styles.heroScore, { color: bandColor }]}>{score}</Text>
         <Text style={styles.heroBandLabel}>{band.toUpperCase()}</Text>
         <Text style={styles.heroPersonality}>{personality}</Text>
@@ -281,13 +275,13 @@ function ReturningView({
               style={({ pressed }) => [
                 styles.quickActionCard,
                 {
-                  backgroundColor: colors.bgSecondary,
-                  borderColor: colors.borderWeak,
+                  backgroundColor: '#242424',
+                  borderColor: 'rgba(255,255,255,0.15)',
                   opacity: pressed ? 0.7 : 1,
                 },
               ]}
             >
-              <Text style={[type.body, { color: colors.textPrimary }]}>{action.label}</Text>
+              <Text style={[type.body, { color: '#FFFFFF' }]}>{action.label}</Text>
             </Pressable>
           ))}
         </ScrollView>
@@ -344,7 +338,7 @@ function FraudDetectorCard({ router }: { router: ReturnType<typeof useRouter> })
       onPress={() => router.push('/safety/detector')}
       style={({ pressed }) => [
         styles.detectorCard,
-        { backgroundColor: colors.bgSecondary, opacity: pressed ? 0.92 : 1 },
+        { backgroundColor: '#1A2E1A', opacity: pressed ? 0.92 : 1 },
       ]}
     >
       <View style={styles.detectorTopRow}>
@@ -384,7 +378,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 350,
+    height: 300,
   },
   heroHeadline: {
     fontFamily: 'DMSerifDisplay_400Regular',
@@ -403,7 +397,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   heroCTA: {
-    backgroundColor: '#5B5CF6',
+    backgroundColor: '#B1FF58',
     borderRadius: 50,
     height: 56,
     alignItems: 'center',
@@ -414,7 +408,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A4A00',
   },
   radarRow: {
     flexDirection: 'row',
@@ -428,16 +422,19 @@ const styles = StyleSheet.create({
   },
   // Returning — hero area
   heroArea: {
-    paddingTop: 36,
-    paddingBottom: 28,
+    paddingTop: 48,
+    paddingBottom: 36,
     alignItems: 'center',
+    borderRadius: 16,
+    overflow: 'hidden',
   },
-  returningGlow: {
+  heroAccentStrip: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 350,
+    height: 4,
+    backgroundColor: '#B1FF58',
   },
   heroScore: {
     fontFamily: 'DMSerifDisplay_400Regular',
@@ -481,7 +478,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   statValue: {
     fontFamily: 'DMSerifDisplay_400Regular',
@@ -504,7 +501,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 16,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(0,200,100,0.3)',
   },
   detectorTopRow: {
     flexDirection: 'row',

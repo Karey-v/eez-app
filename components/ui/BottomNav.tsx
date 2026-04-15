@@ -8,7 +8,7 @@ import { LearnIcon } from '@/components/icons/Learn'
 import { RadarIcon } from '@/components/icons/Radar'
 import { ProfileIcon } from '@/components/icons/Profile'
 
-const TAB_ACTIVE_COLOR = '#5B5CF6'
+const TAB_ACTIVE_COLOR = '#B1FF58'
 
 export type BottomNavTab = 'home' | 'learn' | 'radar' | 'profile'
 

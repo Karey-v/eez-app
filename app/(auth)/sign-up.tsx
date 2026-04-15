@@ -58,7 +58,7 @@ export default function SignUpScreen() {
 
         {/* Logo */}
         <View style={styles.logoRow}>
-          <EezLogo width={36} height={36} color={brand.purple} />
+          <EezLogo width={36} height={36} color="#B1FF58" />
         </View>
 
         {/* Heading */}
