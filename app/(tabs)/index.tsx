@@ -1,7 +1,7 @@
 // S10 — Home (first-time state) / S11 — Home (returning state)
 // Renders first-time or returning view based on userStore.score
 import { useEffect } from 'react'
-import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native'
+import { ScrollView, View, Text, Pressable, StyleSheet, Dimensions } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import Animated, {
@@ -22,6 +22,8 @@ import { ArrowIcon } from '@/components/icons/Arrow'
 import { ShieldIcon } from '@/components/icons/Shield'
 import { Card } from '@/components/ui/Card'
 import { radarFeed } from '@/data/radarFeed'
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 const BAND_PERSONALITY: Record<string, string> = {
   'On Lock':        "You're a Vault.",
@@ -104,15 +106,14 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
       {/* Hero section — unboxed, directly on dark bg */}
       <View style={styles.heroSection}>
         <LinearGradient
-          colors={['rgba(98,44,255,0.5)', 'rgba(98,44,255,0.2)', 'transparent']}
+          colors={['rgba(98,44,255,0.6)', 'rgba(98,44,255,0.3)', 'rgba(98,44,255,0.05)', 'transparent']}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.firstTimeGlow}
           pointerEvents="none"
         />
-        <Text style={styles.heroHeadline}>so... how leakable are you?</Text>
-        <Text style={styles.heroSubtext}>find out in 5 minutes.</Text>
-        <View style={{ height: 24 }} />
+        <Text style={[styles.heroHeadline, { marginTop: 60 }]}>so... how leakable are you?</Text>
+        <Text style={[styles.heroSubtext, { marginBottom: 24 }]}>find out in 5 minutes.</Text>
         <Pressable
           onPress={() => router.push('/leakability/intro')}
           style={({ pressed }) => [styles.heroCTA, { opacity: pressed ? 0.88 : 1 }]}
@@ -124,26 +125,50 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
       {/* AI Fraud Detector */}
       <FraudDetectorCard router={router} />
 
-      {/* Latest radar snippet */}
+      {/* START HERE */}
+      <View style={{ marginTop: spacing.sectionTop }}>
+        <Text style={styles.sectionLabel}>START HERE</Text>
+        <Pressable
+          onPress={() => router.push('/(tabs)/learn')}
+          style={({ pressed }) => [styles.moduleCard, { opacity: pressed ? 0.85 : 1 }]}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 22, marginBottom: 8 }}>🔑</Text>
+              <Text style={styles.moduleCardTitle}>Password Glow-Up</Text>
+              <Text style={styles.moduleCardMeta}>4 mins · Beginner</Text>
+            </View>
+            <ArrowIcon size={18} color="#666666" />
+          </View>
+        </Pressable>
+      </View>
+
+      {/* Latest from radar */}
       <View style={{ marginTop: spacing.sectionTop }}>
         <Text style={[type.label, { color: colors.textTertiary, marginBottom: spacing.sectionBottom }]}>
           latest from radar
         </Text>
-        <Card onPress={() => router.push('/(tabs)/radar')}>
-          <View style={styles.radarRow}>
-            <View style={[styles.categoryDot, { backgroundColor: brand.purpleCTA }]} />
-            <Text style={[type.label, { color: '#8B8CF8', fontFamily: 'Inter_700Bold', fontWeight: '700' }]}>phishing</Text>
-            <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
-              {radarFeed[0].timestamp}
-            </Text>
-          </View>
-          <Text style={[type.cardTitle, { color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontWeight: '700', marginTop: 6 }]}>
-            {radarFeed[0].headline}
-          </Text>
-          <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
-            {radarFeed[0].preview}
-          </Text>
-        </Card>
+        <View style={{ gap: 8 }}>
+          {radarFeed.slice(0, 2).map((item) => (
+            <Card key={item.id} onPress={() => router.push('/(tabs)/radar')}>
+              <View style={styles.radarRow}>
+                <View style={[styles.categoryDot, { backgroundColor: brand.purpleCTA }]} />
+                <Text style={[type.label, { color: '#8B8CF8', fontFamily: 'Inter_700Bold', fontWeight: '700' }]}>
+                  {item.category.toLowerCase()}
+                </Text>
+                <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
+                  {item.timestamp}
+                </Text>
+              </View>
+              <Text style={[type.cardTitle, { color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontWeight: '700', marginTop: 6 }]}>
+                {item.headline}
+              </Text>
+              <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
+                {item.preview}
+              </Text>
+            </Card>
+          ))}
+        </View>
       </View>
     </>
   )
@@ -378,15 +403,17 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 300,
+    height: SCREEN_HEIGHT * 0.55,
   },
   heroHeadline: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 32,
-    lineHeight: 38,
+    fontSize: 36,
+    lineHeight: 44,
     fontWeight: '400',
     color: '#FFFFFF',
     textAlign: 'center',
+    maxWidth: '85%',
+    paddingHorizontal: 20,
   },
   heroSubtext: {
     fontFamily: 'Inter_400Regular',
@@ -399,10 +426,11 @@ const styles = StyleSheet.create({
   heroCTA: {
     backgroundColor: '#B1FF58',
     borderRadius: 50,
-    height: 56,
+    height: 48,
+    width: '70%',
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'stretch',
+    alignSelf: 'center',
   },
   heroCTAText: {
     fontFamily: 'Inter_700Bold',
@@ -512,5 +540,29 @@ const styles = StyleSheet.create({
   detectorOnlineRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  sectionLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 10,
+    color: '#666666',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginBottom: 12,
+  },
+  moduleCard: {
+    backgroundColor: '#242424',
+    borderRadius: 14,
+    padding: 16,
+  },
+  moduleCardTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  moduleCardMeta: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#888888',
   },
 })
