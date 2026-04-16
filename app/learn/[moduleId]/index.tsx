@@ -56,10 +56,10 @@ export default function ModuleIntroScreen() {
         {/* Tag + duration chips */}
         <View style={styles.chips}>
           <View style={[styles.chip, { backgroundColor: colors.bgSecondary }]}>
-            <Text style={[type.label, { color: colors.textPrimary }]}>{module.tag}</Text>
+            <Text style={[type.label, { color: colors.textPrimary, textTransform: 'none' }]}>{module.tag}</Text>
           </View>
           <View style={[styles.chip, { backgroundColor: colors.bgSecondary }]}>
-            <Text style={[type.label, { color: colors.textPrimary }]}>⏱ {module.duration}</Text>
+            <Text style={[type.label, { color: colors.textPrimary, textTransform: 'none' }]}>⏱ {module.duration}</Text>
           </View>
         </View>
 

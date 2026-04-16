@@ -66,7 +66,7 @@ export default function LearnScreen() {
             >
               <View style={styles.moduleHeader}>
                 <View style={{ flex: 1 }}>
-                  <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 4 }]}>
+                  <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 4, textTransform: 'none' }]}>
                     {module.tag} · {module.duration}
                   </Text>
                   <Text

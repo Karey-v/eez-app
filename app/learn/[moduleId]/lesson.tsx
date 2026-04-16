@@ -42,7 +42,7 @@ function ProgressDots({ total, current }: { total: number; current: number }) {
           style={[
             styles.dot,
             {
-              backgroundColor: i <= current ? brand.purpleCTA : colors.bgTertiary,
+              backgroundColor: i <= current ? '#B1FF58' : colors.bgTertiary,
               width: i === current ? 20 : 6,
             },
           ]}
@@ -68,7 +68,7 @@ function TextVisualLesson({ lesson }: { lesson: Lesson }) {
       )}
       {lesson.insight && (
         <View style={[styles.insightCard, { backgroundColor: colors.bgSecondary }]}>
-          <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6 }]}>EEZ insight</Text>
+          <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6, textTransform: 'none' }]}>EEZ insight</Text>
           <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
             {lesson.insight}
           </Text>
@@ -109,16 +109,23 @@ function SwipeRevealLesson({
       {/* Reveal panel */}
       <Pressable
         onPress={reveal}
-        style={[styles.revealCard, { backgroundColor: colors.bgSecondary }]}
+        style={[styles.revealCard, { backgroundColor: '#1A1A1A' }]}
       >
         {lesson.subtitle && (
-          <Text style={[type.label, { color: colors.textTertiary, marginBottom: 14 }]}>
+          <Text style={[type.label, { color: '#FFFFFF', marginBottom: 14, textTransform: 'none' }]}>
             {lesson.subtitle}
           </Text>
         )}
         {/* Answer — always rendered, hidden by overlay */}
         <Text
-          style={[type.sectionHead, { color: brand.purpleCTA, textAlign: 'center', lineHeight: 26 }]}
+          style={{
+            fontFamily: 'Inter_700Bold',
+            fontSize: 20,
+            fontWeight: '700',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            lineHeight: 26,
+          }}
         >
           {lesson.revealAnswer}
         </Text>
@@ -130,14 +137,27 @@ function SwipeRevealLesson({
               StyleSheet.absoluteFillObject,
               styles.revealOverlay,
               overlayStyle,
-              { backgroundColor: colors.bgSecondary },
+              { backgroundColor: '#1A1A1A' },
             ]}
           >
             <Text style={{ fontSize: 28, marginBottom: 10 }}>👆</Text>
-            <Text style={[type.label, { color: colors.textTertiary }]}>{lesson.revealLabel}</Text>
+            <Text style={[type.label, { color: '#FFFFFF', textTransform: 'none' }]}>{lesson.revealLabel}</Text>
           </Animated.View>
         )}
       </Pressable>
+      {!revealed && (
+        <Text
+          style={{
+            fontFamily: 'Inter_400Regular',
+            fontSize: 11,
+            color: '#B1FF58',
+            textAlign: 'center',
+            marginTop: 10,
+          }}
+        >
+          swipe to reveal
+        </Text>
+      )}
 
       {revealed && lesson.body && (
         <Animated.Text
@@ -265,7 +285,7 @@ function TapUncoverLesson({
           entering={FadeIn.duration(200)}
           style={[styles.explanationCard, { backgroundColor: colors.bgSecondary }]}
         >
-          <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6 }]}>
+          <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6, textTransform: 'none' }]}>
             {activeSpot.label}
           </Text>
           <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
@@ -329,9 +349,9 @@ function ChoiceLesson({
             : colors.warningText
         const feedbackLabel =
           opt.variant === 'pro-move'
-            ? '✅ Pro Move'
+            ? '✅ Pro move'
             : opt.variant === 'red-flag'
-            ? '🚩 Red Flag'
+            ? '🚩 Red flag'
             : opt.correct
             ? '✅ Correct'
             : '✗ Not quite'
@@ -363,7 +383,7 @@ function ChoiceLesson({
                   { backgroundColor: feedbackBg, borderLeftColor: feedbackColor },
                 ]}
               >
-                <Text style={[type.label, { color: feedbackColor, marginBottom: 4 }]}>
+                <Text style={[type.label, { color: feedbackColor, marginBottom: 4, textTransform: 'none' }]}>
                   {feedbackLabel}
                 </Text>
                 <Text style={[type.body, { color: feedbackColor, lineHeight: 18 }]}>
@@ -442,7 +462,7 @@ export default function LessonScreen() {
           </Pressable>
 
           <View style={[styles.typeChip, { backgroundColor: colors.bgSecondary }]}>
-            <Text style={[type.label, { color: brand.purpleCTA }]}>
+            <Text style={[type.label, { color: brand.purpleCTA, textTransform: 'none' }]}>
               {TYPE_LABELS[lesson.type] ?? lesson.type}
             </Text>
           </View>
