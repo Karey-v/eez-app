@@ -125,24 +125,6 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
       {/* AI Fraud Detector */}
       <FraudDetectorCard router={router} />
 
-      {/* START HERE */}
-      <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={styles.sectionLabel}>START HERE</Text>
-        <Pressable
-          onPress={() => router.push('/(tabs)/learn')}
-          style={({ pressed }) => [styles.moduleCard, { opacity: pressed ? 0.85 : 1 }]}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 22, marginBottom: 8 }}>🔑</Text>
-              <Text style={styles.moduleCardTitle}>Password Glow-Up</Text>
-              <Text style={styles.moduleCardMeta}>4 mins · Beginner</Text>
-            </View>
-            <ArrowIcon size={18} color="#666666" />
-          </View>
-        </Pressable>
-      </View>
-
       {/* Latest from radar */}
       <View style={{ marginTop: spacing.sectionTop }}>
         <Text style={[type.label, { color: colors.textTertiary, marginBottom: spacing.sectionBottom }]}>
