@@ -1,6 +1,6 @@
 // app/radar/map.tsx — Radar Map (stack route version)
 // Same visual as the tab default. Back navigation via header arrow.
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ReactElement } from 'react'
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native'
 import Svg, { Line as SvgLine, Circle, Path } from 'react-native-svg'
 import Animated, {
@@ -20,8 +20,8 @@ const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
 
 function GridBackground() {
   const STEP = 48
-  const vLines: JSX.Element[] = []
-  const hLines: JSX.Element[] = []
+  const vLines: ReactElement[] = []
+  const hLines: ReactElement[] = []
   for (let x = 0; x <= SCREEN_W; x += STEP) {
     vLines.push(
       <SvgLine key={`v${x}`} x1={x} y1={0} x2={x} y2={SCREEN_H}
