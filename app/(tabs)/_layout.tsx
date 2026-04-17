@@ -5,10 +5,10 @@ import { useTheme } from '@/theme'
 import { HomeIcon } from '@/components/icons/Home'
 import { LearnIcon } from '@/components/icons/Learn'
 import { RadarIcon } from '@/components/icons/Radar'
+import { ShieldIcon } from '@/components/icons/Shield'
 import { ProfileIcon } from '@/components/icons/Profile'
 
 const TAB_ACTIVE_COLOR = '#5B5CF6'
-const TAB_DOT_COLOR    = '#B1FF58'
 
 export default function TabLayout() {
   const { colors } = useTheme()
@@ -70,6 +70,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="detect"
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabItem
+              icon={<ShieldIcon size={20} color={focused ? TAB_ACTIVE_COLOR : '#9A9A9A'} strokeWidth={focused ? 2.5 : 1.8} />}
+              label="Detect"
+              focused={focused}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="safety"
         options={{ href: null }}
       />
@@ -93,18 +105,9 @@ function TabItem({ icon, label, focused }: { icon: React.ReactNode; label: strin
   return (
     <View style={styles.tabItem}>
       {icon}
-      <Text
-        style={[
-          styles.label,
-          {
-            color: focused ? TAB_ACTIVE_COLOR : '#9A9A9A',
-            opacity: focused ? 1 : 0.6,
-          },
-        ]}
-      >
+      <Text style={[styles.label, { color: focused ? TAB_ACTIVE_COLOR : '#9A9A9A' }]}>
         {label}
       </Text>
-      {focused ? <View style={styles.dot} /> : <View style={styles.dotPlaceholder} />}
     </View>
   )
 }
@@ -114,25 +117,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 8,
-    gap: 2,
+    gap: 3,
   },
   label: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 9,
     fontWeight: '600',
     textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: TAB_DOT_COLOR,
-    marginTop: 2,
-  },
-  dotPlaceholder: {
-    width: 4,
-    height: 4,
-    marginTop: 2,
+    letterSpacing: 0.5,
   },
 })
