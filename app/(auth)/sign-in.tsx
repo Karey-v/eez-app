@@ -53,11 +53,11 @@ export default function SignInScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
 
         {/* Logo */}
         <View style={styles.logoRow}>
-          <EezLogo width={36} height={36} color="#B1FF58" />
+          <EezLogo width={36} height={36} color="#5B5CF6" />
         </View>
 
         {/* Heading */}

@@ -28,7 +28,7 @@ export function Input({
     backgroundColor: colors.bgSecondary,
     borderRadius: 10,
     borderWidth: focused ? 1 : 0.5,
-    borderColor: focused ? '#5B5CF6' : colors.borderWeak,
+    borderColor: focused ? '#5B5CF6' : 'rgba(98,44,255,0.2)',
     paddingVertical: spacing.inputV,
     paddingHorizontal: spacing.inputH,
     fontFamily: 'Inter_400Regular',

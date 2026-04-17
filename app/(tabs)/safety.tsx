@@ -66,7 +66,7 @@ function ScenarioCard({
       style={({ pressed }) => [
         styles.scenarioCard,
         {
-          backgroundColor: colors.bgSecondary,
+          backgroundColor: '#FFFFFF',
           borderColor: colors.borderWeak,
           opacity: pressed && !disabled ? 0.85 : disabled ? 0.45 : 1,
         },
@@ -96,8 +96,8 @@ export default function SafetyScreen() {
   const router = useRouter()
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
+      <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -185,7 +185,7 @@ export default function SafetyScreen() {
           emergency helplines
         </Text>
 
-        <View style={[styles.helplinesCard, { backgroundColor: colors.bgSecondary }]}>
+        <View style={[styles.helplinesCard, { backgroundColor: '#FFFFFF' }]}>
           {['FTC Report Fraud', 'FBI IC3', 'Crisis Text Line'].map((name, i) => (
             <View
               key={name}

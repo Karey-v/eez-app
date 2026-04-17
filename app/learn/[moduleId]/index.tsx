@@ -22,7 +22,7 @@ export default function ModuleIntroScreen() {
 
   if (!module) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.bgPrimary, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgSecondary, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={[type.body, { color: colors.textSecondary }]}>Module not found.</Text>
       </View>
     )
@@ -34,8 +34,8 @@ export default function ModuleIntroScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
+      <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -55,10 +55,10 @@ export default function ModuleIntroScreen() {
 
         {/* Tag + duration chips */}
         <View style={styles.chips}>
-          <View style={[styles.chip, { backgroundColor: colors.bgSecondary }]}>
+          <View style={[styles.chip, { backgroundColor: '#EEF0FF' }]}>
             <Text style={[type.label, { color: colors.textPrimary, textTransform: 'none' }]}>{module.tag}</Text>
           </View>
-          <View style={[styles.chip, { backgroundColor: colors.bgSecondary }]}>
+          <View style={[styles.chip, { backgroundColor: '#EEF0FF' }]}>
             <Text style={[type.label, { color: colors.textPrimary, textTransform: 'none' }]}>⏱ {module.duration}</Text>
           </View>
         </View>
@@ -77,7 +77,7 @@ export default function ModuleIntroScreen() {
         </Text>
 
         {/* What you'll learn */}
-        <View style={[styles.learnCard, { backgroundColor: colors.bgSecondary }]}>
+        <View style={[styles.learnCard, { backgroundColor: '#FFFFFF' }]}>
           <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 14 }]}>
             what you'll learn
           </Text>

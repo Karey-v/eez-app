@@ -59,7 +59,7 @@ function ProgressLines({ total, current }: { total: number; current: number }) {
           key={i}
           style={[
             styles.progressLine,
-            { backgroundColor: i <= current ? '#FFFFFF' : 'rgba(255,255,255,0.15)' },
+            { backgroundColor: i <= current ? '#5B5CF6' : '#EEF0FF' },
           ]}
         />
       ))}
@@ -99,23 +99,18 @@ export default function QuestionScreen() {
   }, [currentQuestionIndex, nextQuestion, completeTest, setScore, router])
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <StatusBar style="dark" />
 
       {/* ── Fixed header ── */}
       <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
         {/* Thin progress lines — very top */}
         <ProgressLines total={questions.length} current={currentQuestionIndex} />
 
-        {/* Category label — lots of space above */}
-        <Text
-          style={[
-            type.label,
-            { color: '#888888', marginTop: 28 },
-          ]}
-        >
-          {question.category}
-        </Text>
+        {/* Category pill — lots of space above */}
+        <View style={[styles.categoryPill, { marginTop: 28 }]}>
+          <Text style={styles.categoryPillText}>{question.category}</Text>
+        </View>
       </View>
 
       {/* ── Question body — keyed so state fully resets each question ── */}
@@ -207,7 +202,7 @@ function QuestionBody({
         <Text
           style={[
             styles.questionText,
-            { color: '#FFFFFF', marginBottom: 40 },
+            { color: '#0A0A0A', marginBottom: 40 },
           ]}
         >
           {question.prompt}
@@ -217,7 +212,7 @@ function QuestionBody({
       {/* Slider question */}
       {question.type === 'slider' && (
         <>
-          <Text style={[styles.questionText, { color: '#FFFFFF', marginBottom: 32 }]}>
+          <Text style={[styles.questionText, { color: '#0A0A0A', marginBottom: 32 }]}>
             {question.prompt}
           </Text>
           <SliderQuestion
@@ -389,9 +384,9 @@ function OptionButton({
       style={({ pressed }) => [
         styles.optionBtn,
         {
-          borderColor: selected ? '#5B5CF6' : 'rgba(255,255,255,0.08)',
-          borderWidth: selected ? 1.5 : 0.5,
-          backgroundColor: selected ? 'rgba(91,92,246,0.15)' : '#1A1A1A',
+          borderColor: selected ? '#5B5CF6' : 'rgba(98,44,255,0.15)',
+          borderWidth: selected ? 1.5 : 1,
+          backgroundColor: selected ? '#EEF0FF' : '#F8F7FF',
           opacity: anySelected && !selected ? 0.45 : pressed ? 0.8 : 1,
         },
       ]}
@@ -400,7 +395,7 @@ function OptionButton({
         style={{
           fontFamily: 'Inter_400Regular',
           fontSize: 15,
-          color: '#FFFFFF',
+          color: '#0A0A0A',
           lineHeight: 20,
         }}
       >
@@ -559,6 +554,20 @@ const styles = StyleSheet.create({
     height: 2,
     borderRadius: 1,
   },
+  categoryPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#EEF0FF',
+    borderRadius: 50,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  categoryPillText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: '#5B5CF6',
+  },
   body: {
     flexGrow: 1,
   },
@@ -567,7 +576,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     lineHeight: 34,
     fontWeight: '400',
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     textAlign: 'left',
   },
   scenarioCard: {

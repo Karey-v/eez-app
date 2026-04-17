@@ -7,7 +7,8 @@ import { LearnIcon } from '@/components/icons/Learn'
 import { RadarIcon } from '@/components/icons/Radar'
 import { ProfileIcon } from '@/components/icons/Profile'
 
-const TAB_ACTIVE_COLOR = '#B1FF58'
+const TAB_ACTIVE_COLOR = '#5B5CF6'
+const TAB_DOT_COLOR    = '#B1FF58'
 
 export default function TabLayout() {
   const { colors } = useTheme()
@@ -19,16 +20,16 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: {
           height: 64 + insets.bottom,
-          backgroundColor: '#111111',
+          backgroundColor: '#FFFFFF',
           borderTopWidth: 0.5,
-          borderTopColor: 'rgba(255,255,255,0.12)',
+          borderTopColor: 'rgba(98,44,255,0.15)',
           paddingBottom: insets.bottom,
           paddingTop: 0,
           elevation: 0,
           shadowOpacity: 0,
         },
         tabBarActiveTintColor: TAB_ACTIVE_COLOR,
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.5)',
+        tabBarInactiveTintColor: '#9A9A9A',
         tabBarShowLabel: false,
       }}
     >
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: TAB_ACTIVE_COLOR,
+    backgroundColor: TAB_DOT_COLOR,
     marginTop: 2,
   },
   dotPlaceholder: {

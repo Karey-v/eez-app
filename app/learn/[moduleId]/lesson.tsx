@@ -67,7 +67,7 @@ function TextVisualLesson({ lesson }: { lesson: Lesson }) {
         </Text>
       )}
       {lesson.insight && (
-        <View style={[styles.insightCard, { backgroundColor: colors.bgSecondary }]}>
+        <View style={[styles.insightCard, { backgroundColor: '#FFFFFF' }]}>
           <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6, textTransform: 'none' }]}>EEZ insight</Text>
           <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
             {lesson.insight}
@@ -109,10 +109,10 @@ function SwipeRevealLesson({
       {/* Reveal panel */}
       <Pressable
         onPress={reveal}
-        style={[styles.revealCard, { backgroundColor: '#1A1A1A' }]}
+        style={[styles.revealCard, { backgroundColor: '#EEF0FF' }]}
       >
         {lesson.subtitle && (
-          <Text style={[type.label, { color: '#FFFFFF', marginBottom: 14, textTransform: 'none' }]}>
+          <Text style={[type.label, { color: '#5B5CF6', marginBottom: 14, textTransform: 'none' }]}>
             {lesson.subtitle}
           </Text>
         )}
@@ -122,7 +122,7 @@ function SwipeRevealLesson({
             fontFamily: 'Inter_700Bold',
             fontSize: 20,
             fontWeight: '700',
-            color: '#FFFFFF',
+            color: '#0A0A0A',
             textAlign: 'center',
             lineHeight: 26,
           }}
@@ -137,11 +137,11 @@ function SwipeRevealLesson({
               StyleSheet.absoluteFillObject,
               styles.revealOverlay,
               overlayStyle,
-              { backgroundColor: '#1A1A1A' },
+              { backgroundColor: '#EEF0FF' },
             ]}
           >
             <Text style={{ fontSize: 28, marginBottom: 10 }}>👆</Text>
-            <Text style={[type.label, { color: '#FFFFFF', textTransform: 'none' }]}>{lesson.revealLabel}</Text>
+            <Text style={[type.label, { color: '#5B5CF6', textTransform: 'none' }]}>{lesson.revealLabel}</Text>
           </Animated.View>
         )}
       </Pressable>
@@ -150,7 +150,7 @@ function SwipeRevealLesson({
           style={{
             fontFamily: 'Inter_400Regular',
             fontSize: 11,
-            color: '#B1FF58',
+            color: '#5B5CF6',
             textAlign: 'center',
             marginTop: 10,
           }}
@@ -283,7 +283,7 @@ function TapUncoverLesson({
         <Animated.View
           key={activeSpot.id}
           entering={FadeIn.duration(200)}
-          style={[styles.explanationCard, { backgroundColor: colors.bgSecondary }]}
+          style={[styles.explanationCard, { backgroundColor: '#FFFFFF' }]}
         >
           <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6, textTransform: 'none' }]}>
             {activeSpot.label}
@@ -365,7 +365,7 @@ function ChoiceLesson({
                 {
                   borderColor: isSelected ? brand.purpleCTA : colors.borderWeak,
                   borderWidth: isSelected ? 1.5 : 0.5,
-                  backgroundColor: isSelected ? 'rgba(91,92,246,0.15)' : colors.bgSecondary,
+                  backgroundColor: isSelected ? 'rgba(91,92,246,0.12)' : '#FFFFFF',
                   opacity: selected !== null && !isSelected ? 0.45 : 1,
                 },
               ]}
@@ -431,15 +431,15 @@ export default function LessonScreen() {
 
   if (!lesson) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.bgPrimary, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgSecondary, justifyContent: 'center', alignItems: 'center' }}>
         <Text style={[type.body, { color: colors.textSecondary }]}>Loading…</Text>
       </View>
     )
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
+      <StatusBar style="dark" />
 
       {/* Fixed header */}
       <View
@@ -461,7 +461,7 @@ export default function LessonScreen() {
             <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
           </Pressable>
 
-          <View style={[styles.typeChip, { backgroundColor: colors.bgSecondary }]}>
+          <View style={[styles.typeChip, { backgroundColor: '#EEF0FF' }]}>
             <Text style={[type.label, { color: brand.purpleCTA, textTransform: 'none' }]}>
               {TYPE_LABELS[lesson.type] ?? lesson.type}
             </Text>
@@ -506,7 +506,7 @@ export default function LessonScreen() {
             {
               paddingBottom: 16,
               paddingHorizontal: spacing.screenH,
-              backgroundColor: colors.bgPrimary,
+              backgroundColor: colors.bgSecondary,
               borderTopColor: colors.borderWeak,
             },
           ]}

@@ -29,7 +29,7 @@ export default function TestIntroScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -50,26 +50,30 @@ export default function TestIntroScreen() {
           <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
         </Pressable>
 
+        {/* Detective emoji */}
+        <Text style={styles.heroEmoji}>🕵️</Text>
+
         {/* Title */}
-        <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 8, marginTop: 24 }]}>
+        <Text style={[type.label, { color: brand.purple, marginBottom: 8 }]}>
           leakability test
         </Text>
-        <Text style={[type.heroTitle, { color: colors.textPrimary, lineHeight: 36, marginBottom: 16 }]}>
+        <Text style={[type.heroTitle, { color: colors.textPrimary, lineHeight: 36, marginBottom: 12 }]}>
           the leakability test.
         </Text>
-        <Text style={[type.body, { color: colors.textSecondary, lineHeight: 20, marginBottom: 28 }]}>
+        <Text style={[type.body, { color: colors.textSecondary, lineHeight: 20, marginBottom: 4 }]}>
           10 questions based on how you actually behave online. you'll get a personalised score, a risk band, and specific things to watch out for.
         </Text>
+        <Text style={styles.meltEmoji}>🫠</Text>
 
-        {/* Info chips — lavender bg per spec */}
+        {/* Info chips — lavender bg */}
         <View style={styles.chips}>
           {INFO_CHIPS.map((chip) => (
             <View
               key={chip.label}
-              style={[styles.chip, { backgroundColor: colors.bgSecondary }]}
+              style={[styles.chip, { backgroundColor: brand.lavender }]}
             >
               <Text style={{ fontSize: 12 }}>{chip.icon}</Text>
-              <Text style={[type.label, { color: colors.textPrimary }]}>{chip.label}</Text>
+              <Text style={[type.label, { color: brand.purple }]}>{chip.label}</Text>
             </View>
           ))}
         </View>
@@ -118,6 +122,16 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     justifyContent: 'center',
+  },
+  heroEmoji: {
+    fontSize: 48,
+    marginTop: 20,
+    marginBottom: 16,
+  },
+  meltEmoji: {
+    fontSize: 28,
+    marginTop: 8,
+    marginBottom: 20,
   },
   chips: {
     flexDirection: 'row',

@@ -284,7 +284,7 @@ export default function RadarFeedScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#F5F5F7',
+    backgroundColor: '#F8F7FF',
   },
   headerRow: {
     flexDirection: 'row',

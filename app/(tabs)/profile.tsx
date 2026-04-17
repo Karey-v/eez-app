@@ -40,7 +40,7 @@ function SettingsRow({
         styles.settingsRow,
         {
           borderBottomWidth: last ? 0 : 0.5,
-          borderBottomColor: 'rgba(255,255,255,0.06)',
+          borderBottomColor: 'rgba(98,44,255,0.1)',
           opacity: pressed ? 0.65 : 1,
         },
       ]}
@@ -87,7 +87,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -107,7 +107,7 @@ export default function ProfileScreen() {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials || '?'}</Text>
           </View>
-          <Text style={styles.userName}>{name.toLowerCase()}</Text>
+          <Text style={[styles.userName, { color: colors.textPrimary }]}>{name.toLowerCase()}</Text>
           {band ? (
             <View style={[styles.bandBadge, { backgroundColor: bandColor ?? '#5B5CF6' }]}>
               <Text style={styles.bandBadgeText}>{band.toUpperCase()}</Text>
@@ -119,7 +119,7 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Stats row — 4 equal white cards */}
+        {/* Stats row */}
         <View style={styles.statsRow}>
           <StatCard value={score ?? '—'} label="score" />
           <StatCard value={completedModules.length} label="modules" />
@@ -145,13 +145,13 @@ export default function ProfileScreen() {
                 style={[
                   styles.badgeItem,
                   {
-                    backgroundColor: earned ? badge.color : colors.bgSecondary,
+                    backgroundColor: earned ? badge.color : '#EEF0FF',
                     borderColor: colors.borderWeak,
                     borderWidth: earned ? 0 : 0.5,
                   },
                 ]}
               >
-                <Text style={{ fontSize: 24, opacity: earned ? 1 : 0.3 }}>{badge.icon}</Text>
+                <Text style={{ fontSize: 24, opacity: earned ? 1 : 0.4 }}>{badge.icon}</Text>
                 <Text
                   style={[
                     type.meta,
@@ -209,7 +209,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#F8F7FF',
   },
   avatarSection: {
     alignItems: 'center',
@@ -232,7 +232,6 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 24,
     lineHeight: 30,
-    color: '#FFFFFF',
     textAlign: 'center',
     marginTop: 14,
   },
@@ -254,19 +253,19 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 4,
     alignItems: 'center',
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(98,44,255,0.12)',
   },
   statNumber: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 22,
     lineHeight: 26,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
   },
   statLabel: {
     fontFamily: 'Inter_600SemiBold',
@@ -290,10 +289,10 @@ const styles = StyleSheet.create({
   },
   settingsCard: {
     borderRadius: 14,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(98,44,255,0.12)',
   },
   settingsRow: {
     flexDirection: 'row',
@@ -305,14 +304,14 @@ const styles = StyleSheet.create({
   settingsLabel: {
     fontFamily: 'Inter_400Regular',
     fontSize: 13,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
   },
   settingsLabelDanger: {
-    color: '#F87171',
+    color: '#CC0000',
   },
   settingsChevron: {
     fontFamily: 'Inter_400Regular',
     fontSize: 16,
-    color: '#666666',
+    color: '#9A9A9A',
   },
 })

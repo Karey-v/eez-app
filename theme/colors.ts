@@ -9,12 +9,12 @@ export const brand = {
 
 export const light = {
   bgPrimary:     '#FFFFFF',
-  bgSecondary:   '#F5F5F7',
-  bgTertiary:    '#EBEBEB',
+  bgSecondary:   '#F8F7FF',
+  bgTertiary:    '#EEF0FF',
   textPrimary:   '#0A0A0A',
   textSecondary: '#5A5A5A',
   textTertiary:  '#9A9A9A',
-  borderWeak:    'rgba(0,0,0,0.15)',
+  borderWeak:    'rgba(98,44,255,0.12)',
   borderMid:     'rgba(0,0,0,0.30)',
   successBg:     '#E6F4EC',
   successText:   '#007549',

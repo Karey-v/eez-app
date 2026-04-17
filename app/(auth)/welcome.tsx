@@ -53,33 +53,33 @@ function SlideIllustration({ type }: { type: Slide['illustration'] }) {
   if (type === 'eye') {
     return (
       <Svg width={80} height={80} viewBox="0 0 80 80" fill="none">
-        <Circle cx={40} cy={40} r={26} stroke="#602CFF" strokeWidth={1.5} />
-        <Circle cx={40} cy={40} r={10} stroke="#602CFF" strokeWidth={1.5} />
+        <Circle cx={40} cy={40} r={26} stroke="#B1FF58" strokeWidth={1.5} />
+        <Circle cx={40} cy={40} r={10} stroke="#B1FF58" strokeWidth={1.5} />
       </Svg>
     )
   }
   if (type === 'wifi') {
     return (
       <Svg width={80} height={80} viewBox="0 0 80 80" fill="none">
-        <Path d="M10 38 Q40 14 70 38" stroke="#602CFF" strokeWidth={1.5} strokeLinecap="round" />
-        <Path d="M19 50 Q40 30 61 50" stroke="#602CFF" strokeWidth={1.5} strokeLinecap="round" />
-        <Path d="M28 62 Q40 48 52 62" stroke="#602CFF" strokeWidth={1.5} strokeLinecap="round" />
-        <Circle cx={40} cy={70} r={3} fill="#602CFF" />
+        <Path d="M10 38 Q40 14 70 38" stroke="#B1FF58" strokeWidth={1.5} strokeLinecap="round" />
+        <Path d="M19 50 Q40 30 61 50" stroke="#B1FF58" strokeWidth={1.5} strokeLinecap="round" />
+        <Path d="M28 62 Q40 48 52 62" stroke="#B1FF58" strokeWidth={1.5} strokeLinecap="round" />
+        <Circle cx={40} cy={70} r={3} fill="#B1FF58" />
       </Svg>
     )
   }
   // lock
   return (
     <Svg width={80} height={80} viewBox="0 0 80 80" fill="none">
-      <Rect x={18} y={40} width={44} height={28} rx={6} stroke="#602CFF" strokeWidth={1.5} />
+      <Rect x={18} y={40} width={44} height={28} rx={6} stroke="#B1FF58" strokeWidth={1.5} />
       <Path
         d="M26 40V32C26 18 54 18 54 32V40"
-        stroke="#602CFF"
+        stroke="#B1FF58"
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <Circle cx={40} cy={54} r={4} stroke="#602CFF" strokeWidth={1.5} />
+      <Circle cx={40} cy={54} r={4} stroke="#B1FF58" strokeWidth={1.5} />
     </Svg>
   )
 }
@@ -108,17 +108,17 @@ export default function WelcomeScreen() {
   function renderSlide({ item, index }: ListRenderItemInfo<Slide>) {
     return (
       <View style={[styles.slide, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }]}>
-        {/* Layer 1: dark purple at top fading to near-black — full screen base */}
+        {/* Layer 1: deep purple base */}
         <LinearGradient
-          colors={['#1a0a2e', '#0a0a0a']}
+          colors={['#2D1B69', '#1A0A45']}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.gradientLayer1}
           pointerEvents="none"
         />
-        {/* Layer 2: bright purple glow from top center fading out over 60% */}
+        {/* Layer 2: lighter purple overlay from top */}
         <LinearGradient
-          colors={['rgba(98,44,255,0.6)', 'rgba(98,44,255,0)']}
+          colors={['rgba(139,92,246,0.3)', 'rgba(139,92,246,0)']}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.gradientLayer2}
@@ -140,7 +140,7 @@ export default function WelcomeScreen() {
                   styles.progressLine,
                   {
                     backgroundColor:
-                      i <= activeIndex ? '#602CFF' : 'rgba(255,255,255,0.2)',
+                      i <= activeIndex ? '#B1FF58' : 'rgba(255,255,255,0.2)',
                   },
                 ]}
               />
@@ -212,13 +212,13 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#2D1B69',
   },
   flatList: {
     flex: 1,
   },
   slide: {
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#2D1B69',
   },
   gradientLayer1: {
     position: 'absolute',
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   verticalLine: {
     width: 1,
     height: 120,
-    backgroundColor: '#602CFF',
+    backgroundColor: '#B1FF58',
   },
   slideContent: {
     marginTop: 32,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   ctaButton: {
-    backgroundColor: '#602CFF',
+    backgroundColor: '#B1FF58',
     borderRadius: 50,
     height: 56,
     alignItems: 'center',
@@ -300,6 +300,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A4A00',
   },
 })

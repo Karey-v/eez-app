@@ -18,8 +18,8 @@ export default function LearnScreen() {
   const { completedModules } = useLearnStore()
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
+      <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -35,7 +35,7 @@ export default function LearnScreen() {
         </Text>
 
         {/* Streak chip */}
-        <View style={[styles.streakRow, { backgroundColor: colors.bgSecondary }]}>
+        <View style={[styles.streakRow, { backgroundColor: '#EEF0FF' }]}>
           <Text style={{ fontSize: 14 }}>🔥</Text>
           <Text style={[type.cardTitle, { color: colors.textPrimary }]}>
             {streak} day streak
@@ -57,7 +57,7 @@ export default function LearnScreen() {
               style={[
                 styles.moduleCard,
                 {
-                  backgroundColor: colors.bgSecondary,
+                  backgroundColor: '#FFFFFF',
                   borderColor: colors.borderWeak,
                   opacity: isLocked ? 0.45 : 1,
                   marginBottom: spacing.cardGap,
@@ -85,8 +85,8 @@ export default function LearnScreen() {
                 {isLocked ? (
                   <Text style={{ fontSize: 18 }}>🔒</Text>
                 ) : isCompleted ? (
-                  <View style={[styles.donePill, { backgroundColor: colors.successBg }]}>
-                    <Text style={[type.label, { color: colors.successText }]}>done ✓</Text>
+                  <View style={[styles.donePill, { backgroundColor: '#E8FFB0' }]}>
+                    <Text style={[type.label, { color: '#007549' }]}>done ✓</Text>
                   </View>
                 ) : (
                   <Pressable
@@ -125,7 +125,7 @@ export default function LearnScreen() {
                 style={[
                   styles.badgeCircle,
                   {
-                    backgroundColor: earned ? badge.color : colors.bgSecondary,
+                    backgroundColor: earned ? badge.color : '#EEF0FF',
                     borderColor: earned ? badge.color : colors.borderWeak,
                   },
                 ]}

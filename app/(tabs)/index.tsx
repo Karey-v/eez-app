@@ -2,7 +2,6 @@
 // Renders first-time or returning view based on userStore.score
 import { useEffect } from 'react'
 import { ScrollView, View, Text, Pressable, StyleSheet, Dimensions } from 'react-native'
-import { LinearGradient } from 'expo-linear-gradient'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import Animated, {
   useSharedValue,
@@ -19,7 +18,6 @@ import { useUserStore } from '@/store/userStore'
 import { EezLogo } from '@/components/icons/EezLogo'
 import { BellIcon } from '@/components/icons/Bell'
 import { ArrowIcon } from '@/components/icons/Arrow'
-import { ShieldIcon } from '@/components/icons/Shield'
 import { Card } from '@/components/ui/Card'
 import { radarFeed } from '@/data/radarFeed'
 
@@ -51,8 +49,8 @@ export default function HomeScreen() {
   const hasScore = score !== null
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
+      <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -67,7 +65,7 @@ export default function HomeScreen() {
               hey {name?.split(' ')[0]?.toLowerCase() || 'you'}.
             </Text>
           ) : (
-            <EezLogo width={44} height={44} color="#B1FF58" />
+            <EezLogo width={44} height={44} color={brand.purple} />
           )}
           <Pressable
             onPress={() => router.push('/notifications/')}
@@ -103,23 +101,22 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
 
   return (
     <>
-      {/* Hero section — unboxed, directly on dark bg */}
-      <View style={styles.heroSection}>
-        <LinearGradient
-          colors={['rgba(98,44,255,0.6)', 'rgba(98,44,255,0.3)', 'rgba(98,44,255,0.05)', 'transparent']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.firstTimeGlow}
-          pointerEvents="none"
-        />
-        <Text style={[styles.heroHeadline, { marginTop: 60 }]}>so... how leakable are you?</Text>
-        <Text style={[styles.heroSubtext, { marginBottom: 24 }]}>find out in 5 minutes.</Text>
-        <Pressable
-          onPress={() => router.push('/leakability/intro')}
-          style={({ pressed }) => [styles.heroCTA, { opacity: pressed ? 0.88 : 1 }]}
-        >
-          <Text style={styles.heroCTAText}>start the test</Text>
-        </Pressable>
+      {/* Hero card — white with EEF0FF tinted headline area */}
+      <View style={styles.heroCard}>
+        {/* Tinted headline area */}
+        <View style={styles.heroTintArea}>
+          <Text style={styles.heroHeadline}>so... how leakable{'\n'}are you?</Text>
+          <Text style={styles.heroSubtext}>find out in 5 minutes.</Text>
+        </View>
+        {/* CTA area */}
+        <View style={styles.heroCTAArea}>
+          <Pressable
+            onPress={() => router.push('/leakability/intro')}
+            style={({ pressed }) => [styles.heroCTA, { opacity: pressed ? 0.88 : 1 }]}
+          >
+            <Text style={styles.heroCTAText}>start the test</Text>
+          </Pressable>
+        </View>
       </View>
 
       {/* AI Fraud Detector */}
@@ -132,17 +129,21 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
         </Text>
         <View style={{ gap: 8 }}>
           {radarFeed.slice(0, 2).map((item) => (
-            <Card key={item.id} onPress={() => router.push('/(tabs)/radar')}>
+            <Card
+              key={item.id}
+              style={{ backgroundColor: '#FFFFFF' }}
+              onPress={() => router.push('/(tabs)/radar')}
+            >
               <View style={styles.radarRow}>
                 <View style={[styles.categoryDot, { backgroundColor: brand.purpleCTA }]} />
-                <Text style={[type.label, { color: '#8B8CF8', fontFamily: 'Inter_700Bold', fontWeight: '700' }]}>
+                <Text style={[type.label, { color: brand.purpleCTA }]}>
                   {item.category.toLowerCase()}
                 </Text>
                 <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
                   {item.timestamp}
                 </Text>
               </View>
-              <Text style={[type.cardTitle, { color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontWeight: '700', marginTop: 6 }]}>
+              <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 6 }]}>
                 {item.headline}
               </Text>
               <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
@@ -158,20 +159,19 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
 
 // ─── Returning view (S11) ────────────────────────────────────────────────────
 
-function BandIllustration({ band }: { band: string }) {
-  const stroke = 'rgba(255,255,255,0.85)'
+function BandIllustration({ band, color }: { band: string; color: string }) {
   const sw = 1.5
   const size = 44
 
   if (band === 'On Lock') {
     return (
       <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
-        <Rect x={8} y={22} width={28} height={18} rx={4} stroke={stroke} strokeWidth={sw} />
+        <Rect x={8} y={22} width={28} height={18} rx={4} stroke={color} strokeWidth={sw} />
         <Path
           d="M13 22V17C13 9 31 9 31 17V22"
-          stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
+          stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
         />
-        <Circle cx={22} cy={31} r={3} stroke={stroke} strokeWidth={sw} />
+        <Circle cx={22} cy={31} r={3} stroke={color} strokeWidth={sw} />
       </Svg>
     )
   }
@@ -180,7 +180,7 @@ function BandIllustration({ band }: { band: string }) {
       <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
         <Path
           d="M25 4L11 24H21L19 40L33 20H23L25 4Z"
-          stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
+          stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
         />
       </Svg>
     )
@@ -190,15 +190,15 @@ function BandIllustration({ band }: { band: string }) {
       <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
         <Path
           d="M22 4L25.5 14H36L27.5 20L30.5 30L22 24L13.5 30L16.5 20L8 14H18.5L22 4Z"
-          stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
+          stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
         />
       </Svg>
     )
   }
   return (
     <Svg width={size} height={size} viewBox="0 0 44 44" fill="none">
-      <Path d="M4 18C4 13 8 10 13 10H20C25 10 29 13 29 18C29 23 25 26 20 26H13C8 26 4 23 4 18Z" stroke={stroke} strokeWidth={sw} />
-      <Path d="M15 26C15 21 19 18 24 18H31C36 18 40 21 40 26C40 31 36 34 31 34H24C19 34 15 31 15 26Z" stroke={stroke} strokeWidth={sw} />
+      <Path d="M4 18C4 13 8 10 13 10H20C25 10 29 13 29 18C29 23 25 26 20 26H13C8 26 4 23 4 18Z" stroke={color} strokeWidth={sw} />
+      <Path d="M15 26C15 21 19 18 24 18H31C36 18 40 21 40 26C40 31 36 34 31 34H24C19 34 15 31 15 26Z" stroke={color} strokeWidth={sw} />
     </Svg>
   )
 }
@@ -230,11 +230,11 @@ function ReturningView({
 
   return (
     <>
-      {/* Hero area — deep purple card with lime accent strip */}
-      <View style={[styles.heroArea, { backgroundColor: '#1E1433' }]}>
-        <View style={styles.heroAccentStrip} />
+      {/* Score card — white, 3px top band-color strip */}
+      <View style={[styles.heroArea, { backgroundColor: '#FFFFFF' }]}>
+        <View style={[styles.heroAccentStrip, { backgroundColor: bandColor }]} />
         <Text style={[styles.heroScore, { color: bandColor }]}>{score}</Text>
-        <Text style={styles.heroBandLabel}>{band.toUpperCase()}</Text>
+        <Text style={[styles.heroBandLabel, { color: bandColor }]}>{band.toUpperCase()}</Text>
         <Text style={styles.heroPersonality}>{personality}</Text>
         <Pressable
           onPress={() => router.push('/leakability/breakdown')}
@@ -247,18 +247,19 @@ function ReturningView({
 
       {/* Stats row */}
       <View style={styles.statsRow}>
-        <View style={[styles.statCard, { backgroundColor: colors.bgSecondary }]}>
-          <Text style={[styles.statValue, { color: colors.textPrimary }]}>{score}</Text>
-          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>out of 48</Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: colors.bgSecondary }]}>
-          <Text style={[styles.statValue, { color: bandColor }]}>{band.split(' ')[0]}</Text>
-          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>band</Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: colors.bgSecondary }]}>
-          <Text style={[styles.statValue, { color: colors.textPrimary }]}>{testDate}</Text>
-          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>last test</Text>
-        </View>
+        {[
+          { value: String(score), label: 'out of 48', valueColor: colors.textPrimary },
+          { value: band.split(' ')[0], label: 'band', valueColor: bandColor },
+          { value: testDate, label: 'last test', valueColor: colors.textPrimary },
+        ].map((stat) => (
+          <View
+            key={stat.label}
+            style={[styles.statCard, { backgroundColor: '#FFFFFF', borderColor: colors.borderWeak }]}
+          >
+            <Text style={[styles.statValue, { color: stat.valueColor }]}>{stat.value}</Text>
+            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>{stat.label}</Text>
+          </View>
+        ))}
       </View>
 
       {/* AI Fraud Detector */}
@@ -282,13 +283,13 @@ function ReturningView({
               style={({ pressed }) => [
                 styles.quickActionCard,
                 {
-                  backgroundColor: '#242424',
-                  borderColor: 'rgba(255,255,255,0.15)',
+                  backgroundColor: colors.bgTertiary,
+                  borderColor: colors.borderWeak,
                   opacity: pressed ? 0.7 : 1,
                 },
               ]}
             >
-              <Text style={[type.body, { color: '#FFFFFF' }]}>{action.label}</Text>
+              <Text style={[type.body, { color: '#5B5CF6' }]}>{action.label}</Text>
             </Pressable>
           ))}
         </ScrollView>
@@ -299,7 +300,7 @@ function ReturningView({
         <Text style={[type.label, { color: colors.textTertiary, marginBottom: spacing.sectionBottom }]}>
           based on your score, start here
         </Text>
-        <Card onPress={() => router.push('/learn/password-glow-up')}>
+        <Card style={{ backgroundColor: '#FFFFFF' }} onPress={() => router.push('/learn/password-glow-up')}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flex: 1 }}>
               <Text style={[type.label, { color: '#5B5CF6', marginBottom: 4 }]}>🔑 passwords</Text>
@@ -333,7 +334,7 @@ function HomePulseDot() {
   const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }))
   return (
     <Animated.View
-      style={[{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#B1FF58' }, style]}
+      style={[{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#007549' }, style]}
     />
   )
 }
@@ -345,13 +346,13 @@ function FraudDetectorCard({ router }: { router: ReturnType<typeof useRouter> })
       onPress={() => router.push('/safety/detector')}
       style={({ pressed }) => [
         styles.detectorCard,
-        { backgroundColor: '#1A2E1A', opacity: pressed ? 0.92 : 1 },
+        { opacity: pressed ? 0.92 : 1 },
       ]}
     >
       <View style={styles.detectorTopRow}>
         <View style={styles.detectorOnlineRow}>
           <HomePulseDot />
-          <Text style={[type.label, { color: '#4ADE80', marginLeft: 6 }]}>online</Text>
+          <Text style={[type.label, { color: '#007549', marginLeft: 6 }]}>online</Text>
         </View>
         <ArrowIcon size={16} color={colors.textTertiary} />
       </View>
@@ -361,7 +362,7 @@ function FraudDetectorCard({ router }: { router: ReturnType<typeof useRouter> })
       <Text style={[type.body, { color: colors.textSecondary, lineHeight: 18 }]}>
         paste a message, email, or describe a situation — we'll tell you if something's off.
       </Text>
-      <Text style={[type.label, { color: '#B1FF58', marginTop: 14 }]}>try it now →</Text>
+      <Text style={[type.label, { color: '#007549', marginTop: 14 }]}>try it now →</Text>
     </Pressable>
   )
 }
@@ -375,44 +376,46 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 16,
   },
-  // First-time
-  heroSection: {
-    paddingVertical: 40,
-    alignItems: 'center',
+  // First-time hero card
+  heroCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    borderWidth: 0.5,
+    borderColor: 'rgba(98,44,255,0.15)',
+    overflow: 'hidden',
   },
-  firstTimeGlow: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: SCREEN_HEIGHT * 0.55,
+  heroTintArea: {
+    backgroundColor: '#EEF0FF',
+    paddingHorizontal: 20,
+    paddingTop: 32,
+    paddingBottom: 24,
   },
   heroHeadline: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 36,
-    lineHeight: 44,
+    fontSize: 32,
+    lineHeight: 40,
     fontWeight: '400',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    maxWidth: '85%',
-    paddingHorizontal: 20,
+    color: '#0A0A0A',
+    textAlign: 'left',
   },
   heroSubtext: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
     lineHeight: 21,
-    color: '#AAAAAA',
-    textAlign: 'center',
-    marginTop: 12,
+    color: '#5A5A5A',
+    textAlign: 'left',
+    marginTop: 10,
+  },
+  heroCTAArea: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   heroCTA: {
     backgroundColor: '#B1FF58',
     borderRadius: 50,
     height: 48,
-    width: '70%',
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'center',
   },
   heroCTAText: {
     fontFamily: 'Inter_700Bold',
@@ -430,33 +433,33 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
-  // Returning — hero area
+  // Returning — score card
   heroArea: {
     paddingTop: 48,
     paddingBottom: 36,
     alignItems: 'center',
     borderRadius: 16,
     overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: 'rgba(98,44,255,0.15)',
   },
   heroAccentStrip: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 4,
-    backgroundColor: '#B1FF58',
+    height: 3,
   },
   heroScore: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 80,
-    lineHeight: 88,
+    fontSize: 72,
+    lineHeight: 80,
     fontWeight: '400',
     marginTop: 8,
   },
   heroBandLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 12,
-    color: '#AAAAAA',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginTop: 2,
@@ -464,7 +467,7 @@ const styles = StyleSheet.create({
   heroPersonality: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    color: '#AAAAAA',
+    color: '#5A5A5A',
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: 4,
@@ -472,7 +475,7 @@ const styles = StyleSheet.create({
   heroBreakdownLink: {
     fontFamily: 'Inter_400Regular',
     fontSize: 11,
-    color: '#666666',
+    color: '#9A9A9A',
   },
   // Stats row
   statsRow: {
@@ -488,7 +491,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.12)',
   },
   statValue: {
     fontFamily: 'DMSerifDisplay_400Regular',
@@ -508,10 +510,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   detectorCard: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     padding: 16,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,200,100,0.3)',
+    borderLeftWidth: 3,
+    borderLeftColor: '#007549',
+    borderTopWidth: 0.5,
+    borderRightWidth: 0.5,
+    borderBottomWidth: 0.5,
+    borderTopColor: 'rgba(0,117,73,0.15)',
+    borderRightColor: 'rgba(0,117,73,0.15)',
+    borderBottomColor: 'rgba(0,117,73,0.15)',
   },
   detectorTopRow: {
     flexDirection: 'row',
@@ -522,29 +531,5 @@ const styles = StyleSheet.create({
   detectorOnlineRow: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  sectionLabel: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 10,
-    color: '#666666',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-    marginBottom: 12,
-  },
-  moduleCard: {
-    backgroundColor: '#242424',
-    borderRadius: 14,
-    padding: 16,
-  },
-  moduleCardTitle: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 15,
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  moduleCardMeta: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 13,
-    color: '#888888',
   },
 })

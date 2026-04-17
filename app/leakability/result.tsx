@@ -1,5 +1,5 @@
 // S23 — Score Result
-// Animated count-up (0 → score, 1.5s ease-out), band label, gauge bar, 3 CTAs
+// Light mode, circular progress ring, band pill, green-to-red gauge, outline secondary CTAs
 import { useEffect, useState, useRef } from 'react'
 import { View, Text, Pressable, ScrollView, Share, StyleSheet } from 'react-native'
 import Animated, {
@@ -10,12 +10,20 @@ import Animated, {
   FadeInUp,
   Easing,
 } from 'react-native-reanimated'
+import Svg, { Circle } from 'react-native-svg'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { useUserStore } from '@/store/userStore'
 import { getBand } from '@/data/questions'
+
+const RING_SIZE = 160
+const RING_STROKE = 10
+const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2
+const RING_CENTER = RING_SIZE / 2
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
 
 const BAND_DESCRIPTIONS: Record<string, string> = {
   'On Lock':
@@ -29,7 +37,7 @@ const BAND_DESCRIPTIONS: Record<string, string> = {
 }
 
 export default function ResultScreen() {
-  const { colors, type, spacing } = useTheme()
+  const { type, spacing } = useTheme()
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const { score, band, bandColor } = useUserStore()
@@ -40,7 +48,7 @@ export default function ResultScreen() {
   const bandData = getBand(safeScore)
   const description = BAND_DESCRIPTIONS[safeBand] ?? ''
 
-  // ── Count-up animation (requestAnimationFrame, avoids Reanimated text quirks)
+  // ── Count-up animation
   const [displayScore, setDisplayScore] = useState(0)
   const rafRef = useRef<number | null>(null)
 
@@ -60,7 +68,7 @@ export default function ResultScreen() {
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [safeScore])
 
-  // ── Gauge bar animation (fires after count-up)
+  // ── Gauge bar animation
   const barWidth = useSharedValue(0)
   useEffect(() => {
     barWidth.value = withDelay(
@@ -70,7 +78,7 @@ export default function ResultScreen() {
   }, [safeScore])
   const barStyle = useAnimatedStyle(() => ({ width: `${barWidth.value * 100}%` }))
 
-  // ── Band label fade-in (after count-up)
+  // ── Band label fade-in
   const bandOpacity = useSharedValue(0)
   useEffect(() => {
     bandOpacity.value = withDelay(1400, withTiming(1, { duration: 400 }))
@@ -85,9 +93,11 @@ export default function ResultScreen() {
     } catch {}
   }
 
+  const ringDashOffset = RING_CIRCUMFERENCE * (1 - displayScore / 48)
+
   return (
     <View style={styles.root}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -99,15 +109,45 @@ export default function ResultScreen() {
         <View style={styles.scoreSection}>
           <Text style={styles.scoreLabel}>your leakability score</Text>
 
-          {/* Count-up number */}
-          <Text style={[styles.scoreNumber, { color: safeColor }]}>
-            {displayScore}
-          </Text>
+          {/* Circular progress ring */}
+          <View style={styles.ringWrapper}>
+            <Svg width={RING_SIZE} height={RING_SIZE}>
+              {/* Grey track */}
+              <Circle
+                cx={RING_CENTER}
+                cy={RING_CENTER}
+                r={RING_RADIUS}
+                stroke="#E5E7EB"
+                strokeWidth={RING_STROKE}
+                fill="none"
+              />
+              {/* Band color fill arc */}
+              <Circle
+                cx={RING_CENTER}
+                cy={RING_CENTER}
+                r={RING_RADIUS}
+                stroke={safeColor}
+                strokeWidth={RING_STROKE}
+                fill="none"
+                strokeDasharray={RING_CIRCUMFERENCE}
+                strokeDashoffset={ringDashOffset}
+                strokeLinecap="round"
+                transform={`rotate(-90, ${RING_CENTER}, ${RING_CENTER})`}
+              />
+            </Svg>
+            <View style={styles.ringInner}>
+              <Text style={[styles.scoreNumber, { color: safeColor }]}>
+                {displayScore}
+              </Text>
+            </View>
+          </View>
 
-          {/* Band label — fades in, no pill */}
-          <Animated.Text style={[styles.bandLabel, { color: safeColor }, bandLabelStyle]}>
-            {safeBand.toUpperCase()}
-          </Animated.Text>
+          {/* Band pill */}
+          <Animated.View style={[styles.bandPill, { backgroundColor: '#EEF0FF' }, bandLabelStyle]}>
+            <Text style={[styles.bandPillText, { color: safeColor }]}>
+              {safeBand.toUpperCase()}
+            </Text>
+          </Animated.View>
 
           {/* Personality title */}
           <Animated.Text
@@ -119,7 +159,7 @@ export default function ResultScreen() {
 
           <Animated.Text
             entering={FadeInUp.delay(1800).duration(400)}
-            style={[type.body, { color: colors.textSecondary, marginTop: 10, lineHeight: 21 }]}
+            style={[type.body, { color: '#6B7280', marginTop: 10, lineHeight: 21 }]}
           >
             {description}
           </Animated.Text>
@@ -128,15 +168,20 @@ export default function ResultScreen() {
         {/* ── Risk gauge ── */}
         <Animated.View entering={FadeInUp.delay(1700).duration(300)} style={styles.gaugeSection}>
           <View style={styles.gaugeHeader}>
-            <Text style={[type.meta, { color: colors.textTertiary }]}>risk level</Text>
-            <Text style={[type.meta, { color: colors.textTertiary }]}>0 — 48</Text>
+            <Text style={[type.meta, { color: '#9CA3AF' }]}>risk level</Text>
+            <Text style={[type.meta, { color: '#9CA3AF' }]}>0 — 48</Text>
           </View>
           {/* Track */}
           <View style={styles.gaugeTrack}>
-            {/* Fill */}
-            <Animated.View
-              style={[styles.gaugeFill, { backgroundColor: safeColor }, barStyle]}
-            />
+            {/* Green-to-red gradient fill */}
+            <Animated.View style={[styles.gaugeFill, barStyle]}>
+              <LinearGradient
+                colors={['#22C55E', '#EF4444']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={StyleSheet.absoluteFillObject}
+              />
+            </Animated.View>
             {/* Band threshold markers */}
             {[12 / 48, 24 / 48, 36 / 48].map((pct, i) => (
               <View
@@ -158,7 +203,7 @@ export default function ResultScreen() {
                   {
                     flex: 1,
                     textAlign: i === 0 ? 'left' : i === 3 ? 'right' : 'center',
-                    color: b === safeBand ? safeColor : colors.textTertiary,
+                    color: b === safeBand ? safeColor : '#9CA3AF',
                     fontFamily: b === safeBand ? 'Inter_700Bold' : 'Inter_600SemiBold',
                   },
                 ]}
@@ -169,13 +214,13 @@ export default function ResultScreen() {
           </View>
         </Animated.View>
 
-        {/* ── CTAs — 3 stacked full width ── */}
+        {/* ── CTAs ── */}
         <Animated.View entering={FadeInUp.delay(2000).duration(400)} style={styles.ctas}>
           <Pressable
             onPress={() => router.push('/leakability/breakdown')}
             style={({ pressed }) => [
               styles.ctaPrimary,
-              { backgroundColor: safeColor, opacity: pressed ? 0.85 : 1 },
+              { opacity: pressed ? 0.85 : 1 },
             ]}
           >
             <Text style={styles.ctaPrimaryText}>see breakdown →</Text>
@@ -185,24 +230,20 @@ export default function ResultScreen() {
             onPress={() => router.push('/learn/password-glow-up')}
             style={({ pressed }) => [
               styles.ctaSecondary,
-              { backgroundColor: '#1A1A1A', opacity: pressed ? 0.7 : 1 },
+              { opacity: pressed ? 0.7 : 1 },
             ]}
           >
-            <Text style={[styles.ctaSecondaryText, { color: colors.textPrimary }]}>
-              start learning
-            </Text>
+            <Text style={styles.ctaSecondaryText}>start learning</Text>
           </Pressable>
 
           <Pressable
             onPress={handleShare}
             style={({ pressed }) => [
               styles.ctaSecondary,
-              { backgroundColor: '#1A1A1A', opacity: pressed ? 0.7 : 1 },
+              { opacity: pressed ? 0.7 : 1 },
             ]}
           >
-            <Text style={[styles.ctaSecondaryText, { color: colors.textPrimary }]}>
-              share score
-            </Text>
+            <Text style={styles.ctaSecondaryText}>share score</Text>
           </Pressable>
         </Animated.View>
       </ScrollView>
@@ -213,44 +254,60 @@ export default function ResultScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flexGrow: 1,
   },
   scoreSection: {
     marginBottom: 36,
+    alignItems: 'center',
   },
   scoreLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
-    color: '#9A9A9A',
+    color: '#9CA3AF',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
+  },
+  ringWrapper: {
+    width: RING_SIZE,
+    height: RING_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  ringInner: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scoreNumber: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 80,
-    lineHeight: 84,
+    fontSize: 48,
+    lineHeight: 52,
     textAlign: 'center',
   },
-  bandLabel: {
+  bandPill: {
+    borderRadius: 50,
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    marginBottom: 24,
+  },
+  bandPillText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 12,
+    fontSize: 11,
     letterSpacing: 0.8,
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 4,
   },
   personalityTitle: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 24,
     lineHeight: 30,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     textAlign: 'left',
-    marginTop: 32,
+    alignSelf: 'stretch',
   },
   gaugeSection: {
     marginBottom: 36,
@@ -262,18 +319,19 @@ const styles = StyleSheet.create({
   },
   gaugeTrack: {
     height: 8,
-    borderRadius: 0,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    overflow: 'visible',
+    borderRadius: 4,
+    backgroundColor: '#E5E7EB',
+    overflow: 'hidden',
     marginBottom: 10,
     position: 'relative',
   },
   gaugeFill: {
     height: 8,
-    borderRadius: 0,
+    borderRadius: 4,
     position: 'absolute',
     left: 0,
     top: 0,
+    overflow: 'hidden',
   },
   gaugeMarker: {
     position: 'absolute',
@@ -294,6 +352,7 @@ const styles = StyleSheet.create({
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#5B5CF6',
   },
   ctaPrimaryText: {
     fontFamily: 'Inter_700Bold',
@@ -305,9 +364,13 @@ const styles = StyleSheet.create({
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#5B5CF6',
+    backgroundColor: 'transparent',
   },
   ctaSecondaryText: {
     fontFamily: 'Inter_700Bold',
     fontSize: 14,
+    color: '#5B5CF6',
   },
 })

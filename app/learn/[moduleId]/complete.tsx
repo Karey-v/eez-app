@@ -23,7 +23,7 @@ import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Confetti particle ────────────────────────────────────────────────────────
 
-const CONFETTI_COLORS = ['#5B5CF6', '#602CFF', '#B1FF58', '#FFFFFF', '#FF732E', '#FFD700', '#4ADE80']
+const CONFETTI_COLORS = ['#5B5CF6', '#602CFF', '#B1FF58', '#0A0A0A', '#FF732E', '#FFD700', '#007549']
 
 type ParticleConfig = {
   tx: number
@@ -183,14 +183,14 @@ export default function CompleteScreen() {
   if (!module || !badge) {
     return (
       <View style={[styles.root, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={[type.body, { color: '#AAAAAA' }]}>Loading…</Text>
+        <Text style={[type.body, { color: '#5A5A5A' }]}>Loading…</Text>
       </View>
     )
   }
 
   return (
     <View style={styles.root}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -271,7 +271,7 @@ export default function CompleteScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#F8F7FF',
   },
   badgeWrapper: {
     width: 100,
@@ -291,25 +291,25 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#EEF0FF',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(98,44,255,0.12)',
   },
   badgeUnlockedLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
-    color: '#AAAAAA',
+    color: '#9A9A9A',
     marginBottom: 6,
   },
   badgeName: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 28,
     lineHeight: 34,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     textAlign: 'center',
   },
   xpRow: {
@@ -340,27 +340,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 28,
     marginTop: 4,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#EEF0FF',
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(98,44,255,0.12)',
   },
   streakText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
   },
   summaryCard: {
     borderRadius: 14,
     padding: 20,
     marginBottom: 20,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#FFFFFF',
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(98,44,255,0.12)',
   },
   summaryTitle: {
     fontFamily: 'Inter_700Bold',
     fontSize: 13,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     marginBottom: 14,
   },
   summaryRow: {
@@ -375,13 +375,13 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginTop: 5,
     flexShrink: 0,
-    backgroundColor: '#AAAAAA',
+    backgroundColor: '#5B5CF6',
   },
   summaryText: {
     fontFamily: 'Inter_400Regular',
     fontSize: 13,
     lineHeight: 19,
-    color: '#AAAAAA',
+    color: '#5A5A5A',
     flex: 1,
   },
   ctas: {
@@ -390,27 +390,27 @@ const styles = StyleSheet.create({
   lockedNextCard: {
     borderRadius: 14,
     padding: 16,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#FFFFFF',
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(98,44,255,0.12)',
   },
   lockedLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
     letterSpacing: 0.5,
-    color: '#666666',
+    color: '#9A9A9A',
     marginBottom: 4,
   },
   lockedTitle: {
     fontFamily: 'Inter_700Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     marginBottom: 2,
   },
   lockedSub: {
     fontFamily: 'Inter_400Regular',
     fontSize: 12,
-    color: '#666666',
+    color: '#9A9A9A',
   },
   ctaPrimary: {
     borderRadius: 50,
@@ -427,15 +427,15 @@ const styles = StyleSheet.create({
   ctaSecondary: {
     borderRadius: 50,
     height: 56,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#EEF0FF',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(98,44,255,0.12)',
   },
   ctaSecondaryText: {
     fontFamily: 'Inter_700Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#5B5CF6',
   },
 })

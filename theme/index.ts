@@ -5,7 +5,7 @@ import { spacing } from './spacing'
 export { light, dark, brand, type, spacing }
 
 export function useTheme() {
-  // Force dark mode globally
-  const colors = dark
+  // Force light mode globally
+  const colors = light
   return { colors, brand, type, spacing }
 }
