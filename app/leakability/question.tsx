@@ -105,10 +105,7 @@ export default function QuestionScreen() {
 
       {/* ── Fixed header ── */}
       <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
-        {/* Thin progress lines — very top */}
         <ProgressLines total={questions.length} current={currentQuestionIndex} />
-
-        {/* Category pill — lots of space above */}
         <View style={[styles.categoryPill, { marginTop: 28 }]}>
           <Text style={styles.categoryPillText}>{question.category}</Text>
         </View>
@@ -126,7 +123,7 @@ export default function QuestionScreen() {
   )
 }
 
-// ─── QuestionBody — resets per question via key prop ─────────────────────────
+// ─── QuestionBody ─────────────────────────────────────────────────────────────
 
 function QuestionBody({
   question,
@@ -150,7 +147,7 @@ function QuestionBody({
 
     if (question.type !== 'slider') {
       setAdvancing(true)
-      setTimeout(() => onAdvance(), 900)
+      setTimeout(() => onAdvance(), 800)
     }
   }
 
@@ -174,17 +171,20 @@ function QuestionBody({
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {/* Simulation card — shown for simulation-tap questions */}
+      {/* Simulation card */}
       {question.type === 'simulation-tap' && question.simulation && (
         <View style={{ marginBottom: 28 }}>
           <Text style={[styles.questionText, { marginBottom: 24 }]}>
             {question.prompt}
           </Text>
-          <SimulationCard simulation={question.simulation} />
+          <SimulationCard
+            simulation={question.simulation}
+            asModal={question.id === 7}
+          />
         </View>
       )}
 
-      {/* Scenario card — shown for scenario questions */}
+      {/* Scenario card */}
       {question.type === 'scenario' && (
         <View
           style={[
@@ -199,14 +199,14 @@ function QuestionBody({
         </View>
       )}
 
-      {/* Question prompt — multiple-choice */}
+      {/* Multiple-choice prompt */}
       {question.type === 'multiple-choice' && (
         <Text style={[styles.questionText, { marginBottom: 40 }]}>
           {question.prompt}
         </Text>
       )}
 
-      {/* Slider question */}
+      {/* Slider */}
       {question.type === 'slider' && (
         <>
           <Text style={[styles.questionText, { marginBottom: 32 }]}>
@@ -226,7 +226,7 @@ function QuestionBody({
         </>
       )}
 
-      {/* Options — for simulation-tap, multiple-choice, scenario */}
+      {/* Options */}
       {question.type !== 'slider' && question.options && (
         <View style={styles.options}>
           {question.type === 'scenario' && (
@@ -238,11 +238,8 @@ function QuestionBody({
             <OptionButton
               key={i}
               label={option.label}
-              feedback={option.feedback}
-              score={option.score}
               selected={selectedIndex === i}
               anySelected={selectedIndex !== null}
-              showFeedback={selectedIndex === i}
               onPress={() => handleOptionSelect(i)}
             />
           ))}
@@ -252,14 +249,15 @@ function QuestionBody({
   )
 }
 
-// ─── Simulation Card ─────────────────────────────────────────────────────────
+// ─── Simulation Card ──────────────────────────────────────────────────────────
 
 function SimulationCard({
   simulation,
+  asModal = false,
 }: {
   simulation: NonNullable<Question['simulation']>
+  asModal?: boolean
 }) {
-  const { colors, type } = useTheme()
   const { uiType, sender, content, preview } = simulation
 
   const initials = sender
@@ -271,79 +269,104 @@ function SimulationCard({
     .slice(0, 2)
     .toUpperCase()
 
+  // ── iOS-style lock screen notification ──────────────────────────────────────
   if (uiType === 'notification') {
-    return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
-        <View style={styles.notifRow}>
-          <View style={[styles.notifIcon, { backgroundColor: '#5B5CF6' }]}>
-            <Text style={{ color: '#fff', fontSize: 12, fontFamily: 'Inter_700Bold' }}>
-              {initials || '?'}
-            </Text>
+    const notifCard = (
+      <View style={styles.iosNotifBanner}>
+        <View style={styles.iosNotifTopRow}>
+          <View style={[styles.iosNotifAppIcon, { backgroundColor: '#5B5CF6' }]}>
+            <Text style={styles.iosNotifIconText}>{initials || '?'}</Text>
           </View>
-          <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={[type.cardTitle, { color: colors.textPrimary }]}>{sender}</Text>
-              <Text style={[type.meta, { color: colors.textTertiary }]}>now</Text>
-            </View>
-            {preview && (
-              <Text style={[type.bodySmall, { color: colors.textSecondary, fontFamily: 'Inter_700Bold', fontWeight: '700', marginTop: 1 }]}>
-                {preview}
-              </Text>
-            )}
-          </View>
-        </View>
-        <Text style={[type.body, { color: colors.textPrimary, marginTop: 10, lineHeight: 18 }]}>
-          {content}
-        </Text>
-      </View>
-    )
-  }
-
-  if (uiType === 'message') {
-    return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
-        <View style={styles.messageHeader}>
-          <View style={[styles.avatar, { backgroundColor: '#007549' }]}>
-            <Text style={{ color: '#fff', fontSize: 11, fontFamily: 'Inter_700Bold' }}>
-              {initials || '?'}
-            </Text>
-          </View>
-          <Text style={[type.cardTitle, { color: colors.textPrimary }]}>{sender}</Text>
-        </View>
-        <View style={styles.messageBubble}>
-          <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>{content}</Text>
-        </View>
-      </View>
-    )
-  }
-
-  if (uiType === 'email') {
-    return (
-      <View style={[styles.simCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak }]}>
-        <View style={styles.emailHeader}>
-          <Text style={[type.meta, { color: colors.textTertiary, width: 40 }]}>FROM</Text>
-          <Text style={[type.body, { color: colors.textPrimary, flex: 1, fontFamily: 'Inter_700Bold', fontWeight: '700' }]} numberOfLines={1}>
-            {sender}
-          </Text>
+          <Text style={styles.iosNotifAppName}>{sender}</Text>
+          <Text style={styles.iosNotifTime}>now</Text>
         </View>
         {preview && (
-          <View style={[styles.emailRow, { borderTopWidth: 0.5, borderTopColor: colors.borderWeak }]}>
-            <Text style={[type.meta, { color: colors.textTertiary, width: 40 }]}>RE</Text>
-            <Text style={[type.body, { color: colors.textSecondary, flex: 1 }]} numberOfLines={1}>
-              {preview}
-            </Text>
-          </View>
+          <Text style={styles.iosNotifTitle} numberOfLines={1}>{preview}</Text>
         )}
-        <View style={[{ borderTopWidth: 0.5, borderTopColor: colors.borderWeak, paddingTop: 10, marginTop: 4 }]}>
-          <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>{content}</Text>
+        <Text style={styles.iosNotifBody} numberOfLines={3}>{content}</Text>
+      </View>
+    )
+
+    if (asModal) {
+      return (
+        <View style={styles.modalDim}>
+          <View style={styles.modalPhoneHint}>
+            <Text style={styles.modalTime}>9:41</Text>
+            <Text style={styles.modalDate}>Wednesday, April 18</Text>
+          </View>
+          {notifCard}
+        </View>
+      )
+    }
+
+    return (
+      <View style={styles.iosLockscreen}>
+        <Text style={styles.lockTime}>9:41</Text>
+        <Text style={styles.lockDate}>Wednesday, April 18</Text>
+        {notifCard}
+      </View>
+    )
+  }
+
+  // ── iMessage-style message ───────────────────────────────────────────────────
+  if (uiType === 'message') {
+    return (
+      <View style={styles.iMessageContainer}>
+        {/* Header bar */}
+        <View style={styles.iMessageHeader}>
+          <View style={[styles.iMessageAvatar, { backgroundColor: '#34C759' }]}>
+            <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
+          </View>
+          <View>
+            <Text style={styles.iMessageSenderName}>{sender}</Text>
+            <Text style={styles.iMessageMeta}>iMessage</Text>
+          </View>
+        </View>
+
+        {/* Chat area */}
+        <View style={styles.iMessageChatArea}>
+          {/* Incoming bubble — grey, left-aligned */}
+          <View style={styles.iMessageBubbleRow}>
+            <View style={[styles.iMessageAvatarSmall, { backgroundColor: '#34C759' }]}>
+              <Text style={styles.iMessageAvatarSmallText}>{initials || '?'}</Text>
+            </View>
+            <View style={styles.iMessageBubble}>
+              <Text style={styles.iMessageBubbleText}>{content}</Text>
+            </View>
+          </View>
+          <Text style={styles.iMessageDelivered}>Delivered</Text>
         </View>
       </View>
     )
   }
 
-  // alert fallback
+  // ── Email inbox card ─────────────────────────────────────────────────────────
+  if (uiType === 'email') {
+    return (
+      <View style={styles.emailInboxCard}>
+        <View style={styles.emailInboxRow}>
+          <View style={[styles.emailAvatar, { backgroundColor: '#FF3B30' }]}>
+            <Text style={styles.emailAvatarText}>{initials || '?'}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={styles.emailInboxTopLine}>
+              <Text style={styles.emailInboxSender} numberOfLines={1}>{sender}</Text>
+              <Text style={styles.emailInboxTime}>now</Text>
+            </View>
+            {preview && (
+              <Text style={styles.emailInboxSubject} numberOfLines={1}>{preview}</Text>
+            )}
+            <Text style={styles.emailInboxPreview} numberOfLines={2}>{content}</Text>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
+  // ── Alert fallback ───────────────────────────────────────────────────────────
+  const { colors, type } = useTheme()
   return (
-    <View style={[styles.simCard, { backgroundColor: colors.dangerBg, borderColor: colors.dangerText }]}>
+    <View style={[styles.simCardAlert, { backgroundColor: colors.dangerBg, borderColor: colors.dangerText }]}>
       <Text style={[type.cardTitle, { color: colors.dangerText }]}>{sender}</Text>
       <Text style={[type.body, { color: colors.textPrimary, marginTop: 6, lineHeight: 18 }]}>{content}</Text>
     </View>
@@ -354,26 +377,15 @@ function SimulationCard({
 
 function OptionButton({
   label,
-  feedback,
-  score,
   selected,
   anySelected,
-  showFeedback,
   onPress,
 }: {
   label: string
-  feedback?: string
-  score: number
   selected: boolean
   anySelected: boolean
-  showFeedback: boolean
   onPress: () => void
 }) {
-  const { colors, type } = useTheme()
-
-  const feedbackColor =
-    score === 0 ? colors.successText : score === 1 ? colors.warningText : colors.dangerText
-
   return (
     <Pressable
       onPress={onPress}
@@ -398,13 +410,6 @@ function OptionButton({
       >
         {label}
       </Text>
-      {showFeedback && feedback && (
-        <Animated.View entering={FadeIn.duration(200)}>
-          <Text style={[type.bodySmall, { color: feedbackColor, marginTop: 6, lineHeight: 16 }]}>
-            {feedback}
-          </Text>
-        </Animated.View>
-      )}
     </Pressable>
   )
 }
@@ -436,7 +441,6 @@ function SliderQuestion({
 
   return (
     <View>
-      {/* Track + thumb */}
       <View
         onLayout={(e) => { containerWidthRef.current = e.nativeEvent.layout.width }}
         onStartShouldSetResponder={() => true}
@@ -445,9 +449,7 @@ function SliderQuestion({
         onResponderMove={(e) => onChange(indexFromX(e.nativeEvent.locationX))}
         style={styles.sliderTouchArea}
       >
-        {/* Track background */}
         <View style={[styles.sliderTrack, { backgroundColor: colors.bgTertiary }]}>
-          {/* Fill */}
           {selectedIndex !== null && (
             <View
               style={[
@@ -458,7 +460,6 @@ function SliderQuestion({
           )}
         </View>
 
-        {/* Step tick marks */}
         {options.map((_, i) => {
           const pct = i / (STEPS - 1)
           const isActive = selectedIndex !== null && i <= selectedIndex
@@ -477,7 +478,6 @@ function SliderQuestion({
           )
         })}
 
-        {/* Thumb */}
         {selectedIndex !== null && (
           <Animated.View
             style={[
@@ -491,13 +491,11 @@ function SliderQuestion({
         )}
       </View>
 
-      {/* Left / right labels */}
       <View style={styles.sliderLabelRow}>
         <Text style={[type.bodySmall, { color: colors.textTertiary, flex: 1 }]}>{labels.left}</Text>
         <Text style={[type.bodySmall, { color: colors.textTertiary }]}>{labels.right}</Text>
       </View>
 
-      {/* Step value labels */}
       <View style={styles.sliderStepRow}>
         {options.map((opt, i) => (
           <Pressable
@@ -520,7 +518,6 @@ function SliderQuestion({
         ))}
       </View>
 
-      {/* Selected value display */}
       {selectedIndex !== null && (
         <Animated.View entering={FadeIn.duration(200)} style={[styles.sliderValue, { backgroundColor: colors.bgSecondary }]}>
           <Text style={[type.label, { color: brand.purpleCTA }]}>
@@ -593,57 +590,256 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     justifyContent: 'center',
   },
-  simCard: {
+
+  // ── iOS lockscreen notification ──
+  iosLockscreen: {
+    backgroundColor: '#1C1C1E',
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingTop: 22,
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
+  lockTime: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 54,
+    color: '#FFFFFF',
+    letterSpacing: -1,
+    lineHeight: 58,
+  },
+  lockDate: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.75)',
+    marginBottom: 20,
+    marginTop: 2,
+  },
+  iosNotifBanner: {
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderRadius: 14,
+    padding: 13,
+    width: '100%',
+  },
+  iosNotifTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+    gap: 7,
+  },
+  iosNotifAppIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iosNotifIconText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 9,
+    color: '#FFFFFF',
+  },
+  iosNotifAppName: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.65)',
+    flex: 1,
+  },
+  iosNotifTime: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  iosNotifTitle: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#FFFFFF',
+    marginBottom: 2,
+  },
+  iosNotifBody: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
+    lineHeight: 18,
+  },
+
+  // ── Gift card modal (dim + floating notification) ──
+  modalDim: {
+    backgroundColor: 'rgba(0,0,0,0.88)',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 24,
+    alignItems: 'center',
+  },
+  modalPhoneHint: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTime: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 54,
+    color: '#FFFFFF',
+    letterSpacing: -1,
+    lineHeight: 58,
+  },
+  modalDate: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 2,
+  },
+
+  // ── iMessage ──
+  iMessageContainer: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  iMessageHeader: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+  iMessageAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iMessageAvatarText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 13,
+    color: '#FFFFFF',
+  },
+  iMessageSenderName: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#0A0A0A',
+  },
+  iMessageMeta: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#8E8E93',
+    marginTop: 1,
+  },
+  iMessageChatArea: {
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 16,
+  },
+  iMessageBubbleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 8,
+    marginBottom: 4,
+  },
+  iMessageAvatarSmall: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  iMessageAvatarSmallText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 9,
+    color: '#FFFFFF',
+  },
+  iMessageBubble: {
+    backgroundColor: '#E5E5EA',
+    borderRadius: 18,
+    borderBottomLeftRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    maxWidth: '85%',
+  },
+  iMessageBubbleText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#0A0A0A',
+    lineHeight: 19,
+  },
+  iMessageDelivered: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#8E8E93',
+    textAlign: 'right',
+    marginTop: 2,
+  },
+
+  // ── Email inbox card ──
+  emailInboxCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.08)',
+  },
+  emailInboxRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  emailAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  emailAvatarText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  emailInboxTopLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  emailInboxSender: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 13,
+    color: '#0A0A0A',
+    flex: 1,
+    marginRight: 8,
+  },
+  emailInboxTime: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#8E8E93',
+    flexShrink: 0,
+  },
+  emailInboxSubject: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#0A0A0A',
+    marginBottom: 2,
+  },
+  emailInboxPreview: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: '#8E8E93',
+    lineHeight: 17,
+  },
+
+  // ── Alert fallback ──
+  simCardAlert: {
     borderRadius: 14,
     borderWidth: 0.5,
     padding: 14,
   },
-  notifRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-  },
-  notifIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  messageHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 12,
-  },
-  messageBubble: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 12,
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
-    padding: 12,
-  },
-  emailHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingBottom: 8,
-  },
-  emailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
+
+  // ── Slider ──
   sliderTouchArea: {
     height: 44,
     justifyContent: 'center',
