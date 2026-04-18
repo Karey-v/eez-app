@@ -11,7 +11,14 @@ import { BellIcon } from '@/components/icons/Bell'
 import { ArrowIcon } from '@/components/icons/Arrow'
 import { Card } from '@/components/ui/Card'
 import { radarFeed } from '@/data/radarFeed'
-import { modules } from '@/data/modules'
+
+const CATEGORY_COLORS: Record<string, string> = {
+  Banks: '#22C55E',
+  Jobs: '#F59E0B',
+  Payments: '#EF4444',
+  Identity: '#8B5CF6',
+  Phishing: '#EC4899',
+}
 
 const BAND_PERSONALITY: Record<string, string> = {
   'On Lock':        "You're a Vault.",
@@ -40,12 +47,12 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient
-      colors={['#EEF0FF', '#FFFFFF']}
+      colors={['#5B5CF6', '#8B7FE8', '#EEF0FF', '#FFFFFF']}
       start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 0.42 }}
+      end={{ x: 0, y: 1 }}
       style={{ flex: 1 }}
     >
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -56,18 +63,18 @@ export default function HomeScreen() {
         {/* ── Top bar ── */}
         <View style={[styles.topBar, { paddingHorizontal: spacing.screenH }]}>
           {hasScore ? (
-            <Text style={[type.heroTitle, { color: colors.textPrimary }]}>
+            <Text style={[type.heroTitle, { color: '#FFFFFF' }]}>
               hey {name?.split(' ')[0]?.toLowerCase() || 'you'}.
             </Text>
           ) : (
-            <EezLogo width={44} height={44} color={brand.purple} />
+            <EezLogo width={44} height={44} color="#FFFFFF" />
           )}
           <Pressable
             onPress={() => router.push('/notifications/')}
             hitSlop={12}
             style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
           >
-            <BellIcon size={24} color={colors.textPrimary} />
+            <BellIcon size={24} color="#FFFFFF" />
           </Pressable>
         </View>
 
@@ -108,33 +115,25 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
         </Pressable>
       </View>
 
-      {/* Modules */}
+      {/* Modules — 3 side-by-side mini cards */}
       <View style={{ marginTop: spacing.sectionTop }}>
         <Text style={[type.label, { color: colors.textTertiary, marginBottom: spacing.sectionBottom }]}>
           learn something
         </Text>
-        <View style={{ gap: 8 }}>
-          {modules.map((m) => (
-            <Card
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          {[
+            { emoji: '🔑', label: 'Passwords', color: '#5B5CF6', id: 'password-glow-up' },
+            { emoji: '🔗', label: 'Messages', color: '#FF6B6B', id: 'link-hygiene' },
+            { emoji: '📱', label: 'Device\nSafety', color: '#22D3EE', id: 'device-safety' },
+          ].map((m) => (
+            <Pressable
               key={m.id}
-              style={{ backgroundColor: '#FFFFFF' }}
-              onPress={m.locked ? undefined : () => router.push(`/learn/${m.id}`)}
+              onPress={() => router.push(`/learn/${m.id}`)}
+              style={({ pressed }) => [styles.moduleCard, { borderLeftColor: m.color, opacity: pressed ? 0.8 : 1 }]}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 4 }]}>{m.tag}</Text>
-                  <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 4 }]}>{m.title}</Text>
-                  <Text style={[type.bodySmall, { color: colors.textSecondary }]}>
-                    {m.duration} · {m.difficulty}{m.locked ? ' · coming soon' : ''}
-                  </Text>
-                </View>
-                {m.locked ? (
-                  <Text style={{ fontSize: 14 }}>🔒</Text>
-                ) : (
-                  <ArrowIcon size={18} color={colors.textTertiary} />
-                )}
-              </View>
-            </Card>
+              <Text style={{ fontSize: 22 }}>{m.emoji}</Text>
+              <Text style={styles.moduleCardLabel}>{m.label}</Text>
+            </Pressable>
           ))}
         </View>
       </View>
@@ -145,30 +144,38 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
           latest from radar
         </Text>
         <View style={{ gap: 8 }}>
-          {radarFeed.slice(0, 2).map((item) => (
-            <Card
-              key={item.id}
-              style={{ backgroundColor: '#FFFFFF' }}
-              onPress={() => router.push('/(tabs)/radar')}
-            >
-              <View style={styles.radarRow}>
-                <View style={[styles.categoryDot, { backgroundColor: brand.purpleCTA }]} />
-                <Text style={[type.label, { color: brand.purpleCTA }]}>
-                  {item.category.toLowerCase()}
+          {radarFeed.slice(0, 2).map((item) => {
+            const catColor = CATEGORY_COLORS[item.category] ?? '#5B5CF6'
+            return (
+              <Card
+                key={item.id}
+                style={{ backgroundColor: '#FFFFFF', borderLeftWidth: 3, borderLeftColor: catColor }}
+                onPress={() => router.push('/(tabs)/radar')}
+              >
+                <View style={styles.radarRow}>
+                  <Text style={[type.label, { color: catColor }]}>
+                    {item.category.toLowerCase()}
+                  </Text>
+                  <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
+                    {item.timestamp}
+                  </Text>
+                </View>
+                <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 6 }]}>
+                  {item.headline}
                 </Text>
-                <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
-                  {item.timestamp}
+                <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
+                  {item.preview}
                 </Text>
-              </View>
-              <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 6 }]}>
-                {item.headline}
-              </Text>
-              <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
-                {item.preview}
-              </Text>
-            </Card>
-          ))}
+              </Card>
+            )
+          })}
         </View>
+        <Pressable
+          onPress={() => router.push('/(tabs)/radar')}
+          style={({ pressed }) => [styles.reportBtn, { opacity: pressed ? 0.8 : 1 }]}
+        >
+          <Text style={styles.reportBtnText}>report something →</Text>
+        </Pressable>
       </View>
     </>
   )
@@ -306,14 +313,14 @@ const styles = StyleSheet.create({
     fontSize: 34,
     lineHeight: 42,
     fontWeight: '400',
-    color: '#0A0A0A',
+    color: '#FFFFFF',
     textAlign: 'center',
   },
   heroSubtext: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
     lineHeight: 21,
-    color: '#5A5A5A',
+    color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
     marginTop: 10,
   },
@@ -338,10 +345,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  categoryDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+  // Module mini-cards
+  moduleCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    padding: 12,
+    gap: 6,
+  },
+  moduleCardLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: '#0A0A0A',
+    lineHeight: 16,
+  },
+  // Report button
+  reportBtn: {
+    marginTop: 12,
+    alignItems: 'center',
+    paddingVertical: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: 'rgba(98,44,255,0.2)',
+  },
+  reportBtnText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#5B5CF6',
   },
   // Returning — score on gradient
   scoreSection: {

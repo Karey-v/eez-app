@@ -199,12 +199,7 @@ function QuestionBody({
 
       {/* Question prompt — multiple-choice */}
       {question.type === 'multiple-choice' && (
-        <Text
-          style={[
-            styles.questionText,
-            { color: '#0A0A0A', marginBottom: 40 },
-          ]}
-        >
+        <Text style={[styles.questionText, { marginBottom: 40 }]}>
           {question.prompt}
         </Text>
       )}
@@ -212,7 +207,7 @@ function QuestionBody({
       {/* Slider question */}
       {question.type === 'slider' && (
         <>
-          <Text style={[styles.questionText, { color: '#0A0A0A', marginBottom: 32 }]}>
+          <Text style={[styles.questionText, { marginBottom: 32 }]}>
             {question.prompt}
           </Text>
           <SliderQuestion
@@ -381,13 +376,13 @@ function OptionButton({
     <Pressable
       onPress={onPress}
       disabled={anySelected}
-      style={({ pressed }) => [
+      style={[
         styles.optionBtn,
         {
-          borderColor: selected ? '#5B5CF6' : 'rgba(98,44,255,0.15)',
-          borderWidth: selected ? 1.5 : 1,
-          backgroundColor: selected ? '#EEF0FF' : '#F8F7FF',
-          opacity: anySelected && !selected ? 0.45 : pressed ? 0.8 : 1,
+          borderColor: selected ? 'rgba(98,44,255,0.6)' : 'rgba(98,44,255,0.2)',
+          borderWidth: 1,
+          backgroundColor: selected ? '#EEF0FF' : '#FFFFFF',
+          opacity: anySelected && !selected ? 0.45 : 1,
         },
       ]}
     >
@@ -556,7 +551,7 @@ const styles = StyleSheet.create({
   },
   categoryPill: {
     alignSelf: 'flex-start',
-    backgroundColor: '#EEF0FF',
+    backgroundColor: '#B1FF58',
     borderRadius: 50,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -566,7 +561,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
-    color: '#5B5CF6',
+    color: '#1A4A00',
   },
   body: {
     flexGrow: 1,
@@ -576,7 +571,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     lineHeight: 34,
     fontWeight: '400',
-    color: '#0A0A0A',
+    color: '#5B5CF6',
     textAlign: 'left',
   },
   scenarioCard: {
@@ -590,7 +585,7 @@ const styles = StyleSheet.create({
   },
   optionBtn: {
     borderRadius: 50,
-    minHeight: 64,
+    minHeight: 56,
     paddingLeft: 20,
     paddingRight: 14,
     paddingVertical: 12,
