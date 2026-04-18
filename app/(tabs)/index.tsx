@@ -48,7 +48,7 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient
-      colors={['#4A1FD9', '#6B42F0', '#9B7FFF', '#EEF0FF', '#FFFFFF']}
+      colors={['#4A1FD9', '#7B5FFF', '#FFFFFF']}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={{ flex: 1 }}
@@ -202,13 +202,6 @@ function ReturningView({
   const personality = BAND_PERSONALITY[band] ?? ''
   const testDate = formatTestDate(lastTestDate)
 
-  const quickActions = [
-    { label: 'retake test', onPress: () => router.push('/leakability/intro') },
-    { label: 'continue learning', onPress: () => router.push('/(tabs)/learn') },
-    { label: 'see radar', onPress: () => router.push('/(tabs)/radar') },
-    { label: 'safety check', onPress: () => router.push('/safety-modal') },
-  ]
-
   return (
     <>
       {/* Score directly on gradient — no card */}
@@ -222,6 +215,13 @@ function ReturningView({
           style={({ pressed }) => [styles.breakdownPill, { opacity: pressed ? 0.8 : 1 }]}
         >
           <Text style={styles.breakdownPillText}>tap to see breakdown →</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push('/leakability/intro')}
+          hitSlop={12}
+          style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1, marginTop: 14 })}
+        >
+          <Text style={styles.retakeLink}>retake quiz</Text>
         </Pressable>
       </View>
 
@@ -242,36 +242,10 @@ function ReturningView({
         ))}
       </View>
 
-      {/* Quick actions */}
-      <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: 'rgba(255,255,255,0.6)', marginBottom: spacing.sectionBottom }]}>
-          quick actions
-        </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ marginHorizontal: -spacing.screenH }}
-          contentContainerStyle={{ paddingHorizontal: spacing.screenH, gap: 8 }}
-        >
-          {quickActions.map((action) => (
-            <Pressable
-              key={action.label}
-              onPress={action.onPress}
-              style={({ pressed }) => [
-                styles.quickActionCard,
-                { opacity: pressed ? 0.7 : 1 },
-              ]}
-            >
-              <Text style={[type.body, { color: '#FFFFFF' }]}>{action.label}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
-
       {/* Module recommendation */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: 'rgba(255,255,255,0.6)', marginBottom: spacing.sectionBottom }]}>
-          based on your score, start here
+        <Text style={[type.label, { color: '#5B5CF6', marginBottom: spacing.sectionBottom }]}>
+          based on your score
         </Text>
         <Card style={{ backgroundColor: '#FFFFFF' }} onPress={() => router.push('/learn/password-glow-up')}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -289,7 +263,7 @@ function ReturningView({
 
       {/* Modules */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: 'rgba(255,255,255,0.6)', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: '#5B5CF6', marginBottom: spacing.sectionBottom }]}>
           learn something
         </Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -312,7 +286,7 @@ function ReturningView({
 
       {/* Latest from radar */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: 'rgba(255,255,255,0.6)', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: '#5B5CF6', marginBottom: spacing.sectionBottom }]}>
           latest from radar
         </Text>
         <View style={{ gap: 8 }}>
@@ -499,12 +473,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: 'rgba(255,255,255,0.7)',
   },
-  quickActionCard: {
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    minHeight: 44,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
+  retakeLink: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#B1FF58',
+    textDecorationLine: 'underline',
   },
 })

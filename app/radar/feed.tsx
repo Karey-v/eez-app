@@ -1,7 +1,7 @@
 // Radar Feed — incident list with filters, upvotes, report FAB, bottom toggle pill.
 import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
-import Svg, { Line as SvgLine, Circle, Path } from 'react-native-svg'
+import Svg, { Path } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -40,17 +40,24 @@ function MapPinIcon({ color }: { color: string }) {
         strokeWidth={1.4}
         strokeLinejoin="round"
       />
-      <Circle cx="8" cy="6" r="1.8" stroke={color} strokeWidth={1.2} />
+      <Path
+        d="M8 4.2 m-1.8 1.8 a1.8 1.8 0 1 0 3.6 0 a1.8 1.8 0 1 0 -3.6 0"
+        stroke={color}
+        strokeWidth={1.2}
+      />
     </Svg>
   )
 }
 
-function ListIcon({ color }: { color: string }) {
+function ChatBubbleIcon({ color }: { color: string }) {
   return (
     <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
-      <SvgLine x1="3" y1="5" x2="15" y2="5" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-      <SvgLine x1="3" y1="9" x2="15" y2="9" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-      <SvgLine x1="3" y1="13" x2="15" y2="13" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+      <Path
+        d="M3.5 1.5 H14.5 Q16.5 1.5 16.5 3.5 V10.5 Q16.5 12.5 14.5 12.5 H7 L4 16 V12.5 H3.5 Q1.5 12.5 1.5 10.5 V3.5 Q1.5 1.5 3.5 1.5 Z"
+        stroke={color}
+        strokeWidth={1.5}
+        strokeLinejoin="round"
+      />
     </Svg>
   )
 }
@@ -256,14 +263,14 @@ export default function RadarFeedScreen() {
         <View style={styles.togglePill}>
           {/* Map — inactive */}
           <Pressable
-            style={styles.toggleOption}
+            style={[styles.toggleOption, styles.toggleOptionInactive]}
             onPress={() => router.replace('/(tabs)/radar')}
           >
-            <MapPinIcon color="#666666" />
+            <MapPinIcon color="#999999" />
           </Pressable>
           {/* List — active */}
-          <Pressable style={styles.toggleOption}>
-            <ListIcon color="#FFFFFF" />
+          <Pressable style={[styles.toggleOption, styles.toggleOptionActive]}>
+            <ChatBubbleIcon color="#0A0A0A" />
           </Pressable>
         </View>
       </View>
@@ -295,7 +302,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 28,
-    color: '#0A0A0A',
+    color: '#B1FF58',
   },
   blinkDot: {
     width: 8,
@@ -441,7 +448,7 @@ const styles = StyleSheet.create({
   },
   togglePill: {
     flexDirection: 'row',
-    backgroundColor: '#0A0A0A',
+    backgroundColor: 'transparent',
     height: 56,
     borderRadius: 28,
     paddingHorizontal: 4,
@@ -454,5 +461,13 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  toggleOptionActive: {
+    borderWidth: 1.5,
+    borderColor: '#0A0A0A',
+  },
+  toggleOptionInactive: {
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
   },
 })

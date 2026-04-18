@@ -70,7 +70,7 @@ function getVariantContainer(variant: Variant, colors: ReturnType<typeof useThem
     case 'orange':
       return { backgroundColor: '#F4632A' }
     case 'lime':
-      return { backgroundColor: '#B8F04A' }
+      return { backgroundColor: '#B1FF58' }
     case 'outline':
       return {
         backgroundColor: 'transparent',

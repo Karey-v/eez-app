@@ -78,12 +78,15 @@ function MapPinIcon({ color }: { color: string }) {
   )
 }
 
-function ListIcon({ color }: { color: string }) {
+function ChatBubbleIcon({ color }: { color: string }) {
   return (
     <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
-      <SvgLine x1="3" y1="5" x2="15" y2="5" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-      <SvgLine x1="3" y1="9" x2="15" y2="9" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-      <SvgLine x1="3" y1="13" x2="15" y2="13" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+      <Path
+        d="M3.5 1.5 H14.5 Q16.5 1.5 16.5 3.5 V10.5 Q16.5 12.5 14.5 12.5 H7 L4 16 V12.5 H3.5 Q1.5 12.5 1.5 10.5 V3.5 Q1.5 1.5 3.5 1.5 Z"
+        stroke={color}
+        strokeWidth={1.5}
+        strokeLinejoin="round"
+      />
     </Svg>
   )
 }
@@ -343,10 +346,10 @@ export default function RadarScreen() {
           </Pressable>
           {/* List — inactive */}
           <Pressable
-            style={styles.toggleOption}
+            style={[styles.toggleOption, styles.toggleOptionInactive]}
             onPress={() => router.push('/radar/feed')}
           >
-            <ListIcon color="rgba(255,255,255,0.5)" />
+            <ChatBubbleIcon color="rgba(255,255,255,0.5)" />
           </Pressable>
         </View>
       </View>
@@ -372,7 +375,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 22,
-    color: '#FFFFFF',
+    color: '#B1FF58',
   },
   searchBtn: {
     width: 36,
@@ -451,7 +454,7 @@ const styles = StyleSheet.create({
   },
   togglePill: {
     flexDirection: 'row',
-    backgroundColor: '#0A0A0A',
+    backgroundColor: 'transparent',
     height: 56,
     borderRadius: 28,
     paddingHorizontal: 4,
@@ -466,6 +469,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleOptionActive: {
-    backgroundColor: '#5B5CF6',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+  },
+  toggleOptionInactive: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
   },
 })

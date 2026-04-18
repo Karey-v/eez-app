@@ -51,7 +51,7 @@ function TextVisualLesson({ lesson }: { lesson: Lesson }) {
   const { colors, type, brand } = useTheme()
   return (
     <View>
-      <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 20, lineHeight: 34 }]}>
+      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 20, lineHeight: 34, textTransform: 'uppercase' }]}>
         {lesson.title}
       </Text>
       {lesson.body && (
@@ -60,7 +60,7 @@ function TextVisualLesson({ lesson }: { lesson: Lesson }) {
         </Text>
       )}
       {lesson.insight && (
-        <View style={[styles.insightCard, { backgroundColor: '#FFFFFF' }]}>
+        <View style={[styles.insightCard, { backgroundColor: '#EEF0FF' }]}>
           <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6, textTransform: 'none' }]}>EEZ insight</Text>
           <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
             {lesson.insight}
@@ -95,7 +95,7 @@ function SwipeRevealLesson({
 
   return (
     <View>
-      <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 20, lineHeight: 34 }]}>
+      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 20, lineHeight: 34, textTransform: 'uppercase' }]}>
         {lesson.title}
       </Text>
 
@@ -252,7 +252,7 @@ function TapUncoverLesson({
 
   return (
     <View>
-      <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 12, lineHeight: 34 }]}>
+      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 12, lineHeight: 34, textTransform: 'uppercase' }]}>
         {lesson.title}
       </Text>
       <Text style={[type.body, { color: colors.textSecondary, lineHeight: 18, marginBottom: 24 }]}>
@@ -322,7 +322,7 @@ function ChoiceLesson({
 
   return (
     <View>
-      <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 24, lineHeight: 34 }]}>
+      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 24, lineHeight: 34, textTransform: 'uppercase' }]}>
         {lesson.title}
       </Text>
 
@@ -453,12 +453,6 @@ export default function LessonScreen() {
           >
             <ArrowIcon size={20} color="#5B5CF6" direction="left" />
           </Pressable>
-
-          <View style={[styles.typeChip, { backgroundColor: '#EEF0FF' }]}>
-            <Text style={[type.label, { color: brand.purpleCTA, textTransform: 'none' }]}>
-              {TYPE_LABELS[lesson.type] ?? lesson.type}
-            </Text>
-          </View>
         </View>
 
         <ProgressDots total={lessons.length} current={currentLesson} />
@@ -474,6 +468,11 @@ export default function LessonScreen() {
         }}
       >
         <View key={currentLesson}>
+          <View style={[styles.typeChip, { backgroundColor: '#B1FF58', alignSelf: 'flex-start', marginBottom: 14 }]}>
+            <Text style={[type.label, { color: '#1A4A00', textTransform: 'uppercase' }]}>
+              {TYPE_LABELS[lesson.type] ?? lesson.type}
+            </Text>
+          </View>
           {lesson.type === 'text-visual' && <TextVisualLesson lesson={lesson} />}
 
           {lesson.type === 'swipe-reveal' && (

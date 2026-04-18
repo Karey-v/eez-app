@@ -34,8 +34,8 @@ export default function ModuleIntroScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: '#5B5CF6' }}>
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -50,16 +50,16 @@ export default function ModuleIntroScreen() {
           hitSlop={12}
           style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
         >
-          <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
+          <ArrowIcon size={20} color="#FFFFFF" direction="left" />
         </Pressable>
 
         {/* Tag + duration chips */}
         <View style={styles.chips}>
-          <View style={[styles.chip, { backgroundColor: '#EEF0FF' }]}>
-            <Text style={[type.label, { color: colors.textPrimary, textTransform: 'none' }]}>{module.tag}</Text>
+          <View style={[styles.chip, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+            <Text style={[type.label, { color: '#FFFFFF', textTransform: 'none' }]}>{module.tag}</Text>
           </View>
-          <View style={[styles.chip, { backgroundColor: '#EEF0FF' }]}>
-            <Text style={[type.label, { color: colors.textPrimary, textTransform: 'none' }]}>⏱ {module.duration}</Text>
+          <View style={[styles.chip, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+            <Text style={[type.label, { color: '#FFFFFF', textTransform: 'none' }]}>⏱ {module.duration}</Text>
           </View>
         </View>
 
@@ -67,12 +67,12 @@ export default function ModuleIntroScreen() {
         <Text
           style={[
             type.heroTitle,
-            { color: colors.textPrimary, marginBottom: 6, marginTop: 18, lineHeight: 34 },
+            { color: '#FFFFFF', marginBottom: 6, marginTop: 18, lineHeight: 34 },
           ]}
         >
           {module.title.toLowerCase()}.
         </Text>
-        <Text style={[type.bodySmall, { color: colors.textTertiary, marginBottom: 28 }]}>
+        <Text style={[type.bodySmall, { color: 'rgba(255,255,255,0.7)', marginBottom: 28 }]}>
           {module.difficulty} · {module.xp} XP on completion
         </Text>
 
@@ -96,13 +96,13 @@ export default function ModuleIntroScreen() {
         <Text
           style={[
             type.bodySmall,
-            { color: colors.textTertiary, textAlign: 'center', marginTop: 24, marginBottom: 32, lineHeight: 16 },
+            { color: 'rgba(255,255,255,0.7)', textAlign: 'center', marginTop: 24, marginBottom: 32, lineHeight: 16 },
           ]}
         >
           {module.lessons.length} lessons · stays on your device · totally private
         </Text>
 
-        <Button label="Start module" onPress={handleStart} variant="purple" fullWidth />
+        <Button label="Start module" onPress={handleStart} variant="lime" fullWidth />
       </ScrollView>
       <BottomNav activeTab="learn" />
     </View>
