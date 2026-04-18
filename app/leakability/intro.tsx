@@ -1,27 +1,18 @@
 // S12 — Test Intro
-// Chips: "5 mins" · "🔒 totally private" · "personalized results"
-// CTA: "Start the test"
+import { useState } from 'react'
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useTheme } from '@/theme'
-import { Button } from '@/components/ui/Button'
-import { ArrowIcon } from '@/components/icons/Arrow'
 import { useTestStore } from '@/store/testStore'
-import { BottomNav } from '@/components/ui/BottomNav'
 
-const INFO_CHIPS = [
-  { icon: '⏱', label: '5 mins' },
-  { icon: '🔒', label: 'totally private' },
-  { icon: '✦', label: 'personalized results' },
-]
+const CHIPS = ['⏱ ~5 mins', '🔒 totally private', '✨ personalized']
 
 export default function TestIntroScreen() {
-  const { colors, type, spacing, brand } = useTheme()
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const resetTest = useTestStore((s) => s.resetTest)
+  const [showExplain, setShowExplain] = useState(false)
 
   function handleStart() {
     resetTest()
@@ -29,88 +20,65 @@ export default function TestIntroScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
-          {
-            paddingTop: insets.top + 16,
-            paddingBottom: insets.bottom + 32,
-            paddingHorizontal: spacing.screenH,
-          },
+          { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 32 },
         ]}
       >
-        {/* Back button */}
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
-        >
-          <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
-        </Pressable>
-
         {/* Detective emoji */}
-        <Text style={styles.heroEmoji}>🕵️</Text>
+        <Text style={styles.detectiveEmoji}>🕵️</Text>
 
         {/* Title */}
-        <Text style={[type.label, { color: brand.purple, marginBottom: 8 }]}>
-          leakability test
-        </Text>
-        <Text style={[type.heroTitle, { color: colors.textPrimary, lineHeight: 36, marginBottom: 12 }]}>
-          the leakability test.
-        </Text>
-        <Text style={[type.body, { color: colors.textSecondary, lineHeight: 20, marginBottom: 4 }]}>
-          10 questions based on how you actually behave online. you'll get a personalised score, a risk band, and specific things to watch out for.
-        </Text>
-        <Text style={styles.meltEmoji}>🫠</Text>
+        <Text style={styles.title}>the leakability test.</Text>
 
-        {/* Info chips — lavender bg */}
+        {/* Description */}
+        <Text style={styles.description}>
+          10 real scenarios. use it as though it's your own phone screen. tap what you'd actually do. no right answers. no judgment. just vibes.
+        </Text>
+
+        {/* Info chips */}
         <View style={styles.chips}>
-          {INFO_CHIPS.map((chip) => (
-            <View
-              key={chip.label}
-              style={[styles.chip, { backgroundColor: brand.lavender }]}
-            >
-              <Text style={{ fontSize: 12 }}>{chip.icon}</Text>
-              <Text style={[type.label, { color: brand.purple }]}>{chip.label}</Text>
+          {CHIPS.map((label) => (
+            <View key={label} style={styles.chip}>
+              <Text style={styles.chipText}>{label}</Text>
             </View>
           ))}
         </View>
 
-        {/* What to expect */}
-        <View style={[styles.expectCard, { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak, borderWidth: 0.5 }]}>
-          <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 12 }]}>
-            what to expect
-          </Text>
-          {[
-            'Real scenarios — not trick questions',
-            'Honest feedback on every answer',
-            'A score from 0 to 48 with a band',
-            'A personalised learning path at the end',
-          ].map((item) => (
-            <View key={item} style={styles.expectRow}>
-              <View style={[styles.expectDot, { backgroundColor: brand.purpleCTA }]} />
-              <Text style={[type.body, { color: colors.textSecondary, flex: 1, lineHeight: 18 }]}>
-                {item}
-              </Text>
-            </View>
-          ))}
+        {/* Melting emoji — centered with space */}
+        <View style={styles.emojiWrap}>
+          <Text style={styles.meltEmoji}>🫠</Text>
         </View>
 
-        <Text style={[type.bodySmall, { color: colors.textTertiary, textAlign: 'center', marginTop: 20, marginBottom: 28 }]}>
-          your answers stay on your device. no data is shared.
-        </Text>
-
-        <Button
-          label="Start the test"
+        {/* Primary CTA */}
+        <Pressable
           onPress={handleStart}
-          variant="purple"
-          fullWidth
-        />
+          style={({ pressed }) => [styles.primaryBtn, { opacity: pressed ? 0.88 : 1 }]}
+        >
+          <Text style={styles.primaryBtnText}>start the test 🚀</Text>
+        </Pressable>
+
+        {/* Secondary — toggles explanation */}
+        <Pressable
+          onPress={() => setShowExplain((v) => !v)}
+          style={({ pressed }) => [styles.secondaryBtn, { opacity: pressed ? 0.7 : 1 }]}
+        >
+          <Text style={styles.secondaryBtnText}>wtf is leakability? 🤔</Text>
+        </Pressable>
+
+        {/* Explanation card */}
+        {showExplain && (
+          <View style={styles.explainCard}>
+            <Text style={styles.explainText}>
+              leakability = how exposed your digital life is 🎯 passwords, social engineering, phishing — the works. this test shows you where you stand.
+            </Text>
+          </View>
+        )}
       </ScrollView>
-      <BottomNav activeTab="home" />
     </View>
   )
 }
@@ -118,52 +86,87 @@ export default function TestIntroScreen() {
 const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
+    paddingHorizontal: 24,
   },
-  backBtn: {
-    alignSelf: 'flex-start',
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-  },
-  heroEmoji: {
+  detectiveEmoji: {
     fontSize: 48,
-    marginTop: 20,
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  meltEmoji: {
-    fontSize: 28,
-    marginTop: 8,
+  title: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 32,
+    color: '#0A0A0A',
+    lineHeight: 40,
+    marginBottom: 14,
+  },
+  description: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#5A5A5A',
+    lineHeight: 22,
     marginBottom: 20,
   },
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginBottom: 24,
   },
   chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+    backgroundColor: '#EEF0FF',
     borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 7,
+    paddingHorizontal: 13,
   },
-  expectCard: {
+  chipText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: '#5B5CF6',
+  },
+  emojiWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  meltEmoji: {
+    fontSize: 80,
+  },
+  primaryBtn: {
+    backgroundColor: '#5B5CF6',
+    borderRadius: 50,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  primaryBtnText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
+  },
+  secondaryBtn: {
+    borderRadius: 50,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#5B5CF6',
+  },
+  secondaryBtnText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 15,
+    color: '#5B5CF6',
+  },
+  explainCard: {
+    marginTop: 14,
+    backgroundColor: '#EEF0FF',
     borderRadius: 14,
-    borderWidth: 0.5,
     padding: 16,
   },
-  expectRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-    marginBottom: 8,
-  },
-  expectDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 6,
+  explainText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#0A0A0A',
+    lineHeight: 22,
   },
 })
