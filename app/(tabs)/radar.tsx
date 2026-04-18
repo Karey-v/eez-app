@@ -289,7 +289,7 @@ export default function RadarScreen() {
         ))}
         {/* Dark slate overlay — maintains brand feel over map */}
         <View
-          style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(26,35,50,0.6)' }]}
+          style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.2)' }]}
         />
       </View>
 
@@ -338,7 +338,7 @@ export default function RadarScreen() {
       >
         <View style={styles.togglePill}>
           {/* Map — active */}
-          <Pressable style={styles.toggleOption}>
+          <Pressable style={[styles.toggleOption, styles.toggleOptionActive]}>
             <MapPinIcon color="#FFFFFF" />
           </Pressable>
           {/* List — inactive */}
@@ -346,7 +346,7 @@ export default function RadarScreen() {
             style={styles.toggleOption}
             onPress={() => router.push('/radar/feed')}
           >
-            <ListIcon color="#666666" />
+            <ListIcon color="rgba(255,255,255,0.5)" />
           </Pressable>
         </View>
       </View>
@@ -464,5 +464,8 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  toggleOptionActive: {
+    backgroundColor: '#5B5CF6',
   },
 })

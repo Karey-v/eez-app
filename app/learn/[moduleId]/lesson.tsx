@@ -33,21 +33,12 @@ const TYPE_LABELS: Record<string, string> = {
 // ─── Progress dots ────────────────────────────────────────────────────────────
 
 function ProgressDots({ total, current }: { total: number; current: number }) {
-  const { colors, brand } = useTheme()
   return (
     <View style={styles.dotsRow}>
       {Array.from({ length: total }).map((_, i) => (
         <View
           key={i}
-          style={[
-            styles.dot,
-            {
-              backgroundColor: i === current ? '#5B5CF6' : '#EEF0FF',
-              width: i === current ? 8 : 6,
-              height: i === current ? 8 : 6,
-              borderRadius: i === current ? 4 : 3,
-            },
-          ]}
+          style={[styles.dot, { backgroundColor: i <= current ? '#5B5CF6' : '#EEF0FF' }]}
         />
       ))}
     </View>
@@ -460,7 +451,7 @@ export default function LessonScreen() {
             hitSlop={12}
             style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
           >
-            <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
+            <ArrowIcon size={20} color="#5B5CF6" direction="left" />
           </Pressable>
 
           <View style={[styles.typeChip, { backgroundColor: '#EEF0FF' }]}>
@@ -555,11 +546,11 @@ const styles = StyleSheet.create({
   dotsRow: {
     flexDirection: 'row',
     gap: 4,
-    alignItems: 'center',
   },
   dot: {
-    height: 6,
-    borderRadius: 3,
+    flex: 1,
+    height: 2,
+    borderRadius: 1,
   },
   insightCard: {
     borderRadius: 12,

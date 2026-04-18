@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/Button'
 import { questions, getBand, scaleScore, Question } from '@/data/questions'
 import { useTestStore } from '@/store/testStore'
 import { useUserStore } from '@/store/userStore'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Score calculation ────────────────────────────────────────────────────────
 
@@ -120,6 +121,7 @@ export default function QuestionScreen() {
         onAnswer={handleAnswer}
         onAdvance={handleAdvance}
       />
+      <BottomNav activeTab="home" />
     </View>
   )
 }

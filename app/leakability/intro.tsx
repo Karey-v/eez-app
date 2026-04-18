@@ -9,6 +9,7 @@ import { useTheme } from '@/theme'
 import { Button } from '@/components/ui/Button'
 import { ArrowIcon } from '@/components/icons/Arrow'
 import { useTestStore } from '@/store/testStore'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 const INFO_CHIPS = [
   { icon: '⏱', label: '5 mins' },
@@ -109,6 +110,7 @@ export default function TestIntroScreen() {
           fullWidth
         />
       </ScrollView>
+      <BottomNav activeTab="home" />
     </View>
   )
 }

@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { useUserStore } from '@/store/userStore'
 import { getBand } from '@/data/questions'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 const RING_SIZE = 160
 const RING_STROKE = 10
@@ -247,6 +248,7 @@ export default function ResultScreen() {
           </Pressable>
         </Animated.View>
       </ScrollView>
+      <BottomNav activeTab="home" />
     </View>
   )
 }

@@ -1,4 +1,5 @@
 // S10 — Home (first-time state) / S11 — Home (returning state)
+import React from 'react'
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
@@ -212,38 +213,38 @@ function ReturningView({
     <>
       {/* Score directly on gradient — no card */}
       <View style={styles.scoreSection}>
-        <Text style={[styles.heroScore, { color: '#FFFFFF' }]}>{score}</Text>
+        <Text style={[styles.heroScore, { color: '#B1FF58' }]}>{score}</Text>
         <Text style={[styles.heroBandLabel, { color: '#FFFFFF' }]}>{band.toUpperCase()}</Text>
         <Text style={styles.heroPersonality}>{personality}</Text>
         <Pressable
           onPress={() => router.push('/leakability/breakdown')}
           hitSlop={12}
-          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, marginTop: 12 })}
+          style={({ pressed }) => [styles.breakdownPill, { opacity: pressed ? 0.8 : 1 }]}
         >
-          <Text style={styles.heroBreakdownLink}>tap to see breakdown →</Text>
+          <Text style={styles.breakdownPillText}>tap to see breakdown →</Text>
         </Pressable>
       </View>
 
-      {/* Stats row */}
-      <View style={styles.statsRow}>
+      {/* Stats — single translucent box with pipe separators */}
+      <View style={styles.statsBox}>
         {[
-          { value: String(score), label: 'out of 48', valueColor: colors.textPrimary },
-          { value: band.split(' ')[0], label: 'band', valueColor: bandColor },
-          { value: testDate, label: 'last test', valueColor: colors.textPrimary },
-        ].map((stat) => (
-          <View
-            key={stat.label}
-            style={[styles.statCard, { backgroundColor: '#FFFFFF', borderColor: colors.borderWeak }]}
-          >
-            <Text style={[styles.statValue, { color: stat.valueColor }]}>{stat.value}</Text>
-            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>{stat.label}</Text>
-          </View>
+          { value: String(score), label: 'out of 48' },
+          { value: band.split(' ')[0], label: 'band' },
+          { value: testDate, label: 'last test' },
+        ].map((stat, i, arr) => (
+          <React.Fragment key={stat.label}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{stat.value}</Text>
+              <Text style={styles.statLabel}>{stat.label}</Text>
+            </View>
+            {i < arr.length - 1 && <View style={styles.statPipe} />}
+          </React.Fragment>
         ))}
       </View>
 
       {/* Quick actions */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#FF732E', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: 'rgba(255,255,255,0.6)', marginBottom: spacing.sectionBottom }]}>
           quick actions
         </Text>
         <ScrollView
@@ -258,14 +259,10 @@ function ReturningView({
               onPress={action.onPress}
               style={({ pressed }) => [
                 styles.quickActionCard,
-                {
-                  backgroundColor: colors.bgTertiary,
-                  borderColor: colors.borderWeak,
-                  opacity: pressed ? 0.7 : 1,
-                },
+                { opacity: pressed ? 0.7 : 1 },
               ]}
             >
-              <Text style={[type.body, { color: '#5B5CF6' }]}>{action.label}</Text>
+              <Text style={[type.body, { color: '#FFFFFF' }]}>{action.label}</Text>
             </Pressable>
           ))}
         </ScrollView>
@@ -273,7 +270,7 @@ function ReturningView({
 
       {/* Module recommendation */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#FF732E', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: 'rgba(255,255,255,0.6)', marginBottom: spacing.sectionBottom }]}>
           based on your score, start here
         </Text>
         <Card style={{ backgroundColor: '#FFFFFF' }} onPress={() => router.push('/learn/password-glow-up')}>
@@ -292,7 +289,7 @@ function ReturningView({
 
       {/* Modules */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#FF732E', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: 'rgba(255,255,255,0.6)', marginBottom: spacing.sectionBottom }]}>
           learn something
         </Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -315,7 +312,7 @@ function ReturningView({
 
       {/* Latest from radar */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#FF732E', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: 'rgba(255,255,255,0.6)', marginBottom: spacing.sectionBottom }]}>
           latest from radar
         </Text>
         <View style={{ gap: 8 }}>
@@ -455,48 +452,59 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   heroPersonality: {
-    fontFamily: 'Inter_400Regular',
+    fontFamily: 'Inter_700Bold',
     fontSize: 14,
-    color: '#5A5A5A',
-    fontStyle: 'italic',
+    color: '#B1FF58',
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 6,
   },
-  heroBreakdownLink: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: '#9A9A9A',
+  breakdownPill: {
+    marginTop: 14,
+    backgroundColor: '#B1FF58',
+    borderRadius: 50,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
   },
-  // Stats row
-  statsRow: {
+  breakdownPillText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: '#1A4A00',
+  },
+  // Stats — single translucent box
+  statsBox: {
     flexDirection: 'row',
-    gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 14,
+    paddingVertical: 14,
     marginTop: 4,
   },
-  statCard: {
+  statItem: {
     flex: 1,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
     alignItems: 'center',
     gap: 2,
-    borderWidth: 0.5,
+  },
+  statPipe: {
+    width: 1,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    marginVertical: 4,
   },
   statValue: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 18,
     fontWeight: '400',
+    color: '#FFFFFF',
   },
   statLabel: {
     fontFamily: 'Inter_400Regular',
     fontSize: 10,
+    color: 'rgba(255,255,255,0.7)',
   },
   quickActionCard: {
     borderRadius: 12,
-    borderWidth: 0.5,
     paddingVertical: 10,
     paddingHorizontal: 16,
     minHeight: 44,
     justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
 })

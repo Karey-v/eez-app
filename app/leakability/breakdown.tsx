@@ -11,6 +11,7 @@ import { useUserStore } from '@/store/userStore'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ArrowIcon } from '@/components/icons/Arrow'
 import { Card } from '@/components/ui/Card'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Category config ──────────────────────────────────────────────────────────
 
@@ -231,6 +232,7 @@ export default function BreakdownScreen() {
           </Pressable>
         </Animated.View>
       </ScrollView>
+      <BottomNav activeTab="home" />
     </View>
   )
 }
