@@ -42,8 +42,10 @@ function ProgressDots({ total, current }: { total: number; current: number }) {
           style={[
             styles.dot,
             {
-              backgroundColor: i <= current ? '#B1FF58' : colors.bgTertiary,
-              width: i === current ? 20 : 6,
+              backgroundColor: i === current ? '#5B5CF6' : '#EEF0FF',
+              width: i === current ? 8 : 6,
+              height: i === current ? 8 : 6,
+              borderRadius: i === current ? 4 : 3,
             },
           ]}
         />
@@ -431,14 +433,14 @@ export default function LessonScreen() {
 
   if (!lesson) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.bgSecondary, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center' }}>
         <Text style={[type.body, { color: colors.textSecondary }]}>Loading…</Text>
       </View>
     )
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgSecondary }}>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <StatusBar style="dark" />
 
       {/* Fixed header */}
@@ -506,7 +508,7 @@ export default function LessonScreen() {
             {
               paddingBottom: 16,
               paddingHorizontal: spacing.screenH,
-              backgroundColor: colors.bgSecondary,
+              backgroundColor: '#FFFFFF',
               borderTopColor: colors.borderWeak,
             },
           ]}

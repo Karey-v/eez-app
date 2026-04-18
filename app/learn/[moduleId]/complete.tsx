@@ -320,14 +320,14 @@ const styles = StyleSheet.create({
   },
   xpNumber: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 48,
-    lineHeight: 52,
-    color: '#B1FF58',
+    fontSize: 56,
+    lineHeight: 60,
+    color: '#5B5CF6',
   },
   xpUnit: {
     fontFamily: 'Inter_700Bold',
     fontSize: 20,
-    color: '#B1FF58',
+    color: '#5B5CF6',
     marginBottom: 5,
     marginLeft: 4,
   },
