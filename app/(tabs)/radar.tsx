@@ -1,7 +1,7 @@
 // Radar tab — OSM tile map, lime pulsing dots, bottom toggle pill.
 import { useState, useEffect } from 'react'
 import { View, Text, Pressable, StyleSheet, Dimensions, Image } from 'react-native'
-import Svg, { Line as SvgLine, Circle, Path } from 'react-native-svg'
+import Svg, { Line as SvgLine, Circle } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -12,10 +12,12 @@ import Animated, {
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { MapPinIcon } from '@/components/icons/MapPin'
+import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
 
-// ─── OSM tile grid (4×4, zoom 14, centered on NYC) ───────────────────────────
+// ─── OSM tile grid (4×4, zoom 15, centered on NYC) ───────────────────────────
 
 const TILE_COLS = 4
 const TILE_ROWS = 4
@@ -25,25 +27,25 @@ const TILE_H = SCREEN_H / TILE_ROWS
 
 const TILE_URLS = [
   // row 0
-  'https://tile.openstreetmap.org/14/4823/6160.png',
-  'https://tile.openstreetmap.org/14/4824/6160.png',
-  'https://tile.openstreetmap.org/14/4825/6160.png',
-  'https://tile.openstreetmap.org/14/4826/6160.png',
+  'https://tile.openstreetmap.org/15/9647/12321.png',
+  'https://tile.openstreetmap.org/15/9648/12321.png',
+  'https://tile.openstreetmap.org/15/9649/12321.png',
+  'https://tile.openstreetmap.org/15/9650/12321.png',
   // row 1
-  'https://tile.openstreetmap.org/14/4823/6161.png',
-  'https://tile.openstreetmap.org/14/4824/6161.png',
-  'https://tile.openstreetmap.org/14/4825/6161.png',
-  'https://tile.openstreetmap.org/14/4826/6161.png',
+  'https://tile.openstreetmap.org/15/9647/12322.png',
+  'https://tile.openstreetmap.org/15/9648/12322.png',
+  'https://tile.openstreetmap.org/15/9649/12322.png',
+  'https://tile.openstreetmap.org/15/9650/12322.png',
   // row 2
-  'https://tile.openstreetmap.org/14/4823/6162.png',
-  'https://tile.openstreetmap.org/14/4824/6162.png',
-  'https://tile.openstreetmap.org/14/4825/6162.png',
-  'https://tile.openstreetmap.org/14/4826/6162.png',
+  'https://tile.openstreetmap.org/15/9647/12323.png',
+  'https://tile.openstreetmap.org/15/9648/12323.png',
+  'https://tile.openstreetmap.org/15/9649/12323.png',
+  'https://tile.openstreetmap.org/15/9650/12323.png',
   // row 3
-  'https://tile.openstreetmap.org/14/4823/6163.png',
-  'https://tile.openstreetmap.org/14/4824/6163.png',
-  'https://tile.openstreetmap.org/14/4825/6163.png',
-  'https://tile.openstreetmap.org/14/4826/6163.png',
+  'https://tile.openstreetmap.org/15/9647/12324.png',
+  'https://tile.openstreetmap.org/15/9648/12324.png',
+  'https://tile.openstreetmap.org/15/9649/12324.png',
+  'https://tile.openstreetmap.org/15/9650/12324.png',
 ]
 
 const TILES = TILE_URLS.map((uri, i) => ({
@@ -64,32 +66,6 @@ function SearchIcon({ color }: { color: string }) {
   )
 }
 
-function MapPinIcon({ color }: { color: string }) {
-  return (
-    <Svg width={16} height={18} viewBox="0 0 16 18" fill="none">
-      <Path
-        d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5z"
-        stroke={color}
-        strokeWidth={1.4}
-        strokeLinejoin="round"
-      />
-      <Circle cx="8" cy="6" r="1.8" stroke={color} strokeWidth={1.2} />
-    </Svg>
-  )
-}
-
-function ChatBubbleIcon({ color }: { color: string }) {
-  return (
-    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
-      <Path
-        d="M3.5 1.5 H14.5 Q16.5 1.5 16.5 3.5 V10.5 Q16.5 12.5 14.5 12.5 H7 L4 16 V12.5 H3.5 Q1.5 12.5 1.5 10.5 V3.5 Q1.5 1.5 3.5 1.5 Z"
-        stroke={color}
-        strokeWidth={1.5}
-        strokeLinejoin="round"
-      />
-    </Svg>
-  )
-}
 
 // ─── Pins ─────────────────────────────────────────────────────────────────────
 
@@ -101,7 +77,7 @@ type Pin = {
   time: string
   nx: number  // 0–1 across screen width
   ny: number  // 0–1 across map area height
-  size: 8 | 10 | 14
+  size: 14 | 16 | 20
 }
 
 const PINS: Pin[] = [
@@ -113,7 +89,7 @@ const PINS: Pin[] = [
     time: '2h ago',
     nx: 0.50,
     ny: 0.28,
-    size: 14,
+    size: 20,
   },
   {
     id: 'p2',
@@ -123,7 +99,7 @@ const PINS: Pin[] = [
     time: '5h ago',
     nx: 0.33,
     ny: 0.60,
-    size: 10,
+    size: 16,
   },
   {
     id: 'p3',
@@ -133,7 +109,7 @@ const PINS: Pin[] = [
     time: '1d ago',
     nx: 0.68,
     ny: 0.18,
-    size: 8,
+    size: 14,
   },
   {
     id: 'p4',
@@ -143,7 +119,7 @@ const PINS: Pin[] = [
     time: '3h ago',
     nx: 0.80,
     ny: 0.47,
-    size: 10,
+    size: 16,
   },
 ]
 
@@ -192,7 +168,7 @@ function PulsingDot({
   )
 }
 
-// ─── Popup card (slides up, #1A2332 bg, lime accent) ─────────────────────────
+// ─── Popup card (slides up, white bg, light mode) ────────────────────────────
 
 const CARD_H = 160
 // Toggle pill: bottom=20 + height=56 + gap=12 → card bottom offset
@@ -341,15 +317,15 @@ export default function RadarScreen() {
       >
         <View style={styles.togglePill}>
           {/* Map — active */}
-          <Pressable style={[styles.toggleOption, styles.toggleOptionActive]}>
-            <MapPinIcon color="#FFFFFF" />
+          <Pressable style={styles.toggleOption}>
+            <MapPinIcon color="#FFFFFF" size={20} />
           </Pressable>
-          {/* List — inactive */}
+          {/* Feed — inactive */}
           <Pressable
-            style={[styles.toggleOption, styles.toggleOptionInactive]}
+            style={styles.toggleOption}
             onPress={() => router.push('/radar/feed')}
           >
-            <ChatBubbleIcon color="rgba(255,255,255,0.5)" />
+            <ChatBubbleIcon color="rgba(255,255,255,0.5)" size={20} />
           </Pressable>
         </View>
       </View>
@@ -375,7 +351,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 22,
-    color: '#B1FF58',
+    color: '#5B5CF6',
   },
   searchBtn: {
     width: 36,
@@ -392,16 +368,16 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     height: CARD_H,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     overflow: 'hidden',
     zIndex: 20,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'rgba(0,0,0,0.1)',
   },
   cardAccent: {
     height: 2,
-    backgroundColor: '#B1FF58',
+    backgroundColor: '#5B5CF6',
   },
   cardBody: {
     flex: 1,
@@ -419,12 +395,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 3,
-    backgroundColor: '#B1FF58',
+    backgroundColor: '#5B5CF6',
   },
   cardPillText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
-    color: '#1A4A00',
+    color: '#FFFFFF',
     letterSpacing: 0.2,
   },
   cardMeta: {
@@ -436,13 +412,13 @@ const styles = StyleSheet.create({
   cardHeadline: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     lineHeight: 20,
   },
   viewLink: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 12,
-    color: '#B1FF58',
+    color: '#5B5CF6',
     letterSpacing: 0.2,
   },
   toggleContainer: {
@@ -454,26 +430,18 @@ const styles = StyleSheet.create({
   },
   togglePill: {
     flexDirection: 'row',
-    backgroundColor: 'transparent',
-    height: 56,
-    borderRadius: 28,
+    backgroundColor: '#5B5CF6',
+    height: 52,
+    borderRadius: 26,
     paddingHorizontal: 4,
     alignItems: 'center',
-    gap: 4,
+    gap: 2,
   },
   toggleOption: {
-    width: 56,
+    width: 52,
     height: 44,
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  toggleOptionActive: {
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
-  },
-  toggleOptionInactive: {
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
   },
 })

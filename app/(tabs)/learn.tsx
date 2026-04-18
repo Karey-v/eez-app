@@ -49,7 +49,6 @@ export default function LearnScreen() {
 
         {modules.map((module) => {
           const isCompleted = completedModules.includes(module.id)
-          const isLocked = module.locked
 
           return (
             <View
@@ -59,7 +58,6 @@ export default function LearnScreen() {
                 {
                   backgroundColor: '#FFFFFF',
                   borderColor: colors.borderWeak,
-                  opacity: isLocked ? 0.45 : 1,
                   marginBottom: spacing.cardGap,
                 },
               ]}
@@ -82,9 +80,7 @@ export default function LearnScreen() {
                   </Text>
                 </View>
 
-                {isLocked ? (
-                  <Text style={{ fontSize: 18 }}>🔒</Text>
-                ) : isCompleted ? (
+                {isCompleted ? (
                   <View style={[styles.donePill, { backgroundColor: '#E8FFB0' }]}>
                     <Text style={[type.label, { color: '#007549' }]}>done ✓</Text>
                   </View>

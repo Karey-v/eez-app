@@ -118,7 +118,7 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
 
       {/* Modules — 3 side-by-side mini cards */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#FF732E', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
           learn something
         </Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -141,7 +141,7 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
 
       {/* Latest from radar */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#FF732E', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
           latest from radar
         </Text>
         <View style={{ gap: 8 }}>
@@ -244,7 +244,7 @@ function ReturningView({
 
       {/* Module recommendation */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#5B5CF6', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
           based on your score
         </Text>
         <Card style={{ backgroundColor: '#FFFFFF' }} onPress={() => router.push('/learn/password-glow-up')}>
@@ -263,7 +263,7 @@ function ReturningView({
 
       {/* Modules */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#5B5CF6', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
           learn something
         </Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -286,7 +286,7 @@ function ReturningView({
 
       {/* Latest from radar */}
       <View style={{ marginTop: spacing.sectionTop }}>
-        <Text style={[type.label, { color: '#5B5CF6', marginBottom: spacing.sectionBottom }]}>
+        <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
           latest from radar
         </Text>
         <View style={{ gap: 8 }}>

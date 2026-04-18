@@ -51,7 +51,7 @@ function TextVisualLesson({ lesson }: { lesson: Lesson }) {
   const { colors, type, brand } = useTheme()
   return (
     <View>
-      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 20, lineHeight: 34, textTransform: 'uppercase' }]}>
+      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 20, lineHeight: 34 }]}>
         {lesson.title}
       </Text>
       {lesson.body && (
@@ -95,7 +95,7 @@ function SwipeRevealLesson({
 
   return (
     <View>
-      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 20, lineHeight: 34, textTransform: 'uppercase' }]}>
+      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 20, lineHeight: 34 }]}>
         {lesson.title}
       </Text>
 
@@ -252,7 +252,7 @@ function TapUncoverLesson({
 
   return (
     <View>
-      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 12, lineHeight: 34, textTransform: 'uppercase' }]}>
+      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 12, lineHeight: 34 }]}>
         {lesson.title}
       </Text>
       <Text style={[type.body, { color: colors.textSecondary, lineHeight: 18, marginBottom: 24 }]}>
@@ -322,7 +322,7 @@ function ChoiceLesson({
 
   return (
     <View>
-      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 24, lineHeight: 34, textTransform: 'uppercase' }]}>
+      <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 24, lineHeight: 34 }]}>
         {lesson.title}
       </Text>
 

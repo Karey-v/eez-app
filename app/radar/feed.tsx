@@ -1,7 +1,6 @@
 // Radar Feed — incident list with filters, upvotes, report FAB, bottom toggle pill.
 import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
-import Svg, { Path } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -13,6 +12,8 @@ import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
+import { MapPinIcon } from '@/components/icons/MapPin'
+import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 import { useRadarStore } from '@/store/radarStore'
 import { Toast } from '@/components/ui/Toast'
 import type { IncidentCard } from '@/data/radarFeed'
@@ -29,38 +30,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   Phishing: '#602CFF',
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-
-function MapPinIcon({ color }: { color: string }) {
-  return (
-    <Svg width={16} height={18} viewBox="0 0 16 18" fill="none">
-      <Path
-        d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5z"
-        stroke={color}
-        strokeWidth={1.4}
-        strokeLinejoin="round"
-      />
-      <Path
-        d="M8 4.2 m-1.8 1.8 a1.8 1.8 0 1 0 3.6 0 a1.8 1.8 0 1 0 -3.6 0"
-        stroke={color}
-        strokeWidth={1.2}
-      />
-    </Svg>
-  )
-}
-
-function ChatBubbleIcon({ color }: { color: string }) {
-  return (
-    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
-      <Path
-        d="M3.5 1.5 H14.5 Q16.5 1.5 16.5 3.5 V10.5 Q16.5 12.5 14.5 12.5 H7 L4 16 V12.5 H3.5 Q1.5 12.5 1.5 10.5 V3.5 Q1.5 1.5 3.5 1.5 Z"
-        stroke={color}
-        strokeWidth={1.5}
-        strokeLinejoin="round"
-      />
-    </Svg>
-  )
-}
 
 // ─── Blinking live dot ────────────────────────────────────────────────────────
 
@@ -263,14 +232,14 @@ export default function RadarFeedScreen() {
         <View style={styles.togglePill}>
           {/* Map — inactive */}
           <Pressable
-            style={[styles.toggleOption, styles.toggleOptionInactive]}
+            style={styles.toggleOption}
             onPress={() => router.replace('/(tabs)/radar')}
           >
-            <MapPinIcon color="#999999" />
+            <MapPinIcon color="rgba(255,255,255,0.5)" size={20} />
           </Pressable>
-          {/* List — active */}
-          <Pressable style={[styles.toggleOption, styles.toggleOptionActive]}>
-            <ChatBubbleIcon color="#0A0A0A" />
+          {/* Feed — active */}
+          <Pressable style={styles.toggleOption}>
+            <ChatBubbleIcon color="#FFFFFF" size={20} />
           </Pressable>
         </View>
       </View>
@@ -302,7 +271,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 28,
-    color: '#B1FF58',
+    color: '#5B5CF6',
   },
   blinkDot: {
     width: 8,
@@ -448,26 +417,18 @@ const styles = StyleSheet.create({
   },
   togglePill: {
     flexDirection: 'row',
-    backgroundColor: 'transparent',
-    height: 56,
-    borderRadius: 28,
+    backgroundColor: '#5B5CF6',
+    height: 52,
+    borderRadius: 26,
     paddingHorizontal: 4,
     alignItems: 'center',
-    gap: 4,
+    gap: 2,
   },
   toggleOption: {
-    width: 56,
+    width: 52,
     height: 44,
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  toggleOptionActive: {
-    borderWidth: 1.5,
-    borderColor: '#0A0A0A',
-  },
-  toggleOptionInactive: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
   },
 })
