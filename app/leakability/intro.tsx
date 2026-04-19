@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTestStore } from '@/store/testStore'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 const CHIPS = ['⏱ ~5 mins', '🔒 totally private', '✨ personalized']
 
@@ -20,8 +21,8 @@ export default function TestIntroScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: '#5B5CF6' }}>
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -79,6 +80,7 @@ export default function TestIntroScreen() {
           </View>
         )}
       </ScrollView>
+      <BottomNav activeTab="home" />
     </View>
   )
 }
@@ -95,14 +97,14 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 32,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
     lineHeight: 40,
     marginBottom: 14,
   },
   description: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    color: '#5A5A5A',
+    color: 'rgba(255,255,255,0.8)',
     lineHeight: 22,
     marginBottom: 20,
   },
@@ -112,7 +114,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: '#EEF0FF',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 20,
     paddingVertical: 7,
     paddingHorizontal: 13,
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
   chipText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 12,
-    color: '#5B5CF6',
+    color: '#FFFFFF',
   },
   emojiWrap: {
     flex: 1,
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 80,
   },
   primaryBtn: {
-    backgroundColor: '#5B5CF6',
+    backgroundColor: '#FFFFFF',
     borderRadius: 50,
     height: 52,
     alignItems: 'center',
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     fontFamily: 'Inter_700Bold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#5B5CF6',
   },
   secondaryBtn: {
     borderRadius: 50,
@@ -150,23 +152,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: '#5B5CF6',
+    borderColor: 'rgba(255,255,255,0.5)',
   },
   secondaryBtnText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 15,
-    color: '#5B5CF6',
+    color: '#FFFFFF',
   },
   explainCard: {
     marginTop: 14,
-    backgroundColor: '#EEF0FF',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 14,
     padding: 16,
   },
   explainText: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
     lineHeight: 22,
   },
 })

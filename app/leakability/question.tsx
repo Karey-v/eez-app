@@ -17,7 +17,6 @@ import { questions, getBand, scaleScore, Question } from '@/data/questions'
 import { useTestStore } from '@/store/testStore'
 import { useUserStore } from '@/store/userStore'
 import { BottomNav } from '@/components/ui/BottomNav'
-import { ArrowIcon } from '@/components/icons/Arrow'
 
 // ─── Score calculation ────────────────────────────────────────────────────────
 
@@ -178,9 +177,9 @@ function QuestionBody({
           </View>
         )}
 
-        {/* Scenario card — neutral bg, no label */}
+        {/* Scenario — text directly on white */}
         {question.type === 'scenario' && (
-          <View style={styles.scenarioCard}>
+          <View style={{ marginBottom: 24 }}>
             <Text style={styles.questionText}>
               {question.prompt}
             </Text>
@@ -235,16 +234,16 @@ function QuestionBody({
         <Pressable
           onPress={onBack}
           hitSlop={12}
-          style={({ pressed }) => [styles.navBackBtn, { opacity: pressed ? 0.5 : 1 }]}
+          style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
         >
-          <ArrowIcon size={20} color="#5B5CF6" direction="left" />
+          <Text style={styles.navBackText}>← back</Text>
         </Pressable>
 
         {canAdvance && (
-          <Animated.View entering={FadeIn.duration(220)} style={{ flex: 1 }}>
+          <Animated.View entering={FadeIn.duration(220)}>
             <Pressable
               onPress={onAdvance}
-              style={({ pressed }) => [styles.navNextBtn, { opacity: pressed ? 0.85 : 1 }]}
+              style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
             >
               <Text style={styles.navNextText}>next →</Text>
             </Pressable>
@@ -523,9 +522,7 @@ const styles = StyleSheet.create({
   },
   categoryPillText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 11,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    fontSize: 12,
     color: '#1A4A00',
   },
   body: {
@@ -538,12 +535,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#5B5CF6',
     textAlign: 'left',
-  },
-  scenarioCard: {
-    backgroundColor: '#F5F5F7',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
   },
   options: {
     gap: 12,
@@ -567,31 +558,24 @@ const styles = StyleSheet.create({
   navBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    gap: 12,
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 10,
     borderTopWidth: 0.5,
     borderTopColor: 'rgba(0,0,0,0.06)',
     backgroundColor: '#FFFFFF',
   },
-  navBackBtn: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navNextBtn: {
-    flex: 1,
-    backgroundColor: '#5B5CF6',
-    borderRadius: 50,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+  navBackText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#9CA3AF',
+    textDecorationLine: 'underline',
   },
   navNextText: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 14,
-    color: '#FFFFFF',
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#5B5CF6',
+    textDecorationLine: 'underline',
   },
 
   // ── iOS lockscreen notification ──

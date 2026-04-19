@@ -160,7 +160,7 @@ export default function ResultScreen() {
 
           <Animated.Text
             entering={FadeInUp.delay(1800).duration(400)}
-            style={[type.body, { color: '#6B7280', marginTop: 10, lineHeight: 21 }]}
+            style={[type.body, { color: '#6B7280', marginTop: 10, lineHeight: 21, textAlign: 'center' }]}
           >
             {description}
           </Animated.Text>
@@ -308,8 +308,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 30,
     color: '#0A0A0A',
-    textAlign: 'left',
-    alignSelf: 'stretch',
+    textAlign: 'center',
   },
   gaugeSection: {
     marginBottom: 36,
