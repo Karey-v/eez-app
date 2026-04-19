@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTestStore } from '@/store/testStore'
 import { BottomNav } from '@/components/ui/BottomNav'
 
-const CHIPS = ['⏱ ~5 mins', '🔒 totally private', '✨ personalized']
+const CHIPS = ['⏱ ~5 mins', '🔒 Totally private', '✨ Personalized']
 
 export default function TestIntroScreen() {
   const router = useRouter()
@@ -34,11 +34,11 @@ export default function TestIntroScreen() {
         <Text style={styles.detectiveEmoji}>🕵️</Text>
 
         {/* Title */}
-        <Text style={styles.title}>the leakability test.</Text>
+        <Text style={styles.title}>The leakability test.</Text>
 
         {/* Description */}
         <Text style={styles.description}>
-          10 real scenarios. use it as though it's your own phone screen. tap what you'd actually do. no right answers. no judgment. just vibes.
+          10 real scenarios. Use it as though it's your own phone screen. Tap what you'd actually do. No right answers. No judgment. Just vibes.
         </Text>
 
         {/* Info chips */}
@@ -75,7 +75,7 @@ export default function TestIntroScreen() {
         {showExplain && (
           <View style={styles.explainCard}>
             <Text style={styles.explainText}>
-              leakability = how exposed your digital life is 🎯 passwords, social engineering, phishing — the works. this test shows you where you stand.
+              Leakability = how exposed your digital life is 🎯 Passwords, social engineering, phishing — the works. This test shows you where you stand.
             </Text>
           </View>
         )}

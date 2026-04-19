@@ -31,7 +31,7 @@ export default function LearnScreen() {
         {/* Header */}
         <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 4 }]}>learn.</Text>
         <Text style={[type.body, { color: colors.textSecondary, marginBottom: 20, lineHeight: 18 }]}>
-          bite-sized modules to make you harder to scam.
+          Bite-sized modules to make you harder to scam.
         </Text>
 
         {/* Streak chip */}
@@ -44,7 +44,7 @@ export default function LearnScreen() {
 
         {/* Module section */}
         <Text style={[type.label, { color: colors.textTertiary, marginTop: 24, marginBottom: 10 }]}>
-          your learning path
+          Your learning path
         </Text>
 
         {modules.map((module) => {
@@ -109,7 +109,7 @@ export default function LearnScreen() {
 
         {/* Badge shelf */}
         <Text style={[type.label, { color: colors.textTertiary, marginTop: 24, marginBottom: 10 }]}>
-          badges
+          Badges
         </Text>
 
         <View style={styles.badgeRow}>

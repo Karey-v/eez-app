@@ -30,11 +30,14 @@ export default function Root({ children }: { children: React.ReactNode }) {
               #root {
                 max-width: 390px;
                 width: 100%;
+                height: auto;
+                min-height: 100vh;
                 flex-shrink: 0;
                 box-shadow:
                   0 0 0 1px rgba(255, 255, 255, 0.07),
                   0 8px 48px rgba(0, 0, 0, 0.85);
-                overflow: hidden;
+                overflow-x: hidden;
+                overflow-y: auto;
               }
             `,
           }}

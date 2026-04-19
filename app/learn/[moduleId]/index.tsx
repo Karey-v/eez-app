@@ -28,6 +28,29 @@ export default function ModuleIntroScreen() {
     )
   }
 
+  if (module.locked) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#5B5CF6', paddingTop: insets.top + 16, paddingHorizontal: spacing.screenH }}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
+        >
+          <ArrowIcon size={20} color="#FFFFFF" direction="left" />
+        </Pressable>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontFamily: 'DMSerifDisplay_400Regular', fontSize: 32, color: '#FFFFFF', textAlign: 'center' }}>
+            coming soon.
+          </Text>
+          <Text style={[type.bodySmall, { color: 'rgba(255,255,255,0.6)', marginTop: 10, textAlign: 'center' }]}>
+            This module is on its way.
+          </Text>
+        </View>
+        <BottomNav activeTab="learn" />
+      </View>
+    )
+  }
+
   function handleStart() {
     startModule(moduleId)
     router.push(`/learn/${moduleId}/lesson`)

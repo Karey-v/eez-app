@@ -1,6 +1,6 @@
 // S13–S22 — Leakability Test Questions (dynamic, type-driven)
 // Handles: simulation-tap, slider, multiple-choice, scenario
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native'
-import Animated, { FadeIn } from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -72,6 +72,14 @@ export default function QuestionScreen() {
 
   const question = questions[currentQuestionIndex]
 
+  // Restore previously given answer when user navigates back
+  const storedAnswer = answers.find((a) => a.questionId === question.id)
+  const initialSelectedIndex: number | null = (() => {
+    if (!storedAnswer || !question.options) return null
+    const idx = question.options.findIndex((o) => o.score === storedAnswer.score)
+    return idx >= 0 ? idx : null
+  })()
+
   const handleAnswer = useCallback(
     (optionIndex: number) => {
       const option = question.options![optionIndex]
@@ -92,6 +100,17 @@ export default function QuestionScreen() {
     }
   }, [currentQuestionIndex, nextQuestion, completeTest, setScore, router])
 
+  const handleBack = useCallback(() => {
+    if (currentQuestionIndex === 0) {
+      router.back()
+      return
+    }
+    useTestStore.setState((s) => ({
+      currentQuestionIndex: s.currentQuestionIndex - 1,
+      answers: s.answers.filter((a) => a.questionId !== question.id),
+    }))
+  }, [currentQuestionIndex, question.id, router])
+
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <StatusBar style="dark" />
@@ -110,7 +129,8 @@ export default function QuestionScreen() {
         question={question}
         onAnswer={handleAnswer}
         onAdvance={handleAdvance}
-        onBack={() => router.back()}
+        onBack={handleBack}
+        initialSelectedIndex={initialSelectedIndex}
       />
       <BottomNav activeTab="home" />
     </View>
@@ -124,29 +144,41 @@ function QuestionBody({
   onAnswer,
   onAdvance,
   onBack,
+  initialSelectedIndex,
 }: {
   question: Question
   onAnswer: (optionIndex: number) => void
   onAdvance: () => void
   onBack: () => void
+  initialSelectedIndex: number | null
 }) {
   const { colors, type, spacing } = useTheme()
   const insets = useSafeAreaInsets()
+  // selectedIndex: set only when user makes a new tap (locks further taps)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
-  const [sliderIndex, setSliderIndex] = useState<number | null>(null)
+  // displayIndex: visual highlight — starts from restored answer, updated on new tap
+  const [displayIndex, setDisplayIndex] = useState<number | null>(initialSelectedIndex)
+  const [sliderIndex, setSliderIndex] = useState<number | null>(initialSelectedIndex)
+  const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const canAdvance = selectedIndex !== null
+  useEffect(() => {
+    return () => { if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current) }
+  }, [])
 
   function handleOptionSelect(optionIndex: number) {
     if (selectedIndex !== null) return
     setSelectedIndex(optionIndex)
+    setDisplayIndex(optionIndex)
     onAnswer(optionIndex)
+    advanceTimerRef.current = setTimeout(onAdvance, 600)
   }
 
   function handleSliderChange(index: number) {
     setSliderIndex(index)
-    setSelectedIndex(index)
+    setDisplayIndex(index)
     onAnswer(index)
+    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current)
+    advanceTimerRef.current = setTimeout(onAdvance, 600)
   }
 
   return (
@@ -213,14 +245,14 @@ function QuestionBody({
           <View style={styles.options}>
             {question.type === 'scenario' && (
               <Text style={[type.label, { color: colors.textTertiary, marginBottom: 12 }]}>
-                what do you do?
+                What do you do?
               </Text>
             )}
             {question.options.map((option, i) => (
               <OptionButton
                 key={i}
                 label={option.label}
-                selected={selectedIndex === i}
+                selected={displayIndex === i}
                 anySelected={selectedIndex !== null}
                 onPress={() => handleOptionSelect(i)}
               />
@@ -229,7 +261,7 @@ function QuestionBody({
         )}
       </ScrollView>
 
-      {/* Back / Next nav bar */}
+      {/* Back nav */}
       <View style={[styles.navBar, { paddingBottom: insets.bottom + 8 }]}>
         <Pressable
           onPress={onBack}
@@ -238,17 +270,6 @@ function QuestionBody({
         >
           <Text style={styles.navBackText}>← back</Text>
         </Pressable>
-
-        {canAdvance && (
-          <Animated.View entering={FadeIn.duration(220)}>
-            <Pressable
-              onPress={onAdvance}
-              style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
-            >
-              <Text style={styles.navNextText}>next →</Text>
-            </Pressable>
-          </Animated.View>
-        )}
       </View>
     </View>
   )

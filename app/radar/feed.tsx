@@ -261,13 +261,6 @@ export default function RadarFeedScreen() {
           </Pressable>
         </View>
 
-        <Pressable
-          onPress={() => router.push('/radar/report')}
-          hitSlop={8}
-          style={({ pressed }) => [styles.reportLink, { opacity: pressed ? 0.6 : 1 }]}
-        >
-          <Text style={styles.reportLinkText}>+ report incident</Text>
-        </Pressable>
       </View>
 
       {/* Scrollable feed */}
@@ -411,16 +404,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
     color: '#FFFFFF',
-  },
-  reportLink: {
-    alignSelf: 'flex-start',
-    paddingVertical: 2,
-  },
-  reportLinkText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
-    color: '#5B5CF6',
-    textDecorationLine: 'underline',
   },
   // ── Incident card ──
   cardGap: {

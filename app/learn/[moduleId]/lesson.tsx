@@ -148,7 +148,7 @@ function SwipeRevealLesson({
             marginTop: 10,
           }}
         >
-          swipe to reveal
+          Swipe to reveal
         </Text>
       )}
 
@@ -294,7 +294,7 @@ function TapUncoverLesson({
             { color: colors.textTertiary, marginTop: 16, textAlign: 'center' },
           ]}
         >
-          tap all {hotspots.length} parts to continue
+          Tap all {hotspots.length} parts to continue
         </Text>
       )}
     </View>
