@@ -15,6 +15,8 @@ import { useTheme } from '@/theme'
 import { useRadarStore } from '@/store/radarStore'
 import { Toast } from '@/components/ui/Toast'
 import { BottomNav } from '@/components/ui/BottomNav'
+import { MapPinIcon } from '@/components/icons/MapPin'
+import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 import type { IncidentCard } from '@/data/radarFeed'
 
 function cap(s: string) {
@@ -298,6 +300,22 @@ export default function RadarFeedScreen() {
         )}
       </ScrollView>
 
+      {/* Map/Feed toggle — bottom center above BottomNav */}
+      <View style={[styles.toggleContainer, { bottom: BOTTOM_NAV_H + 16 }]} pointerEvents="box-none">
+        <View style={styles.togglePill}>
+          <Pressable
+            style={styles.toggleOption}
+            hitSlop={8}
+            onPress={() => router.replace('/(tabs)/radar')}
+          >
+            <MapPinIcon color="rgba(255,255,255,0.5)" size={18} />
+          </Pressable>
+          <View style={[styles.toggleOption, styles.toggleActive]}>
+            <ChatBubbleIcon color="#FFFFFF" size={18} />
+          </View>
+        </View>
+      </View>
+
       <BottomNav activeTab="radar" />
 
       <Toast
@@ -327,6 +345,33 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#F8F7FF',
+  },
+  // ── Toggle pill ──
+  toggleContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 30,
+  },
+  togglePill: {
+    flexDirection: 'row',
+    backgroundColor: '#5B5CF6',
+    height: 52,
+    borderRadius: 26,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    gap: 2,
+  },
+  toggleOption: {
+    width: 52,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggleActive: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   // ── Sticky header ──
   stickyHeader: {

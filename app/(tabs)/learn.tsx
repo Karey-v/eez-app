@@ -29,7 +29,7 @@ export default function LearnScreen() {
         }}
       >
         {/* Header */}
-        <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 4 }]}>learn.</Text>
+        <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 4 }]}>Learn.</Text>
         <Text style={[type.body, { color: colors.textSecondary, marginBottom: 20, lineHeight: 18 }]}>
           Bite-sized modules to make you harder to scam.
         </Text>

@@ -109,8 +109,8 @@ export default function SafetyScreen() {
         {/* Header */}
         <View style={styles.headerRow}>
           <ShieldIcon size={22} color={brand.purpleCTA} />
-          <Text style={[type.heroTitle, { color: colors.textPrimary, marginLeft: 8 }]}>
-            safety network.
+          <Text style={[type.heroTitle, { color: '#5B5CF6', marginLeft: 8 }]}>
+            Safety network.
           </Text>
         </View>
         <Text style={[type.body, { color: colors.textSecondary, marginBottom: 24, lineHeight: 18 }]}>
@@ -126,8 +126,7 @@ export default function SafetyScreen() {
           icon="⚠️"
           iconBg="rgba(255,115,46,0.12)"
           title="I think I'm being scammed right now."
-          subtitle="coming soon"
-          disabled
+          onPress={() => router.push('/safety/coming-soon')}
         />
         <View style={{ height: spacing.cardGap }} />
 
@@ -143,8 +142,7 @@ export default function SafetyScreen() {
           icon="👥"
           iconBg="rgba(91,92,246,0.12)"
           title="Someone I know needs help."
-          subtitle="coming soon"
-          disabled
+          onPress={() => router.push('/safety/coming-soon')}
         />
 
         {/* AI Detector card */}

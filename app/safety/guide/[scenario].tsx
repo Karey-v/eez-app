@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { ArrowIcon } from '@/components/icons/Arrow'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Steps data ───────────────────────────────────────────────────────────────
 
@@ -331,6 +332,7 @@ export default function GuideScreen() {
           </Animated.View>
         )}
       </ScrollView>
+      <BottomNav activeTab="home" />
     </View>
   )
 }

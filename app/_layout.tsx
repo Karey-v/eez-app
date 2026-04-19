@@ -119,7 +119,8 @@ export default function RootLayout() {
         <Stack.Screen name="safety/chat" />
         <Stack.Screen name="safety/helplines" />
         <Stack.Screen name="safety/guide/[scenario]" />
-        <Stack.Screen name="safety-modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="safety-modal" />
+        <Stack.Screen name="safety/coming-soon" />
         <Stack.Screen name="radar/feed" />
         <Stack.Screen name="notifications/index" />
         <Stack.Screen name="profile/badges" />

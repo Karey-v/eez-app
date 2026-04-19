@@ -23,6 +23,7 @@ import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { ArrowIcon } from '@/components/icons/Arrow'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Pulse dot ────────────────────────────────────────────────────────────────
 
@@ -95,10 +96,8 @@ export default function DetectorScreen() {
         </Pressable>
 
         <View style={styles.headerTitle}>
+          <Text style={styles.titleText}>EEZ Fraud Detector</Text>
           <PulseDot />
-          <Text style={[type.cardTitle, { color: colors.textPrimary, marginLeft: 8, fontSize: 14 }]}>
-            EEZ Fraud Detector
-          </Text>
         </View>
 
         <View style={{ width: 44 }} />
@@ -128,7 +127,7 @@ export default function DetectorScreen() {
           </View>
           <View style={[styles.botBubble, { backgroundColor: colors.bgSecondary }]}>
             <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
-              hey. paste a message, email subject, or describe a situation — i'll tell you if something's off.
+              Hey. paste a message, email subject, or describe a situation — i'll tell you if something's off.
             </Text>
           </View>
         </View>
@@ -208,11 +207,18 @@ export default function DetectorScreen() {
           <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 18, lineHeight: 20 }}>↑</Text>
         </Pressable>
       </View>
+      <BottomNav activeTab="home" />
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
+  titleText: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 22,
+    color: '#5B5CF6',
+    marginRight: 8,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -230,10 +236,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pulseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#22C55E',
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: '#B1FF58',
   },
   disclaimer: {
     paddingVertical: 8,

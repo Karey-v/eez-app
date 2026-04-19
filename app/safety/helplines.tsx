@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { ArrowIcon } from '@/components/icons/Arrow'
+import { BottomNav } from '@/components/ui/BottomNav'
 import { helplines } from '@/data/helplines'
 
 export default function HelplinesScreen() {
@@ -27,6 +28,7 @@ export default function HelplinesScreen() {
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
       <StatusBar style="dark" />
       <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + 16,
@@ -42,8 +44,8 @@ export default function HelplinesScreen() {
           <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
         </Pressable>
 
-        <Text style={[type.heroTitle, { color: colors.textPrimary, marginTop: 16, marginBottom: 6 }]}>
-          helplines.
+        <Text style={[type.heroTitle, { color: '#5B5CF6', marginTop: 16, marginBottom: 6 }]}>
+          Helplines.
         </Text>
         <Text style={[type.body, { color: colors.textSecondary, marginBottom: 24, lineHeight: 18 }]}>
           real people, real help. all free.
@@ -95,6 +97,7 @@ export default function HelplinesScreen() {
           </View>
         ))}
       </ScrollView>
+      <BottomNav activeTab="home" />
     </View>
   )
 }

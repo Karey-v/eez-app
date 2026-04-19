@@ -1,7 +1,6 @@
 // Radar tab — OSM tile map, lime pulsing dots, bottom toggle pill.
 import { useState, useEffect } from 'react'
 import { View, Text, Pressable, StyleSheet, Dimensions, Image } from 'react-native'
-import Svg, { Line as SvgLine, Circle } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -16,19 +15,6 @@ import { MapPinIcon } from '@/components/icons/MapPin'
 import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
-
-
-// ─── Icons ────────────────────────────────────────────────────────────────────
-
-function SearchIcon({ color }: { color: string }) {
-  return (
-    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
-      <Circle cx="8" cy="8" r="5" stroke={color} strokeWidth={1.5} />
-      <SvgLine x1="12" y1="12" x2="15.5" y2="15.5"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-    </Svg>
-  )
-}
 
 
 // ─── Pins ─────────────────────────────────────────────────────────────────────
@@ -231,22 +217,20 @@ export default function RadarScreen() {
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <Text style={styles.headerTitle}>Radar.</Text>
-        <View style={styles.headerRight}>
-          {/* Map / Feed toggle */}
-          <View style={styles.toggleMini}>
-            <View style={[styles.toggleMiniOption, styles.toggleMiniActive]}>
-              <MapPinIcon color="#FFFFFF" size={14} />
-            </View>
-            <Pressable
-              style={styles.toggleMiniOption}
-              hitSlop={8}
-              onPress={() => router.push('/radar/feed')}
-            >
-              <ChatBubbleIcon color="rgba(255,255,255,0.55)" size={14} />
-            </Pressable>
+      </View>
+
+      {/* Map/Feed toggle — bottom center */}
+      <View style={[styles.toggleContainer, { bottom: insets.bottom + 24 }]} pointerEvents="box-none">
+        <View style={styles.togglePill}>
+          <View style={[styles.toggleOption, styles.toggleActive]}>
+            <MapPinIcon color="#FFFFFF" size={18} />
           </View>
-          <Pressable hitSlop={12} style={styles.searchBtn}>
-            <SearchIcon color="rgba(255,255,255,0.5)" />
+          <Pressable
+            style={styles.toggleOption}
+            hitSlop={8}
+            onPress={() => router.push('/radar/feed')}
+          >
+            <ChatBubbleIcon color="rgba(255,255,255,0.5)" size={18} />
           </Pressable>
         </View>
       </View>
@@ -304,33 +288,31 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: '#5B5CF6',
   },
-  headerRight: {
-    flexDirection: 'row',
+  toggleContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    gap: 8,
+    zIndex: 30,
   },
-  toggleMini: {
+  togglePill: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 20,
-    padding: 3,
+    backgroundColor: '#5B5CF6',
+    height: 52,
+    borderRadius: 26,
+    paddingHorizontal: 4,
+    alignItems: 'center',
     gap: 2,
   },
-  toggleMiniOption: {
-    width: 30,
-    height: 30,
-    borderRadius: 18,
+  toggleOption: {
+    width: 52,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  toggleMiniActive: {
-    backgroundColor: '#5B5CF6',
-  },
-  searchBtn: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
+  toggleActive: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   dotActive: {
     borderWidth: 2,

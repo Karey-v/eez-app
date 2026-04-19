@@ -26,6 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { ArrowIcon } from '@/components/icons/Arrow'
 import { FraudScoreCard } from '@/components/ui/FraudScoreCard'
+import { BottomNav } from '@/components/ui/BottomNav'
 import { getResponse, type MockResponse } from '@/data/chatResponses'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -298,6 +299,7 @@ export default function ChatScreen() {
           <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 18, lineHeight: 20 }}>↑</Text>
         </Pressable>
       </View>
+      <BottomNav activeTab="home" />
     </KeyboardAvoidingView>
   )
 }
