@@ -48,7 +48,7 @@ const sosStyles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#CC0000',
+    backgroundColor: '#FF732E',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 8,

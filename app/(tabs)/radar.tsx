@@ -27,7 +27,7 @@ type Pin = {
   time: string
   nx: number  // 0–1 across screen width
   ny: number  // 0–1 across map area height
-  size: 14 | 16 | 20
+  size: 20 | 22 | 26
 }
 
 function cap(s: string) {
@@ -43,7 +43,7 @@ const PINS: Pin[] = [
     time: '2h ago',
     nx: 0.50,
     ny: 0.28,
-    size: 20,
+    size: 26,
   },
   {
     id: 'p2',
@@ -53,7 +53,7 @@ const PINS: Pin[] = [
     time: '5h ago',
     nx: 0.33,
     ny: 0.60,
-    size: 16,
+    size: 22,
   },
   {
     id: 'p3',
@@ -63,7 +63,7 @@ const PINS: Pin[] = [
     time: '1d ago',
     nx: 0.68,
     ny: 0.18,
-    size: 14,
+    size: 20,
   },
   {
     id: 'p4',
@@ -73,7 +73,7 @@ const PINS: Pin[] = [
     time: '3h ago',
     nx: 0.80,
     ny: 0.47,
-    size: 16,
+    size: 22,
   },
 ]
 
@@ -112,9 +112,10 @@ function PulsingDot({
             width: dotSize,
             height: dotSize,
             borderRadius: dotSize / 2,
-            backgroundColor: '#B1FF58',
+            backgroundColor: '#CCFF00',
+            borderWidth: 2.5,
+            borderColor: '#FFFFFF',
           },
-          active && styles.dotActive,
           !active && animStyle,
         ]}
       />
@@ -205,7 +206,7 @@ export default function RadarScreen() {
       <StatusBar style="light" />
 
       {/* Full-screen map + dark overlay */}
-      <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#1A2332' }]} pointerEvents="none">
         <Image
           source={require('../../assets/images/radar-map.png')}
           style={StyleSheet.absoluteFillObject}
@@ -314,10 +315,7 @@ const styles = StyleSheet.create({
   toggleActive: {
     backgroundColor: 'rgba(255,255,255,0.2)',
   },
-  dotActive: {
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
+  dotActive: {},
   card: {
     position: 'absolute',
     left: 20,

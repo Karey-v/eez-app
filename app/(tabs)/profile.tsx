@@ -98,8 +98,8 @@ export default function ProfileScreen() {
         }}
       >
         {/* Header */}
-        <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 28 }]}>
-          profile.
+        <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 28 }]}>
+          Profile.
         </Text>
 
         {/* Avatar + name block */}

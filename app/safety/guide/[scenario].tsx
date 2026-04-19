@@ -263,10 +263,10 @@ export default function GuideScreen() {
         <Text
           style={[
             type.heroTitle,
-            { color: colors.textPrimary, lineHeight: 34, marginBottom: 6 },
+            { color: '#5B5CF6', lineHeight: 34, marginBottom: 6 },
           ]}
         >
-          you're not alone.
+          You're not alone.
         </Text>
         <Text
           style={[

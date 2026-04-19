@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Image,
 } from 'react-native'
 import Animated, {
   useSharedValue,
@@ -122,8 +123,12 @@ export default function DetectorScreen() {
       >
         {/* Bot welcome bubble */}
         <View style={styles.botRow}>
-          <View style={[styles.avatar, { backgroundColor: brand.darkGreen }]}>
-            <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 11 }}>EEZ</Text>
+          <View style={styles.avatar}>
+            <Image
+              source={require('../../assets/images/icon.png')}
+              style={{ width: 32, height: 32, borderRadius: 16 }}
+              resizeMode="cover"
+            />
           </View>
           <View style={[styles.botBubble, { backgroundColor: colors.bgSecondary }]}>
             <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
@@ -215,7 +220,7 @@ export default function DetectorScreen() {
 const styles = StyleSheet.create({
   titleText: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 22,
+    fontSize: 28,
     color: '#5B5CF6',
     marginRight: 8,
   },

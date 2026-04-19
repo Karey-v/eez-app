@@ -247,7 +247,7 @@ export default function RadarFeedScreen() {
       <View style={[styles.stickyHeader, { paddingTop: insets.top + 20 }]}>
         <View style={styles.headerRow}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Text style={styles.headerTitle}>radar.</Text>
+            <Text style={styles.headerTitle}>Radar.</Text>
             <BlinkDot />
           </View>
         </View>
@@ -301,7 +301,7 @@ export default function RadarFeedScreen() {
       </ScrollView>
 
       {/* Map/Feed toggle — bottom center above BottomNav */}
-      <View style={[styles.toggleContainer, { bottom: BOTTOM_NAV_H + 16 }]} pointerEvents="box-none">
+      <View style={[styles.toggleContainer, { bottom: BOTTOM_NAV_H + 24 }]} pointerEvents="box-none">
         <View style={styles.togglePill}>
           <Pressable
             style={styles.toggleOption}
