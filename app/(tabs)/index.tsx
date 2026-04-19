@@ -13,6 +13,10 @@ import { ArrowIcon } from '@/components/icons/Arrow'
 import { Card } from '@/components/ui/Card'
 import { radarFeed } from '@/data/radarFeed'
 
+function cap(s: string) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
+}
+
 const CATEGORY_COLORS: Record<string, string> = {
   Banks: '#22C55E',
   Jobs: '#F59E0B',
@@ -119,7 +123,7 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
       {/* Modules — 3 side-by-side mini cards */}
       <View style={{ marginTop: spacing.sectionTop }}>
         <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
-          learn something
+          Learn something
         </Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           {[
@@ -142,7 +146,7 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
       {/* Latest from radar */}
       <View style={{ marginTop: spacing.sectionTop }}>
         <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
-          latest from radar
+          Latest from radar
         </Text>
         <View style={{ gap: 8 }}>
           {radarFeed.slice(0, 2).map((item) => {
@@ -155,14 +159,14 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
               >
                 <View style={styles.radarRow}>
                   <Text style={[type.label, { color: catColor }]}>
-                    {item.category.toLowerCase()}
+                    {item.category}
                   </Text>
                   <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
                     {item.timestamp}
                   </Text>
                 </View>
                 <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 6 }]}>
-                  {item.headline}
+                  {cap(item.headline)}
                 </Text>
                 <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
                   {item.preview}
@@ -228,9 +232,9 @@ function ReturningView({
       {/* Stats — single translucent box with pipe separators */}
       <View style={styles.statsBox}>
         {[
-          { value: String(score), label: 'out of 48' },
-          { value: band.split(' ')[0], label: 'band' },
-          { value: testDate, label: 'last test' },
+          { value: String(score), label: 'Out of 48' },
+          { value: band.split(' ')[0], label: 'Band' },
+          { value: testDate, label: 'Last test' },
         ].map((stat, i, arr) => (
           <React.Fragment key={stat.label}>
             <View style={styles.statItem}>
@@ -245,12 +249,12 @@ function ReturningView({
       {/* Module recommendation */}
       <View style={{ marginTop: spacing.sectionTop }}>
         <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
-          based on your score
+          Based on your score
         </Text>
         <Card style={{ backgroundColor: '#FFFFFF' }} onPress={() => router.push('/learn/password-glow-up')}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flex: 1 }}>
-              <Text style={[type.label, { color: '#5B5CF6', marginBottom: 4 }]}>🔑 passwords</Text>
+              <Text style={[type.label, { color: '#5B5CF6', marginBottom: 4 }]}>🔑 Passwords</Text>
               <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 4 }]}>
                 Password Glow-Up
               </Text>
@@ -264,7 +268,7 @@ function ReturningView({
       {/* Modules */}
       <View style={{ marginTop: spacing.sectionTop }}>
         <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
-          learn something
+          Learn something
         </Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           {[
@@ -287,7 +291,7 @@ function ReturningView({
       {/* Latest from radar */}
       <View style={{ marginTop: spacing.sectionTop }}>
         <Text style={[type.label, { color: '#B1FF58', marginBottom: spacing.sectionBottom }]}>
-          latest from radar
+          Latest from radar
         </Text>
         <View style={{ gap: 8 }}>
           {radarFeed.slice(0, 2).map((item) => {
@@ -300,14 +304,14 @@ function ReturningView({
               >
                 <View style={styles.radarRow}>
                   <Text style={[type.label, { color: catColor }]}>
-                    {item.category.toLowerCase()}
+                    {item.category}
                   </Text>
                   <Text style={[type.meta, { color: colors.textTertiary, marginLeft: 'auto' as any }]}>
                     {item.timestamp}
                   </Text>
                 </View>
                 <Text style={[type.cardTitle, { color: colors.textPrimary, marginTop: 6 }]}>
-                  {item.headline}
+                  {cap(item.headline)}
                 </Text>
                 <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 4, lineHeight: 16 }]} numberOfLines={2}>
                   {item.preview}

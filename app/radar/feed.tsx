@@ -12,12 +12,14 @@ import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
-import { MapPinIcon } from '@/components/icons/MapPin'
-import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 import { useRadarStore } from '@/store/radarStore'
 import { Toast } from '@/components/ui/Toast'
 import { BottomNav } from '@/components/ui/BottomNav'
 import type { IncidentCard } from '@/data/radarFeed'
+
+function cap(s: string) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -58,7 +60,7 @@ function CategoryTag({ category, avoided }: { category: string; avoided: boolean
   const color = avoided ? '#1A4A00' : '#FFFFFF'
   return (
     <View style={[styles.tag, { backgroundColor: bg }]}>
-      <Text style={[styles.tagText, { color }]}>{avoided ? 'Avoided' : category}</Text>
+      <Text style={[styles.tagText, { color, textTransform: 'uppercase' }]}>{avoided ? 'Avoided' : category}</Text>
     </View>
   )
 }
@@ -85,13 +87,13 @@ function IncidentCardView({
         <CategoryTag category={card.category} avoided={card.variant === 'avoided'} />
         {card.verified && (
           <View style={styles.verifiedBadge}>
-            <Text style={styles.verifiedText}>✓ verified</Text>
+            <Text style={styles.verifiedText}>✓ Verified</Text>
           </View>
         )}
       </View>
 
       <Text style={styles.cardHeadline} numberOfLines={2}>
-        {card.headline}
+        {cap(card.headline)}
       </Text>
 
       <Text style={styles.cardMeta}>
@@ -116,7 +118,7 @@ function IncidentCardView({
           <Text style={styles.engagementText}>💬 {card.comments}</Text>
         </View>
         <View style={styles.engagementItem}>
-          <Text style={styles.engagementText}>👁 seen this</Text>
+          <Text style={styles.engagementText}>👁 Seen this</Text>
         </View>
       </View>
     </Pressable>
@@ -250,7 +252,7 @@ export default function RadarFeedScreen() {
 
         <View style={styles.searchRow}>
           <View style={styles.searchBar}>
-            <Text style={styles.searchPlaceholder}>search incidents…</Text>
+            <Text style={styles.searchPlaceholder}>Search incidents…</Text>
           </View>
           <Pressable
             onPress={() => setFilterSheet(true)}
@@ -274,7 +276,7 @@ export default function RadarFeedScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 12,
-          paddingBottom: BOTTOM_NAV_H + 130,
+          paddingBottom: BOTTOM_NAV_H + 24,
           paddingHorizontal: 24,
         }}
       >
@@ -295,24 +297,6 @@ export default function RadarFeedScreen() {
           ))
         )}
       </ScrollView>
-
-      {/* Bottom toggle pill — list active, map inactive */}
-      <View
-        style={[styles.toggleContainer, { bottom: BOTTOM_NAV_H + 16 }]}
-        pointerEvents="box-none"
-      >
-        <View style={styles.togglePill}>
-          <Pressable
-            style={styles.toggleOption}
-            onPress={() => router.replace('/(tabs)/radar')}
-          >
-            <MapPinIcon color="rgba(255,255,255,0.5)" size={20} />
-          </Pressable>
-          <Pressable style={styles.toggleOption}>
-            <ChatBubbleIcon color="#FFFFFF" size={20} />
-          </Pressable>
-        </View>
-      </View>
 
       <BottomNav activeTab="radar" />
 
@@ -489,30 +473,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
     color: '#9A9A9A',
-  },
-  // ── Toggle pill ──
-  toggleContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 30,
-  },
-  togglePill: {
-    flexDirection: 'row',
-    backgroundColor: '#5B5CF6',
-    height: 52,
-    borderRadius: 26,
-    paddingHorizontal: 4,
-    alignItems: 'center',
-    gap: 2,
-  },
-  toggleOption: {
-    width: 52,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   // ── Filter sheet ──
   sheetOverlay: {

@@ -82,7 +82,7 @@ export default function LearnScreen() {
 
                 {isCompleted ? (
                   <View style={[styles.donePill, { backgroundColor: '#E8FFB0' }]}>
-                    <Text style={[type.label, { color: '#007549' }]}>done ✓</Text>
+                    <Text style={[type.label, { color: '#007549' }]}>Done ✓</Text>
                   </View>
                 ) : (
                   <Pressable

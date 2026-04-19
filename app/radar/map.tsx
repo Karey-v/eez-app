@@ -2,7 +2,7 @@
 // Same visual as the tab default. Back navigation via header arrow.
 import { useState, useEffect, type ReactElement } from 'react'
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native'
-import Svg, { Line as SvgLine, Circle, Path } from 'react-native-svg'
+import Svg, { Line as SvgLine, Circle } from 'react-native-svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -15,6 +15,10 @@ import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
+
+function cap(s: string) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
+}
 
 // ─── SVG grid background ──────────────────────────────────────────────────────
 
@@ -55,30 +59,6 @@ function SearchIcon({ color }: { color: string }) {
       <Circle cx="8" cy="8" r="5" stroke={color} strokeWidth={1.5} />
       <SvgLine x1="12" y1="12" x2="15.5" y2="15.5"
         stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-    </Svg>
-  )
-}
-
-function MapPinIcon({ color }: { color: string }) {
-  return (
-    <Svg width={16} height={18} viewBox="0 0 16 18" fill="none">
-      <Path
-        d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5z"
-        stroke={color}
-        strokeWidth={1.4}
-        strokeLinejoin="round"
-      />
-      <Circle cx="8" cy="6" r="1.8" stroke={color} strokeWidth={1.2} />
-    </Svg>
-  )
-}
-
-function ListIcon({ color }: { color: string }) {
-  return (
-    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
-      <SvgLine x1="3" y1="5" x2="15" y2="5" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-      <SvgLine x1="3" y1="9" x2="15" y2="9" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-      <SvgLine x1="3" y1="13" x2="15" y2="13" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
     </Svg>
   )
 }
@@ -222,14 +202,14 @@ function BottomCard({
       <View style={styles.cardBody}>
         <View style={styles.cardTopRow}>
           <View style={styles.cardPill}>
-            <Text style={styles.cardPillText}>{content.category}</Text>
+            <Text style={[styles.cardPillText, { textTransform: 'uppercase' }]}>{content.category}</Text>
           </View>
           <Text style={styles.cardMeta} numberOfLines={1}>
             {content.location} · {content.time}
           </Text>
         </View>
         <Text style={styles.cardHeadline} numberOfLines={2}>
-          {content.headline}
+          {cap(content.headline)}
         </Text>
         <Pressable
           onPress={() => router.push('/radar/feed')}
@@ -296,24 +276,6 @@ export default function RadarMapScreen() {
       </Pressable>
 
       <BottomCard pin={selected} cardBottom={cardBottom} />
-
-      {/* Bottom toggle pill */}
-      <View
-        style={[styles.toggleContainer, { bottom: insets.bottom + 20 }]}
-        pointerEvents="box-none"
-      >
-        <View style={styles.togglePill}>
-          <Pressable style={styles.toggleOption}>
-            <MapPinIcon color="#FFFFFF" />
-          </Pressable>
-          <Pressable
-            style={styles.toggleOption}
-            onPress={() => router.push('/radar/feed')}
-          >
-            <ListIcon color="#666666" />
-          </Pressable>
-        </View>
-      </View>
     </View>
   )
 }
@@ -416,28 +378,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#B1FF58',
     letterSpacing: 0.2,
-  },
-  toggleContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 30,
-  },
-  togglePill: {
-    flexDirection: 'row',
-    backgroundColor: '#0A0A0A',
-    height: 56,
-    borderRadius: 28,
-    paddingHorizontal: 4,
-    alignItems: 'center',
-    gap: 4,
-  },
-  toggleOption: {
-    width: 56,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 })

@@ -114,12 +114,12 @@ export default function SafetyScreen() {
           </Text>
         </View>
         <Text style={[type.body, { color: colors.textSecondary, marginBottom: 24, lineHeight: 18 }]}>
-          whatever you're going through — we've got you.
+          Whatever you're going through — we've got you.
         </Text>
 
         {/* Scenario cards */}
         <Text style={[type.label, { color: colors.textTertiary, marginBottom: 10 }]}>
-          what's your situation?
+          What's your situation?
         </Text>
 
         <ScenarioCard
@@ -149,7 +149,7 @@ export default function SafetyScreen() {
 
         {/* AI Detector card */}
         <Text style={[type.label, { color: colors.textTertiary, marginTop: 28, marginBottom: 10 }]}>
-          ai fraud detector
+          AI fraud detector
         </Text>
 
         <Pressable
@@ -175,14 +175,14 @@ export default function SafetyScreen() {
             EEZ Fraud Detector
           </Text>
           <Text style={[type.body, { color: colors.textSecondary, lineHeight: 18 }]}>
-            paste a message, email, or describe a situation — we'll tell you if something's off.
+            Paste a message, email, or describe a situation — we'll tell you if something's off.
           </Text>
           <Text style={[type.label, { color: brand.purpleCTA, marginTop: 12 }]}>try it now →</Text>
         </Pressable>
 
         {/* Emergency helplines */}
         <Text style={[type.label, { color: colors.textTertiary, marginTop: 28, marginBottom: 10 }]}>
-          emergency helplines
+          Emergency helplines
         </Text>
 
         <View style={[styles.helplinesCard, { backgroundColor: '#FFFFFF' }]}>

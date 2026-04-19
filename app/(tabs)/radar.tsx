@@ -12,8 +12,6 @@ import Animated, {
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { MapPinIcon } from '@/components/icons/MapPin'
-import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
 
@@ -42,6 +40,10 @@ type Pin = {
   nx: number  // 0–1 across screen width
   ny: number  // 0–1 across map area height
   size: 14 | 16 | 20
+}
+
+function cap(s: string) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
 }
 
 const PINS: Pin[] = [
@@ -174,7 +176,7 @@ function BottomCard({
         {/* Category pill + meta */}
         <View style={styles.cardTopRow}>
           <View style={styles.cardPill}>
-            <Text style={styles.cardPillText}>{content.category}</Text>
+            <Text style={[styles.cardPillText, { textTransform: 'uppercase' }]}>{content.category}</Text>
           </View>
           <Text style={styles.cardMeta} numberOfLines={1}>
             {content.location} · {content.time}
@@ -183,7 +185,7 @@ function BottomCard({
 
         {/* Headline */}
         <Text style={styles.cardHeadline} numberOfLines={2}>
-          {content.headline}
+          {cap(content.headline)}
         </Text>
 
         {/* Link */}
@@ -203,7 +205,6 @@ function BottomCard({
 
 export default function RadarScreen() {
   const insets = useSafeAreaInsets()
-  const router = useRouter()
   const [selected, setSelected] = useState<Pin | null>(null)
 
   const HEADER_H = insets.top + 56
@@ -261,26 +262,6 @@ export default function RadarScreen() {
 
       {/* Popup card */}
       <BottomCard pin={selected} cardBottom={cardBottom} />
-
-      {/* Bottom toggle pill */}
-      <View
-        style={[styles.toggleContainer, { bottom: insets.bottom + 20 }]}
-        pointerEvents="box-none"
-      >
-        <View style={styles.togglePill}>
-          {/* Map — active */}
-          <Pressable style={styles.toggleOption}>
-            <MapPinIcon color="#FFFFFF" size={20} />
-          </Pressable>
-          {/* Feed — inactive */}
-          <Pressable
-            style={styles.toggleOption}
-            onPress={() => router.push('/radar/feed')}
-          >
-            <ChatBubbleIcon color="rgba(255,255,255,0.5)" size={20} />
-          </Pressable>
-        </View>
-      </View>
     </View>
   )
 }
@@ -372,28 +353,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#5B5CF6',
     letterSpacing: 0.2,
-  },
-  toggleContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 30,
-  },
-  togglePill: {
-    flexDirection: 'row',
-    backgroundColor: '#5B5CF6',
-    height: 52,
-    borderRadius: 26,
-    paddingHorizontal: 4,
-    alignItems: 'center',
-    gap: 2,
-  },
-  toggleOption: {
-    width: 52,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 })

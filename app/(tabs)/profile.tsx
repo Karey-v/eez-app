@@ -114,7 +114,7 @@ export default function ProfileScreen() {
             </View>
           ) : (
             <Text style={[type.body, { color: colors.textTertiary, marginTop: 6, textAlign: 'center' }]}>
-              take the leakability test to get your band
+              Take the leakability test to get your band
             </Text>
           )}
         </View>
@@ -134,7 +134,7 @@ export default function ProfileScreen() {
             { color: colors.textPrimary, marginTop: 28, marginBottom: 14 },
           ]}
         >
-          badges
+          Badges
         </Text>
         <View style={styles.badgeShelf}>
           {ALL_BADGES.map((badge) => {
@@ -187,7 +187,7 @@ export default function ProfileScreen() {
             { color: colors.textPrimary, marginTop: 28, marginBottom: 10 },
           ]}
         >
-          settings
+          Settings
         </Text>
         <View style={styles.settingsCard}>
           <SettingsRow
