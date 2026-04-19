@@ -1,6 +1,5 @@
 // S13–S22 — Leakability Test Questions (dynamic, type-driven)
 // Handles: simulation-tap, slider, multiple-choice, scenario
-// Progress lines fill as questions advance. Auto-advances after selection (except slider).
 import React, { useState, useRef, useCallback } from 'react'
 import {
   View,
@@ -9,21 +8,16 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native'
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  FadeIn,
-} from 'react-native-reanimated'
+import Animated, { FadeIn } from 'react-native-reanimated'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
-import { Button } from '@/components/ui/Button'
 import { questions, getBand, scaleScore, Question } from '@/data/questions'
 import { useTestStore } from '@/store/testStore'
 import { useUserStore } from '@/store/userStore'
 import { BottomNav } from '@/components/ui/BottomNav'
+import { ArrowIcon } from '@/components/icons/Arrow'
 
 // ─── Score calculation ────────────────────────────────────────────────────────
 
@@ -71,7 +65,7 @@ function ProgressLines({ total, current }: { total: number; current: number }) {
 // ─── Root screen ─────────────────────────────────────────────────────────────
 
 export default function QuestionScreen() {
-  const { colors, type, spacing, brand } = useTheme()
+  const { spacing } = useTheme()
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const { currentQuestionIndex, answers, answerQuestion, nextQuestion, completeTest } = useTestStore()
@@ -103,7 +97,7 @@ export default function QuestionScreen() {
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <StatusBar style="dark" />
 
-      {/* ── Fixed header ── */}
+      {/* Fixed header */}
       <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
         <ProgressLines total={questions.length} current={currentQuestionIndex} />
         <View style={[styles.categoryPill, { marginTop: 28 }]}>
@@ -111,12 +105,13 @@ export default function QuestionScreen() {
         </View>
       </View>
 
-      {/* ── Question body — keyed so state fully resets each question ── */}
+      {/* Question body — keyed so state fully resets each question */}
       <QuestionBody
         key={currentQuestionIndex}
         question={question}
         onAnswer={handleAnswer}
         onAdvance={handleAdvance}
+        onBack={() => router.back()}
       />
       <BottomNav activeTab="home" />
     </View>
@@ -129,26 +124,24 @@ function QuestionBody({
   question,
   onAnswer,
   onAdvance,
+  onBack,
 }: {
   question: Question
   onAnswer: (optionIndex: number) => void
   onAdvance: () => void
+  onBack: () => void
 }) {
-  const { colors, type, spacing, brand } = useTheme()
+  const { colors, type, spacing } = useTheme()
   const insets = useSafeAreaInsets()
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [sliderIndex, setSliderIndex] = useState<number | null>(null)
-  const [advancing, setAdvancing] = useState(false)
+
+  const canAdvance = selectedIndex !== null
 
   function handleOptionSelect(optionIndex: number) {
-    if (selectedIndex !== null || advancing) return
+    if (selectedIndex !== null) return
     setSelectedIndex(optionIndex)
     onAnswer(optionIndex)
-
-    if (question.type !== 'slider') {
-      setAdvancing(true)
-      setTimeout(() => onAdvance(), 800)
-    }
   }
 
   function handleSliderChange(index: number) {
@@ -158,94 +151,107 @@ function QuestionBody({
   }
 
   return (
-    <ScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={[
-        styles.body,
-        {
-          paddingHorizontal: spacing.screenH,
-          paddingBottom: insets.bottom + 24,
-          paddingTop: 32,
-        },
-      ]}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Simulation card */}
-      {question.type === 'simulation-tap' && question.simulation && (
-        <View style={{ marginBottom: 28 }}>
-          <Text style={[styles.questionText, { marginBottom: 24 }]}>
-            {question.prompt}
-          </Text>
-          <SimulationCard
-            simulation={question.simulation}
-            asModal={question.id === 7}
-          />
-        </View>
-      )}
-
-      {/* Scenario card */}
-      {question.type === 'scenario' && (
-        <View
-          style={[
-            styles.scenarioCard,
-            { backgroundColor: colors.bgSecondary, borderColor: colors.borderWeak },
-          ]}
-        >
-          <Text style={[type.label, { color: brand.purpleCTA, marginBottom: 6 }]}>scenario</Text>
-          <Text style={styles.questionText}>
-            {question.prompt}
-          </Text>
-        </View>
-      )}
-
-      {/* Multiple-choice prompt */}
-      {question.type === 'multiple-choice' && (
-        <Text style={[styles.questionText, { marginBottom: 40 }]}>
-          {question.prompt}
-        </Text>
-      )}
-
-      {/* Slider */}
-      {question.type === 'slider' && (
-        <>
-          <Text style={[styles.questionText, { marginBottom: 32 }]}>
-            {question.prompt}
-          </Text>
-          <SliderQuestion
-            options={question.options!}
-            labels={question.sliderLabels!}
-            selectedIndex={sliderIndex}
-            onChange={handleSliderChange}
-          />
-          {sliderIndex !== null && (
-            <View style={{ marginTop: 24 }}>
-              <Button label="next →" onPress={onAdvance} variant="purple" fullWidth />
-            </View>
-          )}
-        </>
-      )}
-
-      {/* Options */}
-      {question.type !== 'slider' && question.options && (
-        <View style={styles.options}>
-          {question.type === 'scenario' && (
-            <Text style={[type.label, { color: colors.textTertiary, marginBottom: 12 }]}>
-              what do you do?
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          styles.body,
+          {
+            paddingHorizontal: spacing.screenH,
+            paddingBottom: 24,
+            paddingTop: 32,
+          },
+        ]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Simulation card */}
+        {question.type === 'simulation-tap' && question.simulation && (
+          <View style={{ marginBottom: 28 }}>
+            <Text style={[styles.questionText, { marginBottom: 24 }]}>
+              {question.prompt}
             </Text>
-          )}
-          {question.options.map((option, i) => (
-            <OptionButton
-              key={i}
-              label={option.label}
-              selected={selectedIndex === i}
-              anySelected={selectedIndex !== null}
-              onPress={() => handleOptionSelect(i)}
+            <SimulationCard
+              simulation={question.simulation}
+              asModal={question.id === 7}
             />
-          ))}
-        </View>
-      )}
-    </ScrollView>
+          </View>
+        )}
+
+        {/* Scenario card — neutral bg, no label */}
+        {question.type === 'scenario' && (
+          <View style={styles.scenarioCard}>
+            <Text style={styles.questionText}>
+              {question.prompt}
+            </Text>
+          </View>
+        )}
+
+        {/* Multiple-choice prompt */}
+        {question.type === 'multiple-choice' && (
+          <Text style={[styles.questionText, { marginBottom: 40 }]}>
+            {question.prompt}
+          </Text>
+        )}
+
+        {/* Slider */}
+        {question.type === 'slider' && (
+          <>
+            <Text style={[styles.questionText, { marginBottom: 32 }]}>
+              {question.prompt}
+            </Text>
+            <SliderQuestion
+              options={question.options!}
+              labels={question.sliderLabels!}
+              selectedIndex={sliderIndex}
+              onChange={handleSliderChange}
+            />
+          </>
+        )}
+
+        {/* Options */}
+        {question.type !== 'slider' && question.options && (
+          <View style={styles.options}>
+            {question.type === 'scenario' && (
+              <Text style={[type.label, { color: colors.textTertiary, marginBottom: 12 }]}>
+                what do you do?
+              </Text>
+            )}
+            {question.options.map((option, i) => (
+              <OptionButton
+                key={i}
+                label={option.label}
+                selected={selectedIndex === i}
+                anySelected={selectedIndex !== null}
+                onPress={() => handleOptionSelect(i)}
+              />
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Back / Next nav bar */}
+      <View style={[styles.navBar, { paddingBottom: insets.bottom + 8 }]}>
+        <Pressable
+          onPress={onBack}
+          hitSlop={12}
+          style={({ pressed }) => [styles.navBackBtn, { opacity: pressed ? 0.5 : 1 }]}
+        >
+          <ArrowIcon size={20} color="#5B5CF6" direction="left" />
+        </Pressable>
+
+        {canAdvance && (
+          <Animated.View entering={FadeIn.duration(220)} style={{ flex: 1 }}>
+            <Pressable
+              onPress={onAdvance}
+              style={({ pressed }) => [styles.navNextBtn, { opacity: pressed ? 0.85 : 1 }]}
+            >
+              <Text style={styles.navNextText}>next →</Text>
+            </Pressable>
+          </Animated.View>
+        )}
+      </View>
+    </View>
   )
 }
 
@@ -269,7 +275,7 @@ function SimulationCard({
     .slice(0, 2)
     .toUpperCase()
 
-  // ── iOS-style lock screen notification ──────────────────────────────────────
+  // ── iOS-style lockscreen notification ────────────────────────────────────────
   if (uiType === 'notification') {
     const notifCard = (
       <View style={styles.iosNotifBanner}>
@@ -308,11 +314,10 @@ function SimulationCard({
     )
   }
 
-  // ── iMessage-style message ───────────────────────────────────────────────────
+  // ── iMessage-style ────────────────────────────────────────────────────────────
   if (uiType === 'message') {
     return (
       <View style={styles.iMessageContainer}>
-        {/* Header bar */}
         <View style={styles.iMessageHeader}>
           <View style={[styles.iMessageAvatar, { backgroundColor: '#34C759' }]}>
             <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
@@ -322,10 +327,7 @@ function SimulationCard({
             <Text style={styles.iMessageMeta}>iMessage</Text>
           </View>
         </View>
-
-        {/* Chat area */}
         <View style={styles.iMessageChatArea}>
-          {/* Incoming bubble — grey, left-aligned */}
           <View style={styles.iMessageBubbleRow}>
             <View style={[styles.iMessageAvatarSmall, { backgroundColor: '#34C759' }]}>
               <Text style={styles.iMessageAvatarSmallText}>{initials || '?'}</Text>
@@ -334,13 +336,13 @@ function SimulationCard({
               <Text style={styles.iMessageBubbleText}>{content}</Text>
             </View>
           </View>
-          <Text style={styles.iMessageDelivered}>Delivered</Text>
+          <Text style={styles.iMessageDelivered}>delivered</Text>
         </View>
       </View>
     )
   }
 
-  // ── Email inbox card ─────────────────────────────────────────────────────────
+  // ── Email inbox card ──────────────────────────────────────────────────────────
   if (uiType === 'email') {
     return (
       <View style={styles.emailInboxCard}>
@@ -363,7 +365,7 @@ function SimulationCard({
     )
   }
 
-  // ── Alert fallback ───────────────────────────────────────────────────────────
+  // ── Alert fallback ────────────────────────────────────────────────────────────
   const { colors, type } = useTheme()
   return (
     <View style={[styles.simCardAlert, { backgroundColor: colors.dangerBg, borderColor: colors.dangerText }]}>
@@ -400,16 +402,7 @@ function OptionButton({
         },
       ]}
     >
-      <Text
-        style={{
-          fontFamily: 'Inter_400Regular',
-          fontSize: 15,
-          color: '#0A0A0A',
-          lineHeight: 20,
-        }}
-      >
-        {label}
-      </Text>
+      <Text style={styles.optionLabel}>{label}</Text>
     </Pressable>
   )
 }
@@ -451,15 +444,9 @@ function SliderQuestion({
       >
         <View style={[styles.sliderTrack, { backgroundColor: colors.bgTertiary }]}>
           {selectedIndex !== null && (
-            <View
-              style={[
-                styles.sliderFill,
-                { width: `${fillPercent}%`, backgroundColor: brand.purpleCTA },
-              ]}
-            />
+            <View style={[styles.sliderFill, { width: `${fillPercent}%`, backgroundColor: brand.purpleCTA }]} />
           )}
         </View>
-
         {options.map((_, i) => {
           const pct = i / (STEPS - 1)
           const isActive = selectedIndex !== null && i <= selectedIndex
@@ -477,16 +464,9 @@ function SliderQuestion({
             />
           )
         })}
-
         {selectedIndex !== null && (
           <Animated.View
-            style={[
-              styles.sliderThumb,
-              {
-                left: `${fillPercent}%` as any,
-                backgroundColor: brand.purpleCTA,
-              },
-            ]}
+            style={[styles.sliderThumb, { left: `${fillPercent}%` as any, backgroundColor: brand.purpleCTA }]}
           />
         )}
       </View>
@@ -517,20 +497,6 @@ function SliderQuestion({
           </Pressable>
         ))}
       </View>
-
-      {selectedIndex !== null && (
-        <Animated.View entering={FadeIn.duration(200)} style={[styles.sliderValue, { backgroundColor: colors.bgSecondary }]}>
-          <Text style={[type.label, { color: brand.purpleCTA }]}>
-            {selectedIndex === 0
-              ? 'great — unique passwords are the strongest foundation.'
-              : selectedIndex === 1
-              ? 'one shared password is one too many.'
-              : selectedIndex === 2
-              ? 'a few shared passwords leaves multiple accounts exposed.'
-              : 'most accounts shared — high exposure if any one gets breached.'}
-          </Text>
-        </Animated.View>
-      )}
     </View>
   )
 }
@@ -574,8 +540,8 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   scenarioCard: {
+    backgroundColor: '#F5F5F7',
     borderRadius: 12,
-    borderWidth: 0.5,
     padding: 16,
     marginBottom: 24,
   },
@@ -589,6 +555,43 @@ const styles = StyleSheet.create({
     paddingRight: 14,
     paddingVertical: 12,
     justifyContent: 'center',
+  },
+  optionLabel: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 15,
+    color: '#0A0A0A',
+    lineHeight: 20,
+  },
+
+  // ── Back / Next nav bar ──
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    gap: 12,
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: '#FFFFFF',
+  },
+  navBackBtn: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navNextBtn: {
+    flex: 1,
+    backgroundColor: '#5B5CF6',
+    borderRadius: 50,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navNextText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
   },
 
   // ── iOS lockscreen notification ──
@@ -662,7 +665,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  // ── Gift card modal (dim + floating notification) ──
+  // ── Gift card modal ──
   modalDim: {
     backgroundColor: 'rgba(0,0,0,0.88)',
     borderRadius: 20,
@@ -884,9 +887,5 @@ const styles = StyleSheet.create({
   sliderStepRow: {
     flexDirection: 'row',
     marginBottom: 16,
-  },
-  sliderValue: {
-    borderRadius: 10,
-    padding: 12,
   },
 })
