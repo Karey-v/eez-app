@@ -20,6 +20,11 @@ import { modules, type Lesson, type Hotspot } from '@/data/modules'
 import { ArrowIcon } from '@/components/icons/Arrow'
 import { BottomNav } from '@/components/ui/BottomNav'
 
+function sc(s: string): string {
+  if (!s) return s
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
+}
+
 // ─── Type chip labels ────────────────────────────────────────────────────────
 
 const TYPE_LABELS: Record<string, string> = {
@@ -52,7 +57,7 @@ function TextVisualLesson({ lesson }: { lesson: Lesson }) {
   return (
     <View>
       <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 20, lineHeight: 34 }]}>
-        {lesson.title}
+        {sc(lesson.title)}
       </Text>
       {lesson.body && (
         <Text style={[type.body, { color: colors.textSecondary, lineHeight: 20, marginBottom: 20 }]}>
@@ -96,7 +101,7 @@ function SwipeRevealLesson({
   return (
     <View>
       <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 20, lineHeight: 34 }]}>
-        {lesson.title}
+        {sc(lesson.title)}
       </Text>
 
       {/* Reveal panel */}
@@ -253,7 +258,7 @@ function TapUncoverLesson({
   return (
     <View>
       <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 12, lineHeight: 34 }]}>
-        {lesson.title}
+        {sc(lesson.title)}
       </Text>
       <Text style={[type.body, { color: colors.textSecondary, lineHeight: 18, marginBottom: 24 }]}>
         {lesson.body}
@@ -323,7 +328,7 @@ function ChoiceLesson({
   return (
     <View>
       <Text style={[type.heroTitle, { color: '#5B5CF6', marginBottom: 24, lineHeight: 34 }]}>
-        {lesson.title}
+        {sc(lesson.title)}
       </Text>
 
       {options.map((opt, i) => {
