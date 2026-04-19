@@ -15,29 +15,28 @@ export default function Root({ children }: { children: React.ReactNode }) {
         />
         {/* Expo's required reset: html/body/root height:100%, body overflow:hidden, root display:flex */}
         <ScrollViewStyleReset />
-        {/* Phone-frame constraint: max-width 390px, centered, dark outer background */}
+        {/* Phone-frame constraint: 390px centered, dark outer background */}
         <style
           dangerouslySetInnerHTML={{
             __html: `
-              html, body {
-                background-color: #0A0A0A;
-              }
-              body {
-                display: flex;
-                justify-content: center;
-                align-items: stretch;
-              }
-              #root {
-                width: 390px;
-                max-width: 390px;
-                margin: 0 auto;
-                min-height: 100vh;
-                position: relative;
-                overflow: hidden;
-                box-shadow:
-                  0 0 0 1px rgba(255, 255, 255, 0.07),
-                  0 8px 48px rgba(0, 0, 0, 0.85);
-              }
+              html { background: #0A0A0A; margin: 0; padding: 0; }
+              body { background: #0A0A0A; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; }
+              #root { width: 390px !important; max-width: 390px !important; min-width: 390px !important; overflow: hidden !important; position: relative; background: #0A0A0A; transform-origin: top center; }
+            `,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var root = document.getElementById('root');
+                if (root && window.innerWidth > 430) {
+                  root.style.width = '390px';
+                  root.style.maxWidth = '390px';
+                  root.style.margin = '0 auto';
+                  root.style.overflow = 'hidden';
+                }
+              })();
             `,
           }}
         />
