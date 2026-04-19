@@ -29,14 +29,14 @@ export default function Root({ children }: { children: React.ReactNode }) {
               }
               #root {
                 width: 390px;
+                max-width: 390px;
                 margin: 0 auto;
-                height: auto;
-                flex-shrink: 0;
+                min-height: 100vh;
+                position: relative;
+                overflow: hidden;
                 box-shadow:
                   0 0 0 1px rgba(255, 255, 255, 0.07),
                   0 8px 48px rgba(0, 0, 0, 0.85);
-                overflow-x: hidden;
-                overflow-y: auto;
               }
             `,
           }}
