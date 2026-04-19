@@ -175,7 +175,7 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
           onPress={() => router.push('/radar/report')}
           style={({ pressed }) => [styles.reportBtn, { opacity: pressed ? 0.8 : 1 }]}
         >
-          <Text style={styles.reportBtnText}>report something →</Text>
+          <Text style={styles.reportBtnText}>report incident →</Text>
         </Pressable>
       </View>
     </>
@@ -320,7 +320,7 @@ function ReturningView({
           onPress={() => router.push('/radar/report')}
           style={({ pressed }) => [styles.reportBtn, { opacity: pressed ? 0.8 : 1 }]}
         >
-          <Text style={styles.reportBtnText}>report something →</Text>
+          <Text style={styles.reportBtnText}>report incident →</Text>
         </Pressable>
       </View>
     </>

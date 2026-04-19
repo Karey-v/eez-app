@@ -1,6 +1,6 @@
-// Radar Feed — incident list with filters, upvotes, report FAB, bottom toggle pill.
+// Radar Feed — incident list with filter sheet, report link, upvotes, FAB, bottom toggle pill.
 import { useEffect, useState } from 'react'
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, Pressable, StyleSheet, Modal } from 'react-native'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -16,11 +16,14 @@ import { MapPinIcon } from '@/components/icons/MapPin'
 import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 import { useRadarStore } from '@/store/radarStore'
 import { Toast } from '@/components/ui/Toast'
+import { BottomNav } from '@/components/ui/BottomNav'
 import type { IncidentCard } from '@/data/radarFeed'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const FILTERS = ['All', 'Banks', 'Jobs', 'Payments', 'Identity', 'Phishing'] as const
+const SCAM_TYPES = ['All', 'Banks', 'Jobs', 'Payments', 'Identity', 'Phishing'] as const
+const DISTANCES = ['Nearby', '5 km', '10 km', 'Anywhere'] as const
+const OCCURRENCES = ['Recent', 'Trending', 'Most reported'] as const
 
 const CATEGORY_COLORS: Record<string, string> = {
   Banks: '#5B5CF6',
@@ -29,7 +32,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   Identity: '#CC0000',
   Phishing: '#602CFF',
 }
-
 
 // ─── Blinking live dot ────────────────────────────────────────────────────────
 
@@ -56,7 +58,7 @@ function CategoryTag({ category, avoided }: { category: string; avoided: boolean
   const color = avoided ? '#1A4A00' : '#FFFFFF'
   return (
     <View style={[styles.tag, { backgroundColor: bg }]}>
-      <Text style={[styles.tagText, { color }]}>{avoided ? 'avoided' : category}</Text>
+      <Text style={[styles.tagText, { color }]}>{avoided ? 'Avoided' : category}</Text>
     </View>
   )
 }
@@ -93,7 +95,7 @@ function IncidentCardView({
       </Text>
 
       <Text style={styles.cardMeta}>
-        {card.location.toUpperCase()} · {card.timestamp.toUpperCase()}
+        {card.location} · {card.timestamp}
       </Text>
 
       <Text style={styles.cardPreview} numberOfLines={3}>
@@ -121,6 +123,93 @@ function IncidentCardView({
   )
 }
 
+// ─── Filter sheet ─────────────────────────────────────────────────────────────
+
+function FilterSheet({
+  visible,
+  onClose,
+  scamType,
+  setScamType,
+  distance,
+  setDistance,
+  occurrence,
+  setOccurrence,
+}: {
+  visible: boolean
+  onClose: () => void
+  scamType: string
+  setScamType: (v: string) => void
+  distance: string
+  setDistance: (v: string) => void
+  occurrence: string
+  setOccurrence: (v: string) => void
+}) {
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.sheetOverlay} onPress={onClose} />
+      <View style={styles.sheet}>
+        <View style={styles.sheetHandle} />
+        <View style={styles.sheetHeader}>
+          <Text style={styles.sheetTitle}>Filter</Text>
+          <Pressable onPress={onClose} hitSlop={12}>
+            <Text style={styles.sheetDone}>Done</Text>
+          </Pressable>
+        </View>
+
+        <Text style={styles.sheetSectionLabel}>Distance</Text>
+        <View style={styles.sheetChipRow}>
+          {DISTANCES.map((d) => (
+            <Pressable
+              key={d}
+              onPress={() => setDistance(d)}
+              style={[styles.sheetChip, distance === d && styles.sheetChipActive]}
+            >
+              <Text style={[styles.sheetChipText, distance === d && styles.sheetChipTextActive]}>
+                {d}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        <Text style={styles.sheetSectionLabel}>Scam type</Text>
+        <View style={styles.sheetChipRow}>
+          {SCAM_TYPES.map((s) => (
+            <Pressable
+              key={s}
+              onPress={() => setScamType(s)}
+              style={[styles.sheetChip, scamType === s && styles.sheetChipActive]}
+            >
+              <Text style={[styles.sheetChipText, scamType === s && styles.sheetChipTextActive]}>
+                {s}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        <Text style={styles.sheetSectionLabel}>Occurrence</Text>
+        <View style={styles.sheetChipRow}>
+          {OCCURRENCES.map((o) => (
+            <Pressable
+              key={o}
+              onPress={() => setOccurrence(o)}
+              style={[styles.sheetChip, occurrence === o && styles.sheetChipActive]}
+            >
+              <Text style={[styles.sheetChipText, occurrence === o && styles.sheetChipTextActive]}>
+                {o}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </Modal>
+  )
+}
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function RadarFeedScreen() {
@@ -129,7 +218,10 @@ export default function RadarFeedScreen() {
   const router = useRouter()
 
   const { feed, upvoted, toggleUpvote, reportToast, setReportToast } = useRadarStore()
-  const [activeFilter, setActiveFilter] = useState<string>('All')
+  const [scamType, setScamType] = useState('All')
+  const [distance, setDistance] = useState('Anywhere')
+  const [occurrence, setOccurrence] = useState('Recent')
+  const [filterSheet, setFilterSheet] = useState(false)
   const [toastVisible, setToastVisible] = useState(false)
 
   useEffect(() => {
@@ -140,21 +232,16 @@ export default function RadarFeedScreen() {
   }, [reportToast])
 
   const filteredFeed =
-    activeFilter === 'All' ? feed : feed.filter((c) => c.category === activeFilter)
+    scamType === 'All' ? feed : feed.filter((c) => c.category === scamType)
+
+  const BOTTOM_NAV_H = 56 + insets.bottom
 
   return (
     <View style={styles.root}>
       <StatusBar style="dark" />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: insets.top + 20,
-          paddingBottom: insets.bottom + 100,
-          paddingHorizontal: 24,
-        }}
-      >
-        {/* Header */}
+      {/* Sticky header — title, search, report link, filter */}
+      <View style={[styles.stickyHeader, { paddingTop: insets.top + 20 }]}>
         <View style={styles.headerRow}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Text style={styles.headerTitle}>radar.</Text>
@@ -162,42 +249,39 @@ export default function RadarFeedScreen() {
           </View>
         </View>
 
-        {/* Search bar (visual only) */}
-        <View style={styles.searchBar}>
-          <Text style={styles.searchPlaceholder}>search incidents…</Text>
+        <View style={styles.searchRow}>
+          <View style={styles.searchBar}>
+            <Text style={styles.searchPlaceholder}>search incidents…</Text>
+          </View>
+          <Pressable
+            onPress={() => setFilterSheet(true)}
+            style={({ pressed }) => [styles.filterBtn, { opacity: pressed ? 0.7 : 1 }]}
+          >
+            <Text style={styles.filterBtnText}>filter</Text>
+          </Pressable>
         </View>
 
-        {/* Filter chips */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterRow}
+        <Pressable
+          onPress={() => router.push('/radar/report')}
+          hitSlop={8}
+          style={({ pressed }) => [styles.reportLink, { opacity: pressed ? 0.6 : 1 }]}
         >
-          {FILTERS.map((f) => (
-            <Pressable
-              key={f}
-              onPress={() => setActiveFilter(f)}
-              style={[
-                styles.filterChip,
-                activeFilter === f && styles.filterChipActive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.filterChipText,
-                  activeFilter === f && styles.filterChipTextActive,
-                ]}
-              >
-                {f}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
+          <Text style={styles.reportLinkText}>+ report incident</Text>
+        </Pressable>
+      </View>
 
-        {/* Feed */}
+      {/* Scrollable feed */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingTop: 12,
+          paddingBottom: BOTTOM_NAV_H + 130,
+          paddingHorizontal: 24,
+        }}
+      >
         {filteredFeed.length === 0 ? (
           <View style={{ alignItems: 'center', marginTop: 48 }}>
-            <Text style={styles.emptyText}>no reports in this category yet.</Text>
+            <Text style={styles.emptyText}>No reports in this category yet.</Text>
           </View>
         ) : (
           filteredFeed.map((card) => (
@@ -213,43 +297,53 @@ export default function RadarFeedScreen() {
         )}
       </ScrollView>
 
-      {/* FAB — report */}
+      {/* FAB — report incident */}
       <Pressable
         onPress={() => router.push('/radar/report')}
         style={({ pressed }) => [
           styles.fab,
-          { backgroundColor: brand.purpleCTA, bottom: insets.bottom + 90, opacity: pressed ? 0.85 : 1 },
+          { backgroundColor: brand.purpleCTA, bottom: BOTTOM_NAV_H + 76, opacity: pressed ? 0.85 : 1 },
         ]}
       >
-        <Text style={styles.fabText}>report something? →</Text>
+        <Text style={styles.fabText}>report incident →</Text>
       </Pressable>
 
       {/* Bottom toggle pill — list active, map inactive */}
       <View
-        style={[styles.toggleContainer, { bottom: insets.bottom + 20 }]}
+        style={[styles.toggleContainer, { bottom: BOTTOM_NAV_H + 16 }]}
         pointerEvents="box-none"
       >
         <View style={styles.togglePill}>
-          {/* Map — inactive */}
           <Pressable
             style={styles.toggleOption}
             onPress={() => router.replace('/(tabs)/radar')}
           >
             <MapPinIcon color="rgba(255,255,255,0.5)" size={20} />
           </Pressable>
-          {/* Feed — active */}
           <Pressable style={styles.toggleOption}>
             <ChatBubbleIcon color="#FFFFFF" size={20} />
           </Pressable>
         </View>
       </View>
 
-      {/* Toast */}
+      <BottomNav activeTab="radar" />
+
       <Toast
         message="your report is live on radar."
         type="confirm"
         visible={toastVisible}
         onHide={() => setToastVisible(false)}
+      />
+
+      <FilterSheet
+        visible={filterSheet}
+        onClose={() => setFilterSheet(false)}
+        scamType={scamType}
+        setScamType={setScamType}
+        distance={distance}
+        setDistance={setDistance}
+        occurrence={occurrence}
+        setOccurrence={setOccurrence}
       />
     </View>
   )
@@ -262,11 +356,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F7FF',
   },
+  // ── Sticky header ──
+  stickyHeader: {
+    backgroundColor: '#F8F7FF',
+    paddingHorizontal: 24,
+    paddingBottom: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+    zIndex: 10,
+  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 14,
+    marginBottom: 12,
   },
   headerTitle: {
     fontFamily: 'DMSerifDisplay_400Regular',
@@ -280,11 +383,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#5B5CF6',
     marginTop: 4,
   },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
   searchBar: {
+    flex: 1,
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 14,
-    marginBottom: 14,
     backgroundColor: '#EBEBEB',
   },
   searchPlaceholder: {
@@ -292,27 +401,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#9A9A9A',
   },
-  filterRow: {
-    gap: 8,
-    paddingRight: 4,
-    marginBottom: 16,
-  },
-  filterChip: {
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: '#EBEBEB',
-  },
-  filterChipActive: {
+  filterBtn: {
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     backgroundColor: '#0A0A0A',
   },
-  filterChipText: {
+  filterBtnText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 12,
-    color: '#5A5A5A',
-  },
-  filterChipTextActive: {
+    fontSize: 13,
     color: '#FFFFFF',
+  },
+  reportLink: {
+    alignSelf: 'flex-start',
+    paddingVertical: 2,
+  },
+  reportLinkText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#5B5CF6',
+    textDecorationLine: 'underline',
   },
   // ── Incident card ──
   cardGap: {
@@ -430,5 +538,73 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // ── Filter sheet ──
+  sheetOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  sheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+    paddingTop: 12,
+  },
+  sheetHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E0E0E0',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  sheetTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
+    color: '#0A0A0A',
+  },
+  sheetDone: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: '#5B5CF6',
+  },
+  sheetSectionLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: '#9A9A9A',
+    marginBottom: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  sheetChipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 20,
+  },
+  sheetChip: {
+    borderRadius: 20,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    backgroundColor: '#F0F0F0',
+  },
+  sheetChipActive: {
+    backgroundColor: '#0A0A0A',
+  },
+  sheetChipText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#5A5A5A',
+  },
+  sheetChipTextActive: {
+    color: '#FFFFFF',
   },
 })
