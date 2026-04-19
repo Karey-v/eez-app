@@ -64,7 +64,7 @@ export default function SignUpScreen() {
         {/* Heading */}
         <View style={styles.heading}>
           <Text style={[type.heroTitle, { color: colors.textPrimary }]}>
-            create your account.
+            Create your account.
           </Text>
           <Text style={[type.body, { color: colors.textSecondary, marginTop: 8, lineHeight: 18 }]}>
             your data never leaves your phone — it's only used to personalize your results.

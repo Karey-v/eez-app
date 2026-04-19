@@ -18,6 +18,10 @@ import { useTestStore } from '@/store/testStore'
 import { useUserStore } from '@/store/userStore'
 import { BottomNav } from '@/components/ui/BottomNav'
 
+function cap(s: string) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
+}
+
 // ─── Score calculation ────────────────────────────────────────────────────────
 
 function computeResults(answers: { questionId: number; score: number; category: string }[]) {
@@ -200,7 +204,7 @@ function QuestionBody({
         {question.type === 'simulation-tap' && question.simulation && (
           <View style={{ marginBottom: 28 }}>
             <Text style={[styles.questionText, { marginBottom: 24 }]}>
-              {question.prompt}
+              {cap(question.prompt ?? '')}
             </Text>
             <SimulationCard
               simulation={question.simulation}
@@ -213,7 +217,7 @@ function QuestionBody({
         {question.type === 'scenario' && (
           <View style={{ marginBottom: 24 }}>
             <Text style={styles.questionText}>
-              {question.prompt}
+              {cap(question.prompt ?? '')}
             </Text>
           </View>
         )}
@@ -221,7 +225,7 @@ function QuestionBody({
         {/* Multiple-choice prompt */}
         {question.type === 'multiple-choice' && (
           <Text style={[styles.questionText, { marginBottom: 40 }]}>
-            {question.prompt}
+            {cap(question.prompt ?? '')}
           </Text>
         )}
 
@@ -229,7 +233,7 @@ function QuestionBody({
         {question.type === 'slider' && (
           <>
             <Text style={[styles.questionText, { marginBottom: 32 }]}>
-              {question.prompt}
+              {cap(question.prompt ?? '')}
             </Text>
             <SliderQuestion
               options={question.options!}
@@ -545,6 +549,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
     fontSize: 12,
     color: '#1A4A00',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
   body: {
     flexGrow: 1,

@@ -12,6 +12,8 @@ import Animated, {
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { MapPinIcon } from '@/components/icons/MapPin'
+import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
 
@@ -205,6 +207,7 @@ function BottomCard({
 
 export default function RadarScreen() {
   const insets = useSafeAreaInsets()
+  const router = useRouter()
   const [selected, setSelected] = useState<Pin | null>(null)
 
   const HEADER_H = insets.top + 56
@@ -227,10 +230,25 @@ export default function RadarScreen() {
 
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <Text style={styles.headerTitle}>radar.</Text>
-        <Pressable hitSlop={12} style={styles.searchBtn}>
-          <SearchIcon color="rgba(255,255,255,0.5)" />
-        </Pressable>
+        <Text style={styles.headerTitle}>Radar.</Text>
+        <View style={styles.headerRight}>
+          {/* Map / Feed toggle */}
+          <View style={styles.toggleMini}>
+            <View style={[styles.toggleMiniOption, styles.toggleMiniActive]}>
+              <MapPinIcon color="#FFFFFF" size={14} />
+            </View>
+            <Pressable
+              style={styles.toggleMiniOption}
+              hitSlop={8}
+              onPress={() => router.push('/radar/feed')}
+            >
+              <ChatBubbleIcon color="rgba(255,255,255,0.55)" size={14} />
+            </Pressable>
+          </View>
+          <Pressable hitSlop={12} style={styles.searchBtn}>
+            <SearchIcon color="rgba(255,255,255,0.5)" />
+          </Pressable>
+        </View>
       </View>
 
       {/* Map area — tap to dismiss card */}
@@ -285,6 +303,28 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSerifDisplay_400Regular',
     fontSize: 22,
     color: '#5B5CF6',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  toggleMini: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 20,
+    padding: 3,
+    gap: 2,
+  },
+  toggleMiniOption: {
+    width: 30,
+    height: 30,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggleMiniActive: {
+    backgroundColor: '#5B5CF6',
   },
   searchBtn: {
     width: 36,

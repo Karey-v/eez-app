@@ -76,10 +76,10 @@ export default function DetectScreen() {
         ]}
       >
         <View style={styles.headerTitle}>
-          <PulseDot />
-          <Text style={[type.cardTitle, { color: colors.textPrimary, marginLeft: 8, fontSize: 15 }]}>
+          <Text style={styles.detectorTitle}>
             EEZ Fraud Detector
           </Text>
+          <PulseDot />
         </View>
       </View>
 
@@ -197,11 +197,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  detectorTitle: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 20,
+    color: '#5B5CF6',
+    marginRight: 8,
+  },
   pulseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#22C55E',
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: '#B1FF58',
   },
   disclaimer: {
     paddingVertical: 8,

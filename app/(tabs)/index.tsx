@@ -110,7 +110,7 @@ function FirstTimeView({ router }: { router: ReturnType<typeof useRouter> }) {
     <>
       {/* Hero — headline + button directly on gradient */}
       <View style={styles.heroSection}>
-        <Text style={styles.heroHeadline}>so... how leakable{'\n'}are you?</Text>
+        <Text style={styles.heroHeadline}>So... how leakable{'\n'}are you?</Text>
         <Text style={styles.heroSubtext}>find out in 5 minutes.</Text>
         <Pressable
           onPress={() => router.push('/leakability/intro')}
@@ -225,7 +225,7 @@ function ReturningView({
           hitSlop={12}
           style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1, marginTop: 14 })}
         >
-          <Text style={styles.retakeLink}>retake quiz</Text>
+          <Text style={styles.retakeLink}>Retake quiz</Text>
         </Pressable>
       </View>
 
