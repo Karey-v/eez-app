@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { useRadarStore } from '@/store/radarStore'
 import { ArrowIcon } from '@/components/icons/Arrow'
+import { BottomNav } from '@/components/ui/BottomNav'
 import type { IncidentCard } from '@/data/radarFeed'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -96,11 +97,12 @@ export default function ReportScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: colors.bgPrimary }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
       <StatusBar style="dark" />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -121,20 +123,20 @@ export default function ReportScreen() {
 
         {/* Title */}
         <Text style={[type.heroTitle, { color: colors.textPrimary, marginTop: 16, marginBottom: 4 }]}>
-          report it.
+          Report it.
         </Text>
         <Text style={[type.body, { color: colors.textSecondary, lineHeight: 18, marginBottom: 28 }]}>
-          reporting fraud helps protect the next person. all reports are anonymous.
+          Reporting fraud helps protect the next person. All reports are anonymous.
         </Text>
 
         {/* Section: add to radar */}
         <Text style={[type.label, { color: colors.textTertiary, marginBottom: 12 }]}>
-          add to our radar
+          Add to our radar
         </Text>
 
         {/* Type dropdown */}
         <Text style={[type.bodySmall, { color: colors.textSecondary, marginBottom: 6 }]}>
-          incident type
+          Incident type
         </Text>
         <Pressable
           onPress={() => setTypeOpen(!typeOpen)}
@@ -156,7 +158,7 @@ export default function ReportScreen() {
               { color: selectedType ? colors.textPrimary : colors.textTertiary },
             ]}
           >
-            {selectedType ? selectedType.label : 'select type'}
+            {selectedType ? selectedType.label : 'Select type'}
           </Text>
           <ArrowIcon size={16} color={colors.textTertiary} direction={typeOpen ? 'up' : 'down'} />
         </Pressable>
@@ -202,12 +204,12 @@ export default function ReportScreen() {
 
         {/* Description */}
         <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 16, marginBottom: 6 }]}>
-          what happened?
+          What happened?
         </Text>
         <TextInput
           value={description}
           onChangeText={(t) => setDescription(t.slice(0, MAX_CHARS))}
-          placeholder="describe what happened in your own words…"
+          placeholder="Describe what happened in your own words…"
           placeholderTextColor={colors.textTertiary}
           multiline
           style={[
@@ -237,7 +239,7 @@ export default function ReportScreen() {
 
         {/* Location */}
         <Text style={[type.bodySmall, { color: colors.textSecondary, marginTop: 12, marginBottom: 6 }]}>
-          location (city, optional)
+          Location (city, optional)
         </Text>
         <TextInput
           value={location}
@@ -279,7 +281,7 @@ export default function ReportScreen() {
             },
           ]}
         >
-          <Text style={[type.cardTitle, { color: '#FFFFFF' }]}>submit report</Text>
+          <Text style={[type.cardTitle, { color: '#FFFFFF' }]}>Submit report</Text>
         </Pressable>
 
         <Text
@@ -288,10 +290,12 @@ export default function ReportScreen() {
             { color: colors.textTertiary, textAlign: 'center', marginTop: 12, lineHeight: 16 },
           ]}
         >
-          your identity is never shared. reports are reviewed before appearing on radar.
+          Your identity is never shared. Reports are reviewed before appearing on radar.
         </Text>
       </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+      <BottomNav activeTab="radar" />
+    </View>
   )
 }
 

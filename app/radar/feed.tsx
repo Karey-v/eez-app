@@ -213,7 +213,6 @@ function FilterSheet({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function RadarFeedScreen() {
-  const { brand } = useTheme()
   const insets = useSafeAreaInsets()
   const router = useRouter()
 
@@ -261,6 +260,13 @@ export default function RadarFeedScreen() {
           </Pressable>
         </View>
 
+        <Pressable
+          onPress={() => router.push('/radar/report')}
+          hitSlop={8}
+          style={({ pressed }) => [styles.reportLink, { opacity: pressed ? 0.6 : 1 }]}
+        >
+          <Text style={styles.reportLinkText}>+ report incident</Text>
+        </Pressable>
       </View>
 
       {/* Scrollable feed */}
@@ -289,17 +295,6 @@ export default function RadarFeedScreen() {
           ))
         )}
       </ScrollView>
-
-      {/* FAB — report incident */}
-      <Pressable
-        onPress={() => router.push('/radar/report')}
-        style={({ pressed }) => [
-          styles.fab,
-          { backgroundColor: brand.purpleCTA, bottom: BOTTOM_NAV_H + 76, opacity: pressed ? 0.85 : 1 },
-        ]}
-      >
-        <Text style={styles.fabText}>report incident →</Text>
-      </Pressable>
 
       {/* Bottom toggle pill — list active, map inactive */}
       <View
@@ -405,6 +400,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#FFFFFF',
   },
+  reportLink: {
+    alignSelf: 'flex-start',
+    paddingVertical: 2,
+  },
+  reportLinkText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#5B5CF6',
+    textDecorationLine: 'underline',
+  },
   // ── Incident card ──
   cardGap: {
     marginBottom: 10,
@@ -485,19 +490,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#9A9A9A',
   },
-  // ── FAB ──
-  fab: {
-    position: 'absolute',
-    right: 20,
-    borderRadius: 50,
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-  },
-  fabText: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 13,
-    color: '#FFFFFF',
-  },
   // ── Toggle pill ──
   toggleContainer: {
     position: 'absolute',
@@ -564,8 +556,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9A9A9A',
     marginBottom: 10,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   sheetChipRow: {
     flexDirection: 'row',

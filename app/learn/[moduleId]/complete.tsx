@@ -205,8 +205,8 @@ export default function CompleteScreen() {
 
         {/* Badge name */}
         <Animated.View entering={FadeInUp.delay(400).duration(400)} style={{ alignItems: 'center' }}>
-          <Text style={styles.badgeUnlockedLabel}>badge unlocked</Text>
-          <Text style={styles.badgeName}>{badge.name.toLowerCase()}.</Text>
+          <Text style={styles.badgeUnlockedLabel}>Badge unlocked</Text>
+          <Text style={styles.badgeName}>{badge.name.charAt(0).toUpperCase() + badge.name.slice(1).toLowerCase()}.</Text>
         </Animated.View>
 
         {/* XP counter */}
@@ -217,7 +217,7 @@ export default function CompleteScreen() {
         {/* Streak */}
         <Animated.View entering={FadeInUp.delay(700).duration(400)} style={styles.streakChip}>
           <Text style={{ fontSize: 14 }}>🔥</Text>
-          <Text style={styles.streakText}>streak extended!</Text>
+          <Text style={styles.streakText}>Streak extended!</Text>
         </Animated.View>
 
         {/* Summary card */}
@@ -225,7 +225,7 @@ export default function CompleteScreen() {
           entering={FadeInUp.delay(900).duration(400)}
           style={[styles.summaryCard, { width: '100%' }]}
         >
-          <Text style={styles.summaryTitle}>what you learned</Text>
+          <Text style={styles.summaryTitle}>What you learned</Text>
           {module.whatYoullLearn.map((item) => (
             <View key={item} style={styles.summaryRow}>
               <View style={styles.summaryDot} />
@@ -241,9 +241,9 @@ export default function CompleteScreen() {
         >
           {/* Locked next module */}
           <View style={styles.lockedNextCard}>
-            <Text style={styles.lockedLabel}>next module 🔒</Text>
+            <Text style={styles.lockedLabel}>Next module 🔒</Text>
             <Text style={styles.lockedTitle}>Link & Message Hygiene</Text>
-            <Text style={styles.lockedSub}>coming soon</Text>
+            <Text style={styles.lockedSub}>Coming soon</Text>
           </View>
 
           {/* Primary CTA */}
@@ -251,7 +251,7 @@ export default function CompleteScreen() {
             onPress={() => router.replace('/(tabs)/learn')}
             style={({ pressed }) => [styles.ctaPrimary, { opacity: pressed ? 0.85 : 1 }]}
           >
-            <Text style={styles.ctaPrimaryText}>back to learning home</Text>
+            <Text style={styles.ctaPrimaryText}>Back to learning home</Text>
           </Pressable>
 
           {/* Secondary CTA */}
@@ -259,7 +259,7 @@ export default function CompleteScreen() {
             onPress={() => router.replace('/(tabs)/profile')}
             style={({ pressed }) => [styles.ctaSecondary, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <Text style={styles.ctaSecondaryText}>view my badges</Text>
+            <Text style={styles.ctaSecondaryText}>View my badges</Text>
           </Pressable>
         </Animated.View>
       </ScrollView>
@@ -300,8 +300,6 @@ const styles = StyleSheet.create({
   badgeUnlockedLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
     color: '#9A9A9A',
     marginBottom: 6,
   },

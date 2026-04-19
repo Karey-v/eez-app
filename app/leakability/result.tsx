@@ -108,7 +108,7 @@ export default function ResultScreen() {
       >
         {/* ── Score section ── */}
         <View style={styles.scoreSection}>
-          <Text style={styles.scoreLabel}>your leakability score</Text>
+          <Text style={styles.scoreLabel}>Your leakability score</Text>
 
           {/* Circular progress ring */}
           <View style={styles.ringWrapper}>
@@ -268,8 +268,6 @@ const styles = StyleSheet.create({
   scoreLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
     color: '#9CA3AF',
     textAlign: 'center',
     marginBottom: 20,

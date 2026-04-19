@@ -17,42 +17,6 @@ import { ChatBubbleIcon } from '@/components/icons/ChatBubble'
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
 
-// ─── OSM tile grid (4×4, zoom 15, centered on NYC) ───────────────────────────
-
-const TILE_COLS = 4
-const TILE_ROWS = 4
-// Each tile fills one quarter of the screen in each axis.
-const TILE_W = SCREEN_W / TILE_COLS
-const TILE_H = SCREEN_H / TILE_ROWS
-
-const TILE_URLS = [
-  // row 0
-  'https://tile.openstreetmap.org/15/9647/12321.png',
-  'https://tile.openstreetmap.org/15/9648/12321.png',
-  'https://tile.openstreetmap.org/15/9649/12321.png',
-  'https://tile.openstreetmap.org/15/9650/12321.png',
-  // row 1
-  'https://tile.openstreetmap.org/15/9647/12322.png',
-  'https://tile.openstreetmap.org/15/9648/12322.png',
-  'https://tile.openstreetmap.org/15/9649/12322.png',
-  'https://tile.openstreetmap.org/15/9650/12322.png',
-  // row 2
-  'https://tile.openstreetmap.org/15/9647/12323.png',
-  'https://tile.openstreetmap.org/15/9648/12323.png',
-  'https://tile.openstreetmap.org/15/9649/12323.png',
-  'https://tile.openstreetmap.org/15/9650/12323.png',
-  // row 3
-  'https://tile.openstreetmap.org/15/9647/12324.png',
-  'https://tile.openstreetmap.org/15/9648/12324.png',
-  'https://tile.openstreetmap.org/15/9649/12324.png',
-  'https://tile.openstreetmap.org/15/9650/12324.png',
-]
-
-const TILES = TILE_URLS.map((uri, i) => ({
-  uri,
-  col: i % TILE_COLS,
-  row: Math.floor(i / TILE_COLS),
-}))
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -250,26 +214,14 @@ export default function RadarScreen() {
     <View style={styles.root}>
       <StatusBar style="light" />
 
-      {/* OSM tile grid + dark overlay — fills full screen behind everything */}
+      {/* Full-screen map + dark overlay */}
       <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-        {TILES.map(({ uri, col, row }) => (
-          <Image
-            key={uri}
-            source={{ uri }}
-            style={{
-              position: 'absolute',
-              left: col * TILE_W,
-              top: row * TILE_H,
-              width: TILE_W + 1,   // +1 closes seam between tiles
-              height: TILE_H + 1,
-            }}
-            resizeMode="cover"
-          />
-        ))}
-        {/* Dark slate overlay — maintains brand feel over map */}
-        <View
-          style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.2)' }]}
+        <Image
+          source={require('../../assets/images/radar-map.png')}
+          style={StyleSheet.absoluteFillObject}
+          resizeMode="cover"
         />
+        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.2)' }]} />
       </View>
 
       {/* Header */}

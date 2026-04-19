@@ -93,7 +93,7 @@ export default function ModuleIntroScreen() {
             { color: '#FFFFFF', marginBottom: 6, marginTop: 18, lineHeight: 34 },
           ]}
         >
-          {module.title.toLowerCase()}.
+          {module.title.charAt(0).toUpperCase() + module.title.slice(1).toLowerCase()}.
         </Text>
         <Text style={[type.bodySmall, { color: 'rgba(255,255,255,0.7)', marginBottom: 28 }]}>
           {module.difficulty} · {module.xp} XP on completion
@@ -102,7 +102,7 @@ export default function ModuleIntroScreen() {
         {/* What you'll learn */}
         <View style={[styles.learnCard, { backgroundColor: '#FFFFFF' }]}>
           <Text style={[type.cardTitle, { color: colors.textPrimary, marginBottom: 14 }]}>
-            what you'll learn
+            What you'll learn
           </Text>
           {module.whatYoullLearn.map((item) => (
             <View key={item} style={styles.learnRow}>
