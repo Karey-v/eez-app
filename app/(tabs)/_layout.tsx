@@ -5,7 +5,6 @@ import { useTheme } from '@/theme'
 import { HomeIcon } from '@/components/icons/Home'
 import { LearnIcon } from '@/components/icons/Learn'
 import { RadarIcon } from '@/components/icons/Radar'
-import { ShieldIcon } from '@/components/icons/Shield'
 import { ProfileIcon } from '@/components/icons/Profile'
 
 const TAB_ACTIVE_COLOR = '#5B5CF6'
@@ -71,15 +70,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="detect"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabItem
-              icon={<ShieldIcon size={20} color={focused ? TAB_ACTIVE_COLOR : '#9A9A9A'} strokeWidth={focused ? 2.5 : 1.8} />}
-              label="Detect"
-              focused={focused}
-            />
-          ),
-        }}
+        options={{ href: null }}
       />
       <Tabs.Screen
         name="safety"

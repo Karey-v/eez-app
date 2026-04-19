@@ -28,10 +28,9 @@ export default function Root({ children }: { children: React.ReactNode }) {
                 align-items: stretch;
               }
               #root {
-                max-width: 390px;
-                width: 100%;
+                width: 390px;
+                margin: 0 auto;
                 height: auto;
-                min-height: 100vh;
                 flex-shrink: 0;
                 box-shadow:
                   0 0 0 1px rgba(255, 255, 255, 0.07),
