@@ -10,7 +10,7 @@ import Animated, {
   FadeInUp,
   Easing,
 } from 'react-native-reanimated'
-import Svg, { Circle } from 'react-native-svg'
+import Svg, { Circle, Path, Rect, Line } from 'react-native-svg'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
@@ -26,15 +26,72 @@ const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2
 const RING_CENTER = RING_SIZE / 2
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
 
-const BAND_DESCRIPTIONS: Record<string, string> = {
-  'On Lock':
-    "You dodge most scams instinctively. Your habits are solid — a few tweaks and you're bulletproof.",
-  'Fast Lane':
-    "You're mostly careful, but move too fast in a few situations scammers love. Easy wins ahead.",
-  'Main Character':
-    "You'd probably catch a scam once it's obvious — but you'd get pretty far in before noticing. Let's fix that.",
-  'Loose Link':
-    "Scammers would find you an easy target right now. The good news: awareness is half the battle.",
+function BandIllustration({ band, color }: { band: string; color: string }) {
+  const s = 56
+  const c = color
+  switch (band) {
+    case 'Leaky Window':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          <Rect x="4" y="4" width="48" height="36" rx="3" stroke={c} strokeWidth="2.5" fill="none" />
+          <Line x1="28" y1="4" x2="28" y2="40" stroke={c} strokeWidth="2" />
+          <Line x1="4" y1="22" x2="52" y2="22" stroke={c} strokeWidth="2" />
+          <Line x1="14" y1="40" x2="12" y2="48" stroke={c} strokeWidth="2" strokeLinecap="round" />
+          <Circle cx="12" cy="51" r="2.5" fill={c} />
+          <Line x1="28" y1="40" x2="28" y2="49" stroke={c} strokeWidth="2" strokeLinecap="round" />
+          <Circle cx="28" cy="52" r="2.5" fill={c} />
+          <Line x1="42" y1="40" x2="44" y2="48" stroke={c} strokeWidth="2" strokeLinecap="round" />
+          <Circle cx="44" cy="51" r="2.5" fill={c} />
+        </Svg>
+      )
+    case 'Open Door':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          <Path d="M6 52 L6 6 L50 6 L50 52" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <Line x1="4" y1="52" x2="52" y2="52" stroke={c} strokeWidth="2.5" strokeLinecap="round" />
+          <Path d="M6 6 L32 10 L32 52 L6 52 Z" stroke={c} strokeWidth="2" fill="none" />
+          <Circle cx="29" cy="31" r="2.5" fill={c} />
+        </Svg>
+      )
+    case 'Soft Lock':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          <Rect x="10" y="26" width="36" height="26" rx="6" stroke={c} strokeWidth="2.5" fill="none" />
+          <Path d="M18 26 L18 16 Q18 8 28 8 Q38 8 38 16 L38 22" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <Circle cx="28" cy="38" r="4" stroke={c} strokeWidth="2" fill="none" />
+          <Line x1="28" y1="42" x2="28" y2="47" stroke={c} strokeWidth="2" strokeLinecap="round" />
+        </Svg>
+      )
+    case 'Curtains Down':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          <Line x1="4" y1="10" x2="52" y2="10" stroke={c} strokeWidth="3" strokeLinecap="round" />
+          <Circle cx="4" cy="10" r="3" fill={c} />
+          <Circle cx="52" cy="10" r="3" fill={c} />
+          <Path d="M6 10 Q4 32 18 52 L4 52" stroke={c} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M50 10 Q52 32 38 52 L52 52" stroke={c} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M18 32 Q28 38 38 32" stroke={c} strokeWidth="2" fill="none" strokeLinecap="round" />
+        </Svg>
+      )
+    case 'On Guard':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          <Path d="M28 4 L50 14 L50 30 Q50 46 28 54 Q6 46 6 30 L6 14 Z" stroke={c} strokeWidth="2.5" fill="none" />
+          <Path d="M18 29 L25 36 L38 22" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
+      )
+    case 'Locked In':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          <Rect x="10" y="26" width="36" height="26" rx="6" stroke={c} strokeWidth="2.5" fill="none" />
+          <Path d="M18 26 L18 16 Q18 6 28 6 Q38 6 38 16 L38 26" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <Circle cx="28" cy="38" r="4" stroke={c} strokeWidth="2" fill="none" />
+          <Line x1="28" y1="42" x2="28" y2="47" stroke={c} strokeWidth="2" strokeLinecap="round" />
+        </Svg>
+      )
+    default:
+      return null
+  }
 }
 
 export default function ResultScreen() {
@@ -44,10 +101,10 @@ export default function ResultScreen() {
   const { score, band, bandColor } = useUserStore()
 
   const safeScore = score ?? 0
-  const safeBand = band ?? 'Fast Lane'
+  const safeBand = band ?? 'Open Door'
   const safeColor = bandColor ?? '#5B5CF6'
   const bandData = getBand(safeScore)
-  const description = BAND_DESCRIPTIONS[safeBand] ?? ''
+  const description = bandData.description ?? ''
 
   // ── Count-up animation
   const [displayScore, setDisplayScore] = useState(0)
@@ -110,6 +167,11 @@ export default function ResultScreen() {
         <View style={styles.scoreSection}>
           <Text style={styles.scoreLabel}>Your leakability score</Text>
 
+          {/* Band illustration */}
+          <View style={{ marginBottom: 16 }}>
+            <BandIllustration band={safeBand} color={safeColor} />
+          </View>
+
           {/* Circular progress ring */}
           <View style={styles.ringWrapper}>
             <Svg width={RING_SIZE} height={RING_SIZE}>
@@ -144,7 +206,7 @@ export default function ResultScreen() {
           </View>
 
           {/* Band pill */}
-          <Animated.View style={[styles.bandPill, { backgroundColor: '#EEF0FF' }, bandLabelStyle]}>
+          <Animated.View style={[styles.bandPill, { backgroundColor: safeColor + '20' }, bandLabelStyle]}>
             <Text style={[styles.bandPillText, { color: safeColor }]}>
               {safeBand.toUpperCase()}
             </Text>
@@ -184,7 +246,7 @@ export default function ResultScreen() {
               />
             </Animated.View>
             {/* Band threshold markers */}
-            {[12 / 48, 24 / 48, 36 / 48].map((pct, i) => (
+            {[12 / 48, 20 / 48, 28 / 48, 36 / 48, 43 / 48].map((pct, i) => (
               <View
                 key={i}
                 style={[
@@ -196,20 +258,28 @@ export default function ResultScreen() {
           </View>
           {/* Band labels */}
           <View style={styles.gaugeBandRow}>
-            {['On Lock', 'Fast Lane', 'Main Character', 'Loose Link'].map((b, i) => (
+            {[
+              { label: 'Leaky',    full: 'Leaky Window' },
+              { label: 'Open',     full: 'Open Door' },
+              { label: 'Soft',     full: 'Soft Lock' },
+              { label: 'Curtains', full: 'Curtains Down' },
+              { label: 'Guard',    full: 'On Guard' },
+              { label: 'Locked',   full: 'Locked In' },
+            ].map(({ label, full }, i) => (
               <Text
-                key={b}
+                key={full}
                 style={[
                   type.meta,
                   {
                     flex: 1,
-                    textAlign: i === 0 ? 'left' : i === 3 ? 'right' : 'center',
-                    color: b === safeBand ? safeColor : '#9CA3AF',
-                    fontFamily: b === safeBand ? 'Inter_700Bold' : 'Inter_600SemiBold',
+                    textAlign: i === 0 ? 'left' : i === 5 ? 'right' : 'center',
+                    fontSize: 9,
+                    color: full === safeBand ? safeColor : '#9CA3AF',
+                    fontFamily: full === safeBand ? 'Inter_700Bold' : 'Inter_600SemiBold',
                   },
                 ]}
               >
-                {b}
+                {label}
               </Text>
             ))}
           </View>

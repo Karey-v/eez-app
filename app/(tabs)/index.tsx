@@ -26,10 +26,12 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 const BAND_PERSONALITY: Record<string, string> = {
-  'On Lock':        "You're a Vault.",
-  'Fast Lane':      "You're a Quick Check.",
-  'Main Character': "You're an Open Book.",
-  'Loose Link':     "You're a Wide Open Tab.",
+  'Leaky Window':  "you're The Leaky Window.",
+  'Open Door':     "you're The Open Door.",
+  'Soft Lock':     "you're The Soft Lock.",
+  'Curtains Down': "you're The Curtains Down.",
+  'On Guard':      "you're On Guard.",
+  'Locked In':     "you're Locked In.",
 }
 
 function formatTestDate(isoString: string | null): string {

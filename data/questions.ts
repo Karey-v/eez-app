@@ -180,14 +180,16 @@ export const questions: Question[] = [
 ]
 
 export const BANDS = [
-  { label: 'On Lock',        min: 0,  max: 12, color: '#007549', personality: "You're a Vault." },
-  { label: 'Fast Lane',      min: 13, max: 24, color: '#5B5CF6', personality: "You're a Quick Check." },
-  { label: 'Main Character', min: 25, max: 36, color: '#FF732E', personality: "You're an Open Book." },
-  { label: 'Loose Link',     min: 37, max: 48, color: '#CC0000', personality: "You're a Wide Open Tab." },
+  { label: 'Leaky Window',  min: 0,  max: 12, color: '#FF732E', personality: "you're The Leaky Window.",  description: "Some things are slipping through without you noticing." },
+  { label: 'Open Door',     min: 13, max: 20, color: '#FF9500', personality: "you're The Open Door.",     description: "You're more accessible than you think." },
+  { label: 'Soft Lock',     min: 21, max: 28, color: '#FFD60A', personality: "you're The Soft Lock.",     description: "You're trying, but not fully clicked into place." },
+  { label: 'Curtains Down', min: 29, max: 36, color: '#5B5CF6', personality: "you're The Curtains Down.", description: "You're aware and mostly covered." },
+  { label: 'On Guard',      min: 37, max: 43, color: '#007549', personality: "you're On Guard.",           description: "Strong instincts, solid habits." },
+  { label: 'Locked In',     min: 44, max: 48, color: '#007549', personality: "you're Locked In.",          description: "Tight, secure, hard to reach." },
 ]
 
 export function getBand(scaledScore: number) {
-  return BANDS.find((b) => scaledScore >= b.min && scaledScore <= b.max) ?? BANDS[3]
+  return BANDS.find((b) => scaledScore >= b.min && scaledScore <= b.max) ?? BANDS[0]
 }
 
 export function scaleScore(rawScore: number): number {
