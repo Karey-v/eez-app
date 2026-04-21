@@ -26,67 +26,93 @@ const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2
 const RING_CENTER = RING_SIZE / 2
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
 
-function BandIllustration({ band, color }: { band: string; color: string }) {
+const BRAND_PURPLE = '#602CFF'
+const BRAND_LIME = '#B1FF58'
+
+function BandIllustration({ band }: { band: string }) {
   const s = 56
-  const c = color
   switch (band) {
-    case 'Leaky Window':
+    case 'Locked In':
       return (
         <Svg width={s} height={s} viewBox="0 0 56 56">
-          <Rect x="4" y="4" width="48" height="36" rx="3" stroke={c} strokeWidth="2.5" fill="none" />
-          <Line x1="28" y1="4" x2="28" y2="40" stroke={c} strokeWidth="2" />
-          <Line x1="4" y1="22" x2="52" y2="22" stroke={c} strokeWidth="2" />
-          <Line x1="14" y1="40" x2="12" y2="48" stroke={c} strokeWidth="2" strokeLinecap="round" />
-          <Circle cx="12" cy="51" r="2.5" fill={c} />
-          <Line x1="28" y1="40" x2="28" y2="49" stroke={c} strokeWidth="2" strokeLinecap="round" />
-          <Circle cx="28" cy="52" r="2.5" fill={c} />
-          <Line x1="42" y1="40" x2="44" y2="48" stroke={c} strokeWidth="2" strokeLinecap="round" />
-          <Circle cx="44" cy="51" r="2.5" fill={c} />
-        </Svg>
-      )
-    case 'Open Door':
-      return (
-        <Svg width={s} height={s} viewBox="0 0 56 56">
-          <Path d="M6 52 L6 6 L50 6 L50 52" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-          <Line x1="4" y1="52" x2="52" y2="52" stroke={c} strokeWidth="2.5" strokeLinecap="round" />
-          <Path d="M6 6 L32 10 L32 52 L6 52 Z" stroke={c} strokeWidth="2" fill="none" />
-          <Circle cx="29" cy="31" r="2.5" fill={c} />
-        </Svg>
-      )
-    case 'Soft Lock':
-      return (
-        <Svg width={s} height={s} viewBox="0 0 56 56">
-          <Rect x="10" y="26" width="36" height="26" rx="6" stroke={c} strokeWidth="2.5" fill="none" />
-          <Path d="M18 26 L18 16 Q18 8 28 8 Q38 8 38 16 L38 22" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-          <Circle cx="28" cy="38" r="4" stroke={c} strokeWidth="2" fill="none" />
-          <Line x1="28" y1="42" x2="28" y2="47" stroke={c} strokeWidth="2" strokeLinecap="round" />
-        </Svg>
-      )
-    case 'Curtains Down':
-      return (
-        <Svg width={s} height={s} viewBox="0 0 56 56">
-          <Line x1="4" y1="10" x2="52" y2="10" stroke={c} strokeWidth="3" strokeLinecap="round" />
-          <Circle cx="4" cy="10" r="3" fill={c} />
-          <Circle cx="52" cy="10" r="3" fill={c} />
-          <Path d="M6 10 Q4 32 18 52 L4 52" stroke={c} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          <Path d="M50 10 Q52 32 38 52 L52 52" stroke={c} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          <Path d="M18 32 Q28 38 38 32" stroke={c} strokeWidth="2" fill="none" strokeLinecap="round" />
+          {/* Body — solid */}
+          <Rect x="10" y="26" width="36" height="26" rx="6" fill={BRAND_PURPLE} />
+          {/* Shackle — fully seated */}
+          <Path d="M18 26 L18 14 Q18 5 28 5 Q38 5 38 14 L38 26" stroke={BRAND_PURPLE} strokeWidth="4" fill="none" strokeLinecap="round" />
+          {/* Keyhole circle */}
+          <Circle cx="28" cy="37" r="4.5" fill={BRAND_LIME} />
+          {/* Keyhole stem */}
+          <Rect x="25.5" y="39.5" width="5" height="6" rx="1.5" fill={BRAND_LIME} />
         </Svg>
       )
     case 'On Guard':
       return (
         <Svg width={s} height={s} viewBox="0 0 56 56">
-          <Path d="M28 4 L50 14 L50 30 Q50 46 28 54 Q6 46 6 30 L6 14 Z" stroke={c} strokeWidth="2.5" fill="none" />
-          <Path d="M18 29 L25 36 L38 22" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          {/* Shield — filled */}
+          <Path d="M28 4 L50 14 L50 30 Q50 46 28 54 Q6 46 6 30 L6 14 Z" fill={BRAND_PURPLE} />
+          {/* Checkmark */}
+          <Path d="M17 29 L25 37 L39 21" stroke={BRAND_LIME} strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
       )
-    case 'Locked In':
+    case 'Curtains Down':
       return (
         <Svg width={s} height={s} viewBox="0 0 56 56">
-          <Rect x="10" y="26" width="36" height="26" rx="6" stroke={c} strokeWidth="2.5" fill="none" />
-          <Path d="M18 26 L18 16 Q18 6 28 6 Q38 6 38 16 L38 26" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-          <Circle cx="28" cy="38" r="4" stroke={c} strokeWidth="2" fill="none" />
-          <Line x1="28" y1="42" x2="28" y2="47" stroke={c} strokeWidth="2" strokeLinecap="round" />
+          {/* Rod */}
+          <Line x1="4" y1="10" x2="52" y2="10" stroke={BRAND_PURPLE} strokeWidth="3" strokeLinecap="round" />
+          <Circle cx="6" cy="10" r="3.5" fill={BRAND_PURPLE} />
+          <Circle cx="50" cy="10" r="3.5" fill={BRAND_PURPLE} />
+          {/* Left curtain panel */}
+          <Path d="M6 10 Q4 30 16 52 L6 52 Z" fill={BRAND_PURPLE} />
+          {/* Right curtain panel */}
+          <Path d="M50 10 Q52 30 40 52 L50 52 Z" fill={BRAND_PURPLE} />
+          {/* Tie-back accent */}
+          <Path d="M16 34 Q28 40 40 34" stroke={BRAND_LIME} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        </Svg>
+      )
+    case 'Soft Lock':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          {/* Body — outline only */}
+          <Rect x="10" y="26" width="36" height="26" rx="6" stroke={BRAND_PURPLE} strokeWidth="2.5" fill="none" />
+          {/* Shackle — right side lifted out */}
+          <Path d="M18 26 L18 15 Q18 6 28 6 Q38 6 38 16" stroke={BRAND_PURPLE} strokeWidth="3" fill="none" strokeLinecap="round" />
+          {/* Lifted end dot — lime */}
+          <Circle cx="38" cy="18" r="5" fill={BRAND_LIME} />
+          {/* Keyhole */}
+          <Circle cx="28" cy="38" r="3.5" stroke={BRAND_PURPLE} strokeWidth="2" fill="none" />
+          <Line x1="28" y1="41" x2="28" y2="46" stroke={BRAND_PURPLE} strokeWidth="2" strokeLinecap="round" />
+        </Svg>
+      )
+    case 'Open Door':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          {/* Frame */}
+          <Path d="M6 52 L6 6 L50 6 L50 52" stroke={BRAND_PURPLE} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <Line x1="4" y1="52" x2="52" y2="52" stroke={BRAND_PURPLE} strokeWidth="2.5" strokeLinecap="round" />
+          {/* Door panel — ajar */}
+          <Path d="M6 6 L32 10 L32 52 L6 52 Z" stroke={BRAND_PURPLE} strokeWidth="2" fill="none" />
+          {/* Handle — lime */}
+          <Circle cx="29" cy="31" r="3.5" fill={BRAND_LIME} />
+          {/* Light through gap */}
+          <Line x1="33" y1="16" x2="46" y2="18" stroke={BRAND_LIME} strokeWidth="2" strokeLinecap="round" />
+          <Line x1="33" y1="26" x2="46" y2="27" stroke={BRAND_LIME} strokeWidth="1.5" strokeLinecap="round" />
+        </Svg>
+      )
+    case 'Leaky Window':
+      return (
+        <Svg width={s} height={s} viewBox="0 0 56 56">
+          {/* Window frame */}
+          <Rect x="4" y="4" width="48" height="34" rx="3" stroke={BRAND_PURPLE} strokeWidth="2.5" fill="none" />
+          {/* Dividers */}
+          <Line x1="28" y1="4" x2="28" y2="38" stroke={BRAND_PURPLE} strokeWidth="2" />
+          <Line x1="4" y1="21" x2="52" y2="21" stroke={BRAND_PURPLE} strokeWidth="2" />
+          {/* Drips — lime */}
+          <Path d="M14 38 Q13 44 12 48" stroke={BRAND_LIME} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          <Circle cx="12" cy="51" r="3" fill={BRAND_LIME} />
+          <Path d="M28 38 Q28 44 28 48" stroke={BRAND_LIME} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          <Circle cx="28" cy="51" r="3" fill={BRAND_LIME} />
+          <Path d="M42 38 Q43 44 44 48" stroke={BRAND_LIME} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          <Circle cx="44" cy="51" r="3" fill={BRAND_LIME} />
         </Svg>
       )
     default:
@@ -101,10 +127,11 @@ export default function ResultScreen() {
   const { score, band, bandColor } = useUserStore()
 
   const safeScore = score ?? 0
-  const safeBand = band ?? 'Open Door'
+  const safeBand = band ?? 'Curtains Down'
   const safeColor = bandColor ?? '#5B5CF6'
   const bandData = getBand(safeScore)
   const description = bandData.description ?? ''
+  const cta = bandData.cta ?? ''
 
   // ── Count-up animation
   const [displayScore, setDisplayScore] = useState(0)
@@ -169,7 +196,7 @@ export default function ResultScreen() {
 
           {/* Band illustration */}
           <View style={{ marginBottom: 16 }}>
-            <BandIllustration band={safeBand} color={safeColor} />
+            <BandIllustration band={safeBand} />
           </View>
 
           {/* Circular progress ring */}
@@ -226,6 +253,13 @@ export default function ResultScreen() {
           >
             {description}
           </Animated.Text>
+
+          <Animated.Text
+            entering={FadeInUp.delay(2000).duration(400)}
+            style={[type.body, { color: safeColor, marginTop: 6, lineHeight: 21, textAlign: 'center', fontFamily: 'Inter_600SemiBold' }]}
+          >
+            {cta}
+          </Animated.Text>
         </View>
 
         {/* ── Risk gauge ── */}
@@ -259,12 +293,12 @@ export default function ResultScreen() {
           {/* Band labels */}
           <View style={styles.gaugeBandRow}>
             {[
-              { label: 'Leaky',    full: 'Leaky Window' },
-              { label: 'Open',     full: 'Open Door' },
-              { label: 'Soft',     full: 'Soft Lock' },
-              { label: 'Curtains', full: 'Curtains Down' },
-              { label: 'Guard',    full: 'On Guard' },
               { label: 'Locked',   full: 'Locked In' },
+              { label: 'Guard',    full: 'On Guard' },
+              { label: 'Curtains', full: 'Curtains Down' },
+              { label: 'Soft',     full: 'Soft Lock' },
+              { label: 'Open',     full: 'Open Door' },
+              { label: 'Leaky',    full: 'Leaky Window' },
             ].map(({ label, full }, i) => (
               <Text
                 key={full}
@@ -286,7 +320,7 @@ export default function ResultScreen() {
         </Animated.View>
 
         {/* ── CTAs ── */}
-        <Animated.View entering={FadeInUp.delay(2000).duration(400)} style={styles.ctas}>
+        <Animated.View entering={FadeInUp.delay(2200).duration(400)} style={styles.ctas}>
           <Pressable
             onPress={() => router.push('/leakability/breakdown')}
             style={({ pressed }) => [

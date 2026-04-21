@@ -180,12 +180,12 @@ export const questions: Question[] = [
 ]
 
 export const BANDS = [
-  { label: 'Leaky Window',  min: 0,  max: 12, color: '#FF732E', personality: "you're The Leaky Window.",  description: "Some things are slipping through without you noticing." },
-  { label: 'Open Door',     min: 13, max: 20, color: '#FF9500', personality: "you're The Open Door.",     description: "You're more accessible than you think." },
-  { label: 'Soft Lock',     min: 21, max: 28, color: '#FFD60A', personality: "you're The Soft Lock.",     description: "You're trying, but not fully clicked into place." },
-  { label: 'Curtains Down', min: 29, max: 36, color: '#5B5CF6', personality: "you're The Curtains Down.", description: "You're aware and mostly covered." },
-  { label: 'On Guard',      min: 37, max: 43, color: '#007549', personality: "you're On Guard.",           description: "Strong instincts, solid habits." },
-  { label: 'Locked In',     min: 44, max: 48, color: '#007549', personality: "you're Locked In.",          description: "Tight, secure, hard to reach." },
+  { label: 'Locked In',     min: 0,  max: 12, color: '#007549', personality: "you're The Locked In.",    description: "Tight habits, hard to crack.",                      cta: "Keep it up." },
+  { label: 'On Guard',      min: 13, max: 20, color: '#22C55E', personality: "you're The Guardian.",      description: "Solid instincts, few gaps.",                         cta: "Stay sharp." },
+  { label: 'Curtains Down', min: 21, max: 28, color: '#5B5CF6', personality: "you're The Curtain.",       description: "Mostly covered, mostly good.",                       cta: "Close the last gap." },
+  { label: 'Soft Lock',     min: 29, max: 36, color: '#D4A800', personality: "you're The Soft Lock.",     description: "Trying but not fully clicked in.",                   cta: "One more step." },
+  { label: 'Open Door',     min: 37, max: 43, color: '#FF9500', personality: "you're The Open Door.",     description: "Accessible in ways you might not realise.",          cta: "Close a few tabs." },
+  { label: 'Leaky Window',  min: 44, max: 48, color: '#FF732E', personality: "you're The Leaky Window.",  description: "Some things slipping through unnoticed.",            cta: "Start with one small fix." },
 ]
 
 export function getBand(scaledScore: number) {

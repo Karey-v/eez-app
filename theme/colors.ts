@@ -40,3 +40,12 @@ export const dark = {
   dangerBg:      '#2E0000',
   dangerText:    '#F87171',
 }
+
+export const bandColors = {
+  lockedIn:     '#007549',
+  onGuard:      '#22C55E',
+  curtainsDown: '#5B5CF6',
+  softLock:     '#D4A800',
+  openDoor:     '#FF9500',
+  leakyWindow:  '#FF732E',
+}

@@ -26,12 +26,12 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 const BAND_PERSONALITY: Record<string, string> = {
-  'Leaky Window':  "you're The Leaky Window.",
-  'Open Door':     "you're The Open Door.",
+  'Locked In':     "you're The Locked In.",
+  'On Guard':      "you're The Guardian.",
+  'Curtains Down': "you're The Curtain.",
   'Soft Lock':     "you're The Soft Lock.",
-  'Curtains Down': "you're The Curtains Down.",
-  'On Guard':      "you're On Guard.",
-  'Locked In':     "you're Locked In.",
+  'Open Door':     "you're The Open Door.",
+  'Leaky Window':  "you're The Leaky Window.",
 }
 
 function formatTestDate(isoString: string | null): string {
