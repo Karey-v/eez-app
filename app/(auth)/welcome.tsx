@@ -114,24 +114,17 @@ export default function WelcomeScreen() {
     >
       <StatusBar style="light" />
 
-      {/* Brand purple gradient base */}
+      {/* 4-stop gradient: brand purple at top fading to near-white only at very bottom */}
       <LinearGradient
-        colors={['#602CFF', '#2D1466']}
+        colors={['#602CFF', '#3D1A99', '#1A0A4D', '#F5F5FF']}
+        locations={[0, 0.45, 0.88, 1]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
         style={StyleSheet.absoluteFillObject}
         pointerEvents="none"
       />
-      {/* Lighter purple overlay from top */}
-      <LinearGradient
-        colors={['rgba(139,92,246,0.3)', 'rgba(139,92,246,0)']}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={[StyleSheet.absoluteFillObject, { height: SCREEN_HEIGHT * 0.6 }]}
-        pointerEvents="none"
-      />
 
-      {/* Top bar: progress dots + skip */}
+      {/* Top bar: progress lines + skip */}
       <View
         style={[
           styles.topBar,
@@ -154,7 +147,7 @@ export default function WelcomeScreen() {
           hitSlop={16}
           style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
         >
-          <Text style={styles.skipText}>skip</Text>
+          <Text style={styles.navText}>skip</Text>
         </Pressable>
       </View>
 
@@ -170,7 +163,7 @@ export default function WelcomeScreen() {
         <Text style={styles.subtext}>{slide.body}</Text>
       </View>
 
-      {/* Bottom row: back arrow left, CTA right on last slide */}
+      {/* Bottom row: back left, CTA right on last slide */}
       <View
         style={[
           styles.bottom,
@@ -178,8 +171,12 @@ export default function WelcomeScreen() {
         ]}
       >
         {!isFirst ? (
-          <Pressable onPress={handleBack} hitSlop={16}>
-            <Text style={styles.backText}>← back</Text>
+          <Pressable
+            onPress={handleBack}
+            hitSlop={16}
+            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+          >
+            <Text style={styles.navText}>← back</Text>
           </Pressable>
         ) : (
           <View />
@@ -201,7 +198,7 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2D1466',
+    backgroundColor: '#602CFF',
   },
   topBar: {
     flexDirection: 'row',
@@ -218,7 +215,7 @@ const styles = StyleSheet.create({
     height: 2,
     borderRadius: 1,
   },
-  skipText: {
+  navText: {
     fontFamily: 'Inter_400Regular',
     fontSize: 11,
     color: 'rgba(255,255,255,0.4)',
@@ -257,12 +254,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     minHeight: 44 + 32,
-  },
-  backText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    color: '#FFFFFF',
-    textDecorationLine: 'underline',
   },
   ctaButton: {
     backgroundColor: '#B1FF58',

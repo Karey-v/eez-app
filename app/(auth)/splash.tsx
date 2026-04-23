@@ -1,84 +1,51 @@
 // S01 — Splash Screen
-// Purple bg, EEZ logo centered, fade in 400ms → hold 1s → fade out 300ms → navigate
-// Tappable — user can skip immediately. Auto-advance still fires.
-// On web: skip animation entirely and navigate on next tick.
+// Purple bg, EEZ logo fade-in, exactly 2s total then navigate to welcome
 import { useEffect, useRef } from 'react'
-import { Platform, View, Text, Pressable, StyleSheet } from 'react-native'
+import { View, Animated, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
-  withSequence,
-  runOnJS,
-} from 'react-native-reanimated'
 import { EezLogo } from '@/components/icons/EezLogo'
 import { useUserStore } from '@/store/userStore'
-import { brand } from '@/theme/colors'
 
 export default function SplashScreen() {
   const router = useRouter()
   const isSignedIn = useUserStore((s) => s.isSignedIn)
-  const opacity = useSharedValue(0)
+  const opacity = useRef(new Animated.Value(0)).current
   const navigated = useRef(false)
 
   function navigate() {
     if (navigated.current) return
     navigated.current = true
-    if (isSignedIn) {
-      router.replace('/(tabs)')
-    } else {
-      router.replace('/(auth)/welcome')
-    }
+    router.replace(isSignedIn ? '/(tabs)' : '/(auth)/welcome')
   }
 
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      const id = setTimeout(navigate, 0)
-      return () => clearTimeout(id)
-    }
+    // Fade in over 600ms, then hold until the 2s mark
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start()
 
-    // Fade in 400ms → hold 1000ms → fade out 300ms → navigate
-    opacity.value = withSequence(
-      withTiming(1, { duration: 400 }),
-      withDelay(1000, withTiming(0, { duration: 300 }, () => runOnJS(navigate)()))
-    )
+    const timer = setTimeout(navigate, 2000)
+    return () => clearTimeout(timer)
   }, [])
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }))
-
   return (
-    <Pressable style={styles.container} onPress={navigate}>
+    <View style={styles.container}>
       <StatusBar style="light" />
-      <Animated.View style={[styles.content, animatedStyle]}>
+      <Animated.View style={{ opacity }}>
         <EezLogo width={140} height={140} color="#B1FF58" />
       </Animated.View>
-      <Text style={styles.tapHint}>tap to continue</Text>
-    </Pressable>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: brand.purple,
+    backgroundColor: '#602CFF',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  content: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tapHint: {
-    position: 'absolute',
-    bottom: 48,
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: '#AAAAAA',
-    textAlign: 'center',
   },
 })
