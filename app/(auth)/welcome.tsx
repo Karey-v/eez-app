@@ -1,14 +1,12 @@
 // S03–05 — Welcome Carousel
-// Dark entry experience, 3 slides, SVG illustrations, purple accent
-import { useRef, useState } from 'react'
+// Brand purple gradient, lime headline, tap-to-advance (no swipe)
+import { useState } from 'react'
 import {
   View,
   Text,
-  FlatList,
   Pressable,
   StyleSheet,
   Dimensions,
-  ListRenderItemInfo,
 } from 'react-native'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -23,7 +21,6 @@ type Slide = {
   id: string
   headline: string
   body: string
-  cta?: string
   illustration: 'eye' | 'wifi' | 'lock'
 }
 
@@ -44,7 +41,6 @@ const SLIDES: Slide[] = [
     id: '3',
     headline: 'so... how leakable are you?',
     body: 'Take a 5-minute test, get a personalised risk score, and learn exactly what to fix.',
-    cta: "let's find out",
     illustration: 'lock',
   },
 ]
@@ -68,7 +64,6 @@ function SlideIllustration({ type }: { type: Slide['illustration'] }) {
       </Svg>
     )
   }
-  // lock
   return (
     <Svg width={80} height={80} viewBox="0 0 80 80" fill="none">
       <Rect x={18} y={40} width={44} height={28} rx={6} stroke="#B1FF58" strokeWidth={1.5} />
@@ -88,151 +83,125 @@ export default function WelcomeScreen() {
   const { spacing } = useTheme()
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const flatListRef = useRef<FlatList>(null)
   const [activeIndex, setActiveIndex] = useState(0)
+
+  const slide = SLIDES[activeIndex]
+  const isFirst = activeIndex === 0
+  const isLast = activeIndex === SLIDES.length - 1
+
+  function handleTap() {
+    if (!isLast) {
+      setActiveIndex(activeIndex + 1)
+    } else {
+      router.replace('/(auth)/sign-up')
+    }
+  }
+
+  function handleBack() {
+    if (!isFirst) {
+      setActiveIndex(activeIndex - 1)
+    }
+  }
 
   function handleSkip() {
     router.replace('/(auth)/sign-up')
   }
 
-  function handleCTA() {
-    router.replace('/(auth)/sign-up')
-  }
-
-  function onViewableItemsChanged({ viewableItems }: any) {
-    if (viewableItems.length > 0) {
-      setActiveIndex(viewableItems[0].index ?? 0)
-    }
-  }
-
-  function renderSlide({ item, index }: ListRenderItemInfo<Slide>) {
-    return (
-      <View style={[styles.slide, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }]}>
-        {/* Layer 1: deep purple base */}
-        <LinearGradient
-          colors={['#2D1B69', '#1A0A45']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.gradientLayer1}
-          pointerEvents="none"
-        />
-        {/* Layer 2: lighter purple overlay from top */}
-        <LinearGradient
-          colors={['rgba(139,92,246,0.3)', 'rgba(139,92,246,0)']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.gradientLayer2}
-          pointerEvents="none"
-        />
-
-        {/* Top bar: progress lines + skip */}
-        <View
-          style={[
-            styles.topBar,
-            { paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH },
-          ]}
-        >
-          <View style={styles.progressLines}>
-            {SLIDES.map((_, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.progressLine,
-                  {
-                    backgroundColor:
-                      i <= activeIndex ? '#B1FF58' : 'rgba(255,255,255,0.2)',
-                  },
-                ]}
-              />
-            ))}
-          </View>
-          <Pressable
-            onPress={handleSkip}
-            hitSlop={16}
-            style={({ pressed }) => [styles.skipBtn, { opacity: pressed ? 0.6 : 1 }]}
-          >
-            <Text style={styles.skipText}>skip</Text>
-          </Pressable>
-        </View>
-
-        {/* Illustration area: vertical line then SVG */}
-        <View style={styles.illustrationArea}>
-          <View style={styles.verticalLine} />
-          <SlideIllustration type={item.illustration} />
-        </View>
-
-        {/* Text content */}
-        <View style={[styles.slideContent, { paddingHorizontal: spacing.screenH }]}>
-          <Text style={styles.headline}>{item.headline}</Text>
-          <Text style={styles.subtext}>{item.body}</Text>
-        </View>
-
-        {/* Bottom CTA — only on last slide */}
-        <View
-          style={[
-            styles.bottom,
-            { paddingBottom: insets.bottom + 32, paddingHorizontal: spacing.screenH },
-          ]}
-        >
-          {index === SLIDES.length - 1 && (
-            <Pressable
-              onPress={handleCTA}
-              style={({ pressed }) => [
-                styles.ctaButton,
-                { opacity: pressed ? 0.85 : 1 },
-              ]}
-            >
-              <Text style={styles.ctaText}>let's find out</Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
-    )
-  }
-
   return (
-    <View style={styles.container}>
+    <Pressable
+      style={[styles.container, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }]}
+      onPress={handleTap}
+    >
       <StatusBar style="light" />
-      <FlatList
-        ref={flatListRef}
-        data={SLIDES}
-        renderItem={renderSlide}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-        style={styles.flatList}
+
+      {/* Brand purple gradient base */}
+      <LinearGradient
+        colors={['#602CFF', '#2D1466']}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+        pointerEvents="none"
       />
-    </View>
+      {/* Lighter purple overlay from top */}
+      <LinearGradient
+        colors={['rgba(139,92,246,0.3)', 'rgba(139,92,246,0)']}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={[StyleSheet.absoluteFillObject, { height: SCREEN_HEIGHT * 0.6 }]}
+        pointerEvents="none"
+      />
+
+      {/* Top bar: progress dots + skip */}
+      <View
+        style={[
+          styles.topBar,
+          { paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH },
+        ]}
+      >
+        <View style={styles.progressLines}>
+          {SLIDES.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.progressLine,
+                { backgroundColor: i <= activeIndex ? '#B1FF58' : 'rgba(255,255,255,0.2)' },
+              ]}
+            />
+          ))}
+        </View>
+        <Pressable
+          onPress={handleSkip}
+          hitSlop={16}
+          style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+        >
+          <Text style={styles.skipText}>skip</Text>
+        </Pressable>
+      </View>
+
+      {/* Illustration */}
+      <View style={styles.illustrationArea}>
+        <View style={styles.verticalLine} />
+        <SlideIllustration type={slide.illustration} />
+      </View>
+
+      {/* Text content */}
+      <View style={[styles.slideContent, { paddingHorizontal: spacing.screenH }]}>
+        <Text style={styles.headline}>{slide.headline}</Text>
+        <Text style={styles.subtext}>{slide.body}</Text>
+      </View>
+
+      {/* Bottom row: back arrow left, CTA right on last slide */}
+      <View
+        style={[
+          styles.bottom,
+          { paddingBottom: insets.bottom + 32, paddingHorizontal: spacing.screenH },
+        ]}
+      >
+        {!isFirst ? (
+          <Pressable onPress={handleBack} hitSlop={16}>
+            <Text style={styles.backText}>← back</Text>
+          </Pressable>
+        ) : (
+          <View />
+        )}
+
+        {isLast && (
+          <Pressable
+            onPress={handleTap}
+            style={({ pressed }) => [styles.ctaButton, { opacity: pressed ? 0.85 : 1 }]}
+          >
+            <Text style={styles.ctaText}>let's find out</Text>
+          </Pressable>
+        )}
+      </View>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2D1B69',
-  },
-  flatList: {
-    flex: 1,
-  },
-  slide: {
-    backgroundColor: '#2D1B69',
-  },
-  gradientLayer1: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  gradientLayer2: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '60%',
+    backgroundColor: '#2D1466',
   },
   topBar: {
     flexDirection: 'row',
@@ -249,7 +218,6 @@ const styles = StyleSheet.create({
     height: 2,
     borderRadius: 1,
   },
-  skipBtn: {},
   skipText: {
     fontFamily: 'Inter_400Regular',
     fontSize: 11,
@@ -273,7 +241,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     lineHeight: 38,
     fontWeight: '400',
-    color: '#FFFFFF',
+    color: '#B1FF58',
     textAlign: 'center',
   },
   subtext: {
@@ -285,16 +253,24 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   bottom: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
     minHeight: 44 + 32,
-    justifyContent: 'flex-end',
+  },
+  backText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: '#FFFFFF',
+    textDecorationLine: 'underline',
   },
   ctaButton: {
     backgroundColor: '#B1FF58',
     borderRadius: 50,
     height: 56,
+    paddingHorizontal: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'stretch',
   },
   ctaText: {
     fontFamily: 'Inter_700Bold',

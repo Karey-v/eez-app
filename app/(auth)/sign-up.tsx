@@ -63,7 +63,7 @@ export default function SignUpScreen() {
 
         {/* Heading */}
         <View style={styles.heading}>
-          <Text style={[type.heroTitle, { color: colors.textPrimary }]}>
+          <Text style={[type.heroTitle, { color: '#5B5CF6' }]}>
             Create your account.
           </Text>
           <Text style={[type.body, { color: colors.textSecondary, marginTop: 8, lineHeight: 18 }]}>
