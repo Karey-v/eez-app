@@ -116,8 +116,8 @@ export default function WelcomeScreen() {
 
       {/* 4-stop gradient: brand purple at top fading to near-white only at very bottom */}
       <LinearGradient
-        colors={['#602CFF', '#3D1A99', '#1A0A4D', '#F5F5FF']}
-        locations={[0, 0.45, 0.88, 1]}
+        colors={['#602CFF', '#7B4FFF', '#9B7FFF', '#C4AAFF']}
+        locations={[0, 0.35, 0.7, 1]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
         style={StyleSheet.absoluteFillObject}
