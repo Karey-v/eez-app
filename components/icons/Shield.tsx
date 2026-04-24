@@ -1,9 +1,9 @@
 import React from 'react'
 import Svg, { Path } from 'react-native-svg'
 
-type Props = { size?: number; color?: string; strokeWidth?: number }
+type Props = { size?: number; color?: string; strokeWidth?: number; filled?: boolean }
 
-export function ShieldIcon({ size = 24, color = 'currentColor', strokeWidth = 2 }: Props) {
+export function ShieldIcon({ size = 24, color = 'currentColor', strokeWidth = 2, filled = false }: Props) {
   return (
     <Svg
       width={size}
@@ -18,6 +18,7 @@ export function ShieldIcon({ size = 24, color = 'currentColor', strokeWidth = 2 
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
+        fill={filled ? color : 'none'}
       />
     </Svg>
   )
