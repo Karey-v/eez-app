@@ -193,115 +193,115 @@ export default function ChatScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: colors.bgPrimary }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={0}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
       <StatusBar style="dark" />
-
-      {/* Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: insets.top + 12,
-            paddingHorizontal: spacing.screenH,
-            backgroundColor: colors.bgPrimary,
-            borderBottomColor: colors.borderWeak,
-          },
-        ]}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
-        >
-          <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
-        </Pressable>
-        <Text style={[type.cardTitle, { color: colors.textPrimary, fontSize: 14 }]}>
-          EEZ Fraud Detector
-        </Text>
-        <View style={{ width: 44 }} />
-      </View>
-
-      {/* Messages */}
-      <ScrollView
-        ref={scrollRef}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          paddingTop: 20,
-          paddingBottom: 16,
-          paddingHorizontal: spacing.screenH,
-          gap: 12,
-        }}
-      >
-        {messages.map((msg) =>
-          msg.role === 'user' ? (
-            <UserBubble key={msg.id} text={msg.text} />
-          ) : (
-            <BotMessage
-              key={msg.id}
-              text={msg.text}
-              response={msg.response}
-              onGuidePress={handleGuidePress}
-            />
-          ),
-        )}
-        {isTyping && <TypingIndicator />}
-      </ScrollView>
-
-      {/* Input bar */}
-      <View
-        style={[
-          styles.inputBar,
-          {
-            paddingBottom: insets.bottom + 12,
-            paddingHorizontal: spacing.screenH,
-            backgroundColor: colors.bgPrimary,
-            borderTopColor: colors.borderWeak,
-          },
-        ]}
-      >
-        <TextInput
-          value={input}
-          onChangeText={setInput}
-          placeholder="follow up or paste something else…"
-          placeholderTextColor={colors.textTertiary}
-          multiline
-          returnKeyType="send"
-          onSubmitEditing={sendMessage}
-          editable={!isTyping}
+        {/* Header */}
+        <View
           style={[
-            styles.textInput,
+            styles.header,
             {
-              backgroundColor: colors.bgSecondary,
-              color: colors.textPrimary,
-              borderColor: colors.borderWeak,
-              fontFamily: 'Inter_400Regular',
-              fontSize: 12,
-              opacity: isTyping ? 0.5 : 1,
-            },
-          ]}
-        />
-        <Pressable
-          onPress={sendMessage}
-          disabled={isTyping || !input.trim()}
-          style={({ pressed }) => [
-            styles.sendBtn,
-            {
-              backgroundColor:
-                isTyping || !input.trim() ? colors.bgTertiary : brand.purpleCTA,
-              opacity: pressed ? 0.85 : 1,
+              paddingTop: insets.top + 12,
+              paddingHorizontal: spacing.screenH,
+              backgroundColor: colors.bgPrimary,
+              borderBottomColor: colors.borderWeak,
             },
           ]}
         >
-          <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 18, lineHeight: 20 }}>↑</Text>
-        </Pressable>
-      </View>
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={12}
+            style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
+          </Pressable>
+          <Text style={[type.cardTitle, { color: colors.textPrimary, fontSize: 14 }]}>
+            EEZ Fraud Detector
+          </Text>
+          <View style={{ width: 44 }} />
+        </View>
+
+        {/* Messages */}
+        <ScrollView
+          ref={scrollRef}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            paddingTop: 20,
+            paddingBottom: 16,
+            paddingHorizontal: spacing.screenH,
+            gap: 12,
+          }}
+        >
+          {messages.map((msg) =>
+            msg.role === 'user' ? (
+              <UserBubble key={msg.id} text={msg.text} />
+            ) : (
+              <BotMessage
+                key={msg.id}
+                text={msg.text}
+                response={msg.response}
+                onGuidePress={handleGuidePress}
+              />
+            ),
+          )}
+          {isTyping && <TypingIndicator />}
+        </ScrollView>
+
+        {/* Input bar */}
+        <View
+          style={[
+            styles.inputBar,
+            {
+              paddingBottom: 12,
+              paddingHorizontal: spacing.screenH,
+              backgroundColor: colors.bgPrimary,
+              borderTopColor: colors.borderWeak,
+            },
+          ]}
+        >
+          <TextInput
+            value={input}
+            onChangeText={setInput}
+            placeholder="follow up or paste something else…"
+            placeholderTextColor={colors.textTertiary}
+            multiline
+            returnKeyType="send"
+            onSubmitEditing={sendMessage}
+            editable={!isTyping}
+            style={[
+              styles.textInput,
+              {
+                backgroundColor: colors.bgSecondary,
+                color: colors.textPrimary,
+                borderColor: colors.borderWeak,
+                fontFamily: 'Inter_400Regular',
+                fontSize: 12,
+                opacity: isTyping ? 0.5 : 1,
+              },
+            ]}
+          />
+          <Pressable
+            onPress={sendMessage}
+            disabled={isTyping || !input.trim()}
+            style={({ pressed }) => [
+              styles.sendBtn,
+              {
+                backgroundColor:
+                  isTyping || !input.trim() ? colors.bgTertiary : brand.purpleCTA,
+                opacity: pressed ? 0.85 : 1,
+              },
+            ]}
+          >
+            <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 18, lineHeight: 20 }}>↑</Text>
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
       <BottomNav activeTab="detect" />
-    </KeyboardAvoidingView>
+    </View>
   )
 }
 

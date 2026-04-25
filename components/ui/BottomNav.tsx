@@ -73,7 +73,7 @@ export function BottomNav({ activeTab }: { activeTab: BottomNavTab }) {
       style={[
         styles.container,
         {
-          height: 56 + insets.bottom,
+          height: 64 + insets.bottom,
           paddingBottom: insets.bottom,
           backgroundColor: colors.bgPrimary,
           borderTopColor: colors.borderWeak,

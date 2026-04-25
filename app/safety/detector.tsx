@@ -69,136 +69,137 @@ export default function DetectorScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: colors.bgPrimary }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
       <StatusBar style="dark" />
-
-      {/* Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: insets.top + 12,
-            paddingHorizontal: spacing.screenH,
-            backgroundColor: colors.bgPrimary,
-            borderBottomColor: colors.borderWeak,
-          },
-        ]}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.headerTitle}>
-          <Text style={styles.titleText}>EEZ Fraud Detector</Text>
-          <PulseDot />
-        </View>
-      </View>
-
-      {/* Disclaimer banner */}
-      <View style={[styles.disclaimer, { backgroundColor: colors.bgSecondary, borderBottomColor: colors.borderWeak }]}>
-        <Text style={[type.bodySmall, { color: colors.textTertiary, textAlign: 'center', lineHeight: 15 }]}>
-          EEZ Fraud Detector is an AI assistant. Results are indicative only — always verify independently.
-        </Text>
-      </View>
-
-      {/* Content */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          paddingTop: 24,
-          paddingBottom: 20,
-          paddingHorizontal: spacing.screenH,
-        }}
-      >
-        {/* Bot welcome bubble */}
-        <View style={styles.botRow}>
-          <View style={[styles.avatar, { backgroundColor: '#5B5CF6' }]}>
-            <EezLogo width={20} height={20} color="#B1FF58" />
-          </View>
-          <View style={[styles.botBubble, { backgroundColor: colors.bgSecondary }]}>
-            <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
-              Hey. paste a message, email subject, or describe a situation — I'll tell you if something's off.
-            </Text>
-          </View>
-        </View>
-
-        {/* Quick-start cards */}
-        <Text style={[type.label, { color: colors.textTertiary, marginTop: 24, marginBottom: 10 }]}>
-          quick start
-        </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 8, paddingRight: 4 }}
-        >
-          {QUICK_STARTS.map((qs) => (
-            <Pressable
-              key={qs.label}
-              onPress={() => {
-                setInput(qs.prefill)
-                inputRef.current?.focus()
-              }}
-              style={({ pressed }) => [
-                styles.quickCard,
-                { backgroundColor: colors.bgSecondary, opacity: pressed ? 0.7 : 1 },
-              ]}
-            >
-              <Text style={{ fontSize: 20, marginBottom: 8 }}>{qs.icon}</Text>
-              <Text style={[type.body, { color: colors.textPrimary, fontFamily: 'Inter_600SemiBold', lineHeight: 16 }]}>
-                {qs.label}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </ScrollView>
-
-      {/* Input bar */}
-      <View
-        style={[
-          styles.inputBar,
-          {
-            paddingBottom: insets.bottom + 12,
-            paddingHorizontal: spacing.screenH,
-            backgroundColor: colors.bgPrimary,
-            borderTopColor: colors.borderWeak,
-          },
-        ]}
-      >
-        <TextInput
-          ref={inputRef}
-          value={input}
-          onChangeText={setInput}
-          placeholder="describe the situation or paste a message…"
-          placeholderTextColor={colors.textTertiary}
-          multiline
-          returnKeyType="send"
-          onSubmitEditing={() => handleSend()}
+        {/* Header */}
+        <View
           style={[
-            styles.textInput,
+            styles.header,
             {
-              backgroundColor: colors.bgSecondary,
-              color: colors.textPrimary,
-              borderColor: colors.borderWeak,
-              fontFamily: 'Inter_400Regular',
-              fontSize: 12,
-            },
-          ]}
-        />
-        <Pressable
-          onPress={() => handleSend()}
-          style={({ pressed }) => [
-            styles.sendBtn,
-            {
-              backgroundColor: input.trim() ? brand.purpleCTA : colors.bgTertiary,
-              opacity: pressed ? 0.85 : 1,
+              paddingTop: insets.top + 12,
+              paddingHorizontal: spacing.screenH,
+              backgroundColor: colors.bgPrimary,
+              borderBottomColor: colors.borderWeak,
             },
           ]}
         >
-          <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 18, lineHeight: 20 }}>↑</Text>
-        </Pressable>
-      </View>
+          <View style={styles.headerTitle}>
+            <Text style={styles.titleText}>EEZ Fraud Detector</Text>
+            <PulseDot />
+          </View>
+        </View>
+
+        {/* Disclaimer banner */}
+        <View style={[styles.disclaimer, { backgroundColor: colors.bgSecondary, borderBottomColor: colors.borderWeak }]}>
+          <Text style={[type.bodySmall, { color: colors.textTertiary, textAlign: 'center', lineHeight: 15 }]}>
+            EEZ Fraud Detector is an AI assistant. Results are indicative only — always verify independently.
+          </Text>
+        </View>
+
+        {/* Content */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            paddingTop: 24,
+            paddingBottom: 20,
+            paddingHorizontal: spacing.screenH,
+          }}
+        >
+          {/* Bot welcome bubble */}
+          <View style={styles.botRow}>
+            <View style={[styles.avatar, { backgroundColor: '#5B5CF6' }]}>
+              <EezLogo width={20} height={20} color="#B1FF58" />
+            </View>
+            <View style={[styles.botBubble, { backgroundColor: colors.bgSecondary }]}>
+              <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
+                Hey. paste a message, email subject, or describe a situation — I'll tell you if something's off.
+              </Text>
+            </View>
+          </View>
+
+          {/* Quick-start cards */}
+          <Text style={[type.label, { color: colors.textTertiary, marginTop: 24, marginBottom: 10 }]}>
+            quick start
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8, paddingRight: 4 }}
+          >
+            {QUICK_STARTS.map((qs) => (
+              <Pressable
+                key={qs.label}
+                onPress={() => {
+                  setInput(qs.prefill)
+                  inputRef.current?.focus()
+                }}
+                style={({ pressed }) => [
+                  styles.quickCard,
+                  { backgroundColor: colors.bgSecondary, opacity: pressed ? 0.7 : 1 },
+                ]}
+              >
+                <Text style={{ fontSize: 20, marginBottom: 8 }}>{qs.icon}</Text>
+                <Text style={[type.body, { color: colors.textPrimary, fontFamily: 'Inter_600SemiBold', lineHeight: 16 }]}>
+                  {qs.label}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </ScrollView>
+
+        {/* Input bar */}
+        <View
+          style={[
+            styles.inputBar,
+            {
+              paddingBottom: 12,
+              paddingHorizontal: spacing.screenH,
+              backgroundColor: colors.bgPrimary,
+              borderTopColor: colors.borderWeak,
+            },
+          ]}
+        >
+          <TextInput
+            ref={inputRef}
+            value={input}
+            onChangeText={setInput}
+            placeholder="describe the situation or paste a message…"
+            placeholderTextColor={colors.textTertiary}
+            multiline
+            returnKeyType="send"
+            onSubmitEditing={() => handleSend()}
+            style={[
+              styles.textInput,
+              {
+                backgroundColor: colors.bgSecondary,
+                color: colors.textPrimary,
+                borderColor: colors.borderWeak,
+                fontFamily: 'Inter_400Regular',
+                fontSize: 12,
+              },
+            ]}
+          />
+          <Pressable
+            onPress={() => handleSend()}
+            style={({ pressed }) => [
+              styles.sendBtn,
+              {
+                backgroundColor: input.trim() ? brand.purpleCTA : colors.bgTertiary,
+                opacity: pressed ? 0.85 : 1,
+              },
+            ]}
+          >
+            <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 18, lineHeight: 20 }}>↑</Text>
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
       <BottomNav activeTab="detect" />
-    </KeyboardAvoidingView>
+    </View>
   )
 }
 
