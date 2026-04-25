@@ -31,6 +31,8 @@ export default function TabLayout() {
         tabBarActiveTintColor: TAB_ACTIVE_COLOR,
         tabBarInactiveTintColor: '#9A9A9A',
         tabBarShowLabel: false,
+        tabBarIndicatorStyle: { height: 0 },
+        tabBarIndicator: () => null,
       }}
     >
       <Tabs.Screen
@@ -102,7 +104,7 @@ function TabItem({ icon, label, focused }: { icon: React.ReactNode; label: strin
   return (
     <View style={styles.tabItem}>
       {icon}
-      <Text style={[styles.label, { color: focused ? TAB_ACTIVE_COLOR : '#9A9A9A' }]}>
+      <Text allowFontScaling={false} style={[styles.label, { color: focused ? TAB_ACTIVE_COLOR : '#9A9A9A' }]}>
         {label}
       </Text>
     </View>

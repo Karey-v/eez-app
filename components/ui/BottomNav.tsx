@@ -90,6 +90,7 @@ export function BottomNav({ activeTab }: { activeTab: BottomNavTab }) {
           >
             {tab.icon(focused)}
             <Text
+              allowFontScaling={false}
               style={[
                 styles.label,
                 {
