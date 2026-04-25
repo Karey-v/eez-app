@@ -25,6 +25,7 @@ import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
 import { ArrowIcon } from '@/components/icons/Arrow'
+import { EezLogo } from '@/components/icons/EezLogo'
 import { FraudScoreCard } from '@/components/ui/FraudScoreCard'
 import { BottomNav } from '@/components/ui/BottomNav'
 import { getResponse, type MockResponse } from '@/data/chatResponses'
@@ -67,11 +68,11 @@ function TypingDot({ delay }: { delay: number }) {
 }
 
 function TypingIndicator() {
-  const { colors, brand } = useTheme()
+  const { colors } = useTheme()
   return (
     <View style={styles.botRow}>
-      <View style={[styles.avatar, { backgroundColor: brand.darkGreen }]}>
-        <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 11 }}>EEZ</Text>
+      <View style={[styles.avatar, { backgroundColor: '#5B5CF6' }]}>
+        <EezLogo width={20} height={20} color="#B1FF58" />
       </View>
       <View style={[styles.botBubble, { backgroundColor: colors.bgSecondary }]}>
         <View style={styles.typingRow}>
@@ -109,8 +110,8 @@ function BotMessage({
   const { colors, type, brand } = useTheme()
   return (
     <Animated.View entering={FadeIn.duration(200)} style={styles.botRow}>
-      <View style={[styles.avatar, { backgroundColor: brand.darkGreen }]}>
-        <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 11 }}>EEZ</Text>
+      <View style={[styles.avatar, { backgroundColor: '#5B5CF6' }]}>
+        <EezLogo width={20} height={20} color="#B1FF58" />
       </View>
       <View style={{ flex: 1 }}>
         <View style={[styles.botBubble, { backgroundColor: colors.bgSecondary }]}>
@@ -299,7 +300,7 @@ export default function ChatScreen() {
           <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 18, lineHeight: 20 }}>↑</Text>
         </Pressable>
       </View>
-      <BottomNav activeTab="home" />
+      <BottomNav activeTab="detect" />
     </KeyboardAvoidingView>
   )
 }

@@ -6,11 +6,12 @@ import { useTheme } from '@/theme'
 import { HomeIcon } from '@/components/icons/Home'
 import { LearnIcon } from '@/components/icons/Learn'
 import { RadarIcon } from '@/components/icons/Radar'
+import { SparkleIcon } from '@/components/icons/Sparkle'
 import { ProfileIcon } from '@/components/icons/Profile'
 
 const TAB_ACTIVE_COLOR = '#5B5CF6'
 
-export type BottomNavTab = 'home' | 'learn' | 'radar' | 'profile'
+export type BottomNavTab = 'home' | 'learn' | 'radar' | 'detect' | 'profile'
 
 type Tab = {
   name: BottomNavTab
@@ -42,6 +43,14 @@ const TABS: Tab[] = [
     route: '/(tabs)/radar',
     icon: (focused) => (
       <RadarIcon size={20} color={focused ? TAB_ACTIVE_COLOR : '#9A9A9A'} filled={focused} />
+    ),
+  },
+  {
+    name: 'detect',
+    label: 'Detect',
+    route: '/safety/detector',
+    icon: (focused) => (
+      <SparkleIcon size={20} color={focused ? TAB_ACTIVE_COLOR : '#9A9A9A'} filled={focused} />
     ),
   },
   {

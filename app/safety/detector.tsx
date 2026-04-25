@@ -10,7 +10,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Image,
 } from 'react-native'
 import Animated, {
   useSharedValue,
@@ -23,7 +22,7 @@ import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
-import { ArrowIcon } from '@/components/icons/Arrow'
+import { EezLogo } from '@/components/icons/EezLogo'
 import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Pulse dot ────────────────────────────────────────────────────────────────
@@ -88,20 +87,10 @@ export default function DetectorScreen() {
           },
         ]}
       >
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
-        >
-          <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
-        </Pressable>
-
         <View style={styles.headerTitle}>
           <Text style={styles.titleText}>EEZ Fraud Detector</Text>
           <PulseDot />
         </View>
-
-        <View style={{ width: 44 }} />
       </View>
 
       {/* Disclaimer banner */}
@@ -123,16 +112,12 @@ export default function DetectorScreen() {
       >
         {/* Bot welcome bubble */}
         <View style={styles.botRow}>
-          <View style={styles.avatar}>
-            <Image
-              source={require('../../assets/images/icon.png')}
-              style={{ width: 32, height: 32, borderRadius: 16 }}
-              resizeMode="cover"
-            />
+          <View style={[styles.avatar, { backgroundColor: '#5B5CF6' }]}>
+            <EezLogo width={20} height={20} color="#B1FF58" />
           </View>
           <View style={[styles.botBubble, { backgroundColor: colors.bgSecondary }]}>
             <Text style={[type.body, { color: colors.textPrimary, lineHeight: 18 }]}>
-              Hey. paste a message, email subject, or describe a situation — i'll tell you if something's off.
+              Hey. paste a message, email subject, or describe a situation — I'll tell you if something's off.
             </Text>
           </View>
         </View>
@@ -212,7 +197,7 @@ export default function DetectorScreen() {
           <Text style={{ color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 18, lineHeight: 20 }}>↑</Text>
         </Pressable>
       </View>
-      <BottomNav activeTab="home" />
+      <BottomNav activeTab="detect" />
     </KeyboardAvoidingView>
   )
 }
@@ -220,21 +205,15 @@ export default function DetectorScreen() {
 const styles = StyleSheet.create({
   titleText: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 28,
+    fontSize: 22,
     color: '#5B5CF6',
     marginRight: 8,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingBottom: 12,
     borderBottomWidth: 0.5,
-  },
-  backBtn: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
   },
   headerTitle: {
     flexDirection: 'row',
