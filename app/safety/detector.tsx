@@ -72,7 +72,7 @@ export default function DetectorScreen() {
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
       <StatusBar style="dark" />
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{ flex: 1, paddingBottom: 64 + insets.bottom }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {/* Header */}

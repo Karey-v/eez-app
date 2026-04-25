@@ -75,8 +75,6 @@ export function BottomNav({ activeTab }: { activeTab: BottomNavTab }) {
         {
           height: 64 + insets.bottom,
           paddingBottom: insets.bottom,
-          backgroundColor: colors.bgPrimary,
-          borderTopColor: colors.borderWeak,
         },
       ]}
     >
@@ -110,8 +108,17 @@ export function BottomNav({ activeTab }: { activeTab: BottomNavTab }) {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 0.5,
+    borderTopColor: 'rgba(98,44,255,0.15)',
+    paddingTop: 0,
+    elevation: 0,
+    shadowOpacity: 0,
   },
   tabItem: {
     flex: 1,
