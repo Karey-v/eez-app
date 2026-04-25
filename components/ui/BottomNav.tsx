@@ -100,7 +100,6 @@ export function BottomNav({ activeTab }: { activeTab: BottomNavTab }) {
             >
               {tab.label}
             </Text>
-            {focused ? <View style={styles.dot} /> : <View style={styles.dotPlaceholder} />}
           </Pressable>
         )
       })}
@@ -123,19 +122,8 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 9,
+    fontWeight: '600',
     textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: TAB_ACTIVE_COLOR,
-    marginTop: 2,
-  },
-  dotPlaceholder: {
-    width: 4,
-    height: 4,
-    marginTop: 2,
+    letterSpacing: 0.5,
   },
 })
