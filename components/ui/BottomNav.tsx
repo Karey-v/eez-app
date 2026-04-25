@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 8,
-    gap: 2,
+    gap: 3,
   },
   label: {
     fontFamily: 'Inter_600SemiBold',

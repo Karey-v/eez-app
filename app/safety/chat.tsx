@@ -24,7 +24,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
-import { ArrowIcon } from '@/components/icons/Arrow'
 import { EezLogo } from '@/components/icons/EezLogo'
 import { FraudScoreCard } from '@/components/ui/FraudScoreCard'
 import { BottomNav } from '@/components/ui/BottomNav'
@@ -211,17 +210,7 @@ export default function ChatScreen() {
             },
           ]}
         >
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={12}
-            style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
-          >
-            <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
-          </Pressable>
-          <Text style={[type.cardTitle, { color: colors.textPrimary, fontSize: 14 }]}>
-            EEZ Fraud Detector
-          </Text>
-          <View style={{ width: 44 }} />
+          <Text style={styles.titleText}>EEZ Fraud Detector</Text>
         </View>
 
         {/* Messages */}
@@ -309,14 +298,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingBottom: 12,
     borderBottomWidth: 0.5,
   },
-  backBtn: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
+  titleText: {
+    fontFamily: 'DMSerifDisplay_400Regular',
+    fontSize: 22,
+    color: '#5B5CF6',
   },
   botRow: {
     flexDirection: 'row',
