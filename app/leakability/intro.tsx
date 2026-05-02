@@ -27,7 +27,7 @@ export default function TestIntroScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 32 },
+          { paddingTop: insets.top + 24, paddingBottom: 100 },
         ]}
       >
         {/* Detective emoji */}

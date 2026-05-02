@@ -105,8 +105,9 @@ export default function DetectorScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
+            flexGrow: 1,
             paddingTop: 24,
-            paddingBottom: 20,
+            paddingBottom: 100,
             paddingHorizontal: spacing.screenH,
           }}
         >

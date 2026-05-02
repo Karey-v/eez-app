@@ -63,6 +63,7 @@ export default function HomeScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
+          flexGrow: 1,
           paddingTop: insets.top + 12,
           paddingBottom: insets.bottom + 100,
         }}

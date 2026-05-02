@@ -194,8 +194,9 @@ export default function CompleteScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
+          flexGrow: 1,
           paddingTop: insets.top + 48,
-          paddingBottom: 40,
+          paddingBottom: 100,
           paddingHorizontal: 24,
           alignItems: 'center',
         }}

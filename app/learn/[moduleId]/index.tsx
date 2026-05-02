@@ -62,8 +62,9 @@ export default function ModuleIntroScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
+          flexGrow: 1,
           paddingTop: insets.top + 16,
-          paddingBottom: 40,
+          paddingBottom: 100,
           paddingHorizontal: spacing.screenH,
         }}
       >

@@ -467,6 +467,7 @@ export default function LessonScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
+          flexGrow: 1,
           paddingTop: 24,
           paddingBottom: 110,
           paddingHorizontal: spacing.screenH,
