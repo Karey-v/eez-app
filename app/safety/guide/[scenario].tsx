@@ -10,7 +10,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@/theme'
@@ -178,38 +178,10 @@ export default function GuideScreen() {
   const { colors, type, spacing, brand } = useTheme()
   const insets = useSafeAreaInsets()
   const router = useRouter()
-  const { scenario } = useLocalSearchParams<{ scenario: string }>()
 
   const [checked, setChecked] = useState<boolean[]>(POST_STEPS.map(() => false))
   const checkedCount = checked.filter(Boolean).length
   const allDone = checkedCount === POST_STEPS.length
-
-  // Only "post" scenario is built; other scenarios show coming soon
-  if (scenario !== 'post') {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.bgPrimary,
-          paddingTop: insets.top + 16,
-          paddingHorizontal: spacing.screenH,
-        }}
-      >
-        <StatusBar style="dark" />
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
-        >
-          <ArrowIcon size={20} color={colors.textPrimary} direction="left" />
-        </Pressable>
-        <Text style={[type.heroTitle, { color: colors.textPrimary, marginTop: 24 }]}>coming soon.</Text>
-        <Text style={[type.body, { color: colors.textSecondary, marginTop: 8 }]}>
-          this guide is being built. check back soon.
-        </Text>
-      </View>
-    )
-  }
 
   function toggle(i: number) {
     setChecked((prev) => prev.map((v, idx) => (idx === i ? !v : v)))

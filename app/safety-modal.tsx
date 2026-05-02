@@ -93,7 +93,7 @@ export default function SafetyModalScreen() {
           icon="⚠️"
           iconBg="rgba(255,115,46,0.12)"
           title="I think I'm being scammed right now."
-          onPress={() => router.push('/safety/coming-soon')}
+          onPress={() => router.push('/safety/guide/post')}
         />
         <View style={{ height: spacing.cardGap }} />
 
@@ -109,7 +109,7 @@ export default function SafetyModalScreen() {
           icon="👥"
           iconBg="rgba(91,92,246,0.12)"
           title="Someone I know needs help."
-          onPress={() => router.push('/safety/coming-soon')}
+          onPress={() => router.push('/safety/guide/post')}
         />
 
         {/* Emergency helplines */}
