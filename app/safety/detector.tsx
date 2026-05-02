@@ -145,7 +145,7 @@ export default function DetectorScreen() {
                 ]}
               >
                 <Text style={{ fontSize: 20, marginBottom: 8 }}>{qs.icon}</Text>
-                <Text style={[type.body, { color: colors.textPrimary, fontFamily: 'Inter_600SemiBold', lineHeight: 16 }]}>
+                <Text style={[type.body, { color: colors.textPrimary, fontFamily: 'Inter_600SemiBold', lineHeight: 16, textAlign: 'center' }]}>
                   {qs.label}
                 </Text>
               </Pressable>
@@ -252,9 +252,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   quickCard: {
-    width: 120,
     borderRadius: 14,
-    padding: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignSelf: 'flex-start',
+    alignItems: 'center',
   },
   inputBar: {
     paddingTop: 12,
