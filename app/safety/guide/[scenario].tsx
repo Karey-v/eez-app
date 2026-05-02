@@ -238,7 +238,7 @@ export default function GuideScreen() {
             { color: '#5B5CF6', lineHeight: 34, marginBottom: 6 },
           ]}
         >
-          You're not alone.
+          Here's what to do.
         </Text>
         <Text
           style={[

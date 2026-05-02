@@ -420,10 +420,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heroScore: {
-    fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 72,
-    lineHeight: 80,
-    fontWeight: '400',
+    fontFamily: 'Inter_700Bold',
+    fontSize: 88,
+    lineHeight: 96,
+    fontWeight: '700',
   },
   heroBandLabel: {
     fontFamily: 'Inter_600SemiBold',
@@ -441,15 +441,17 @@ const styles = StyleSheet.create({
   },
   breakdownPill: {
     marginTop: 14,
-    backgroundColor: '#B1FF58',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 50,
     paddingVertical: 8,
     paddingHorizontal: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   breakdownPillText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 12,
-    color: '#1A4A00',
+    color: '#FFFFFF',
   },
   // Stats — single translucent box
   statsBox: {
