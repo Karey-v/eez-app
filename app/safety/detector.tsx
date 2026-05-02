@@ -107,7 +107,7 @@ export default function DetectorScreen() {
           contentContainerStyle={{
             flexGrow: 1,
             paddingTop: 24,
-            paddingBottom: 100,
+            paddingBottom: 64 + insets.bottom,
             paddingHorizontal: spacing.screenH,
           }}
         >

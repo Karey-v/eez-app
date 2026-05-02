@@ -220,7 +220,7 @@ export default function ChatScreen() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             paddingTop: 20,
-            paddingBottom: 16,
+            paddingBottom: 64 + insets.bottom,
             paddingHorizontal: spacing.screenH,
             gap: 12,
           }}

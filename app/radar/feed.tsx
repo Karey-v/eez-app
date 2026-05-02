@@ -237,7 +237,7 @@ export default function RadarFeedScreen() {
   const filteredFeed =
     scamType === 'All' ? feed : feed.filter((c) => c.category === scamType)
 
-  const BOTTOM_NAV_H = 56 + insets.bottom
+  const BOTTOM_NAV_H = 64 + insets.bottom
 
   return (
     <View style={styles.root}>
@@ -278,7 +278,7 @@ export default function RadarFeedScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 12,
-          paddingBottom: BOTTOM_NAV_H + 24,
+          paddingBottom: 64 + insets.bottom,
           paddingHorizontal: 24,
         }}
       >
