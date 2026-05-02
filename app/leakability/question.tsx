@@ -76,7 +76,6 @@ export default function QuestionScreen() {
 
   const question = questions[currentQuestionIndex]
 
-  // Restore previously given answer when user navigates back
   const storedAnswer = answers.find((a) => a.questionId === question.id)
   const initialSelectedIndex: number | null = (() => {
     if (!storedAnswer || !question.options) return null
@@ -143,6 +142,8 @@ export default function QuestionScreen() {
 
 // ─── QuestionBody ─────────────────────────────────────────────────────────────
 
+const INTERNAL_SIM_TYPES = ['wifi-settings', 'reward-popup', 'message-actions', 'instagram-dm', 'browser']
+
 function QuestionBody({
   question,
   onAnswer,
@@ -158,12 +159,15 @@ function QuestionBody({
 }) {
   const { colors, type, spacing } = useTheme()
   const insets = useSafeAreaInsets()
-  // selectedIndex: set only when user makes a new tap (locks further taps)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
-  // displayIndex: visual highlight — starts from restored answer, updated on new tap
   const [displayIndex, setDisplayIndex] = useState<number | null>(initialSelectedIndex)
   const [sliderIndex, setSliderIndex] = useState<number | null>(initialSelectedIndex)
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const isInternalSim =
+    question.type === 'simulation-tap' &&
+    !!question.simulation &&
+    INTERNAL_SIM_TYPES.includes(question.simulation.uiType)
 
   useEffect(() => {
     return () => { if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current) }
@@ -174,7 +178,7 @@ function QuestionBody({
     setSelectedIndex(optionIndex)
     setDisplayIndex(optionIndex)
     onAnswer(optionIndex)
-    advanceTimerRef.current = setTimeout(onAdvance, 600)
+    advanceTimerRef.current = setTimeout(onAdvance, 800)
   }
 
   function handleSliderChange(index: number) {
@@ -182,7 +186,7 @@ function QuestionBody({
     setDisplayIndex(index)
     onAnswer(index)
     if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current)
-    advanceTimerRef.current = setTimeout(onAdvance, 600)
+    advanceTimerRef.current = setTimeout(onAdvance, 800)
   }
 
   return (
@@ -209,6 +213,10 @@ function QuestionBody({
             <SimulationCard
               simulation={question.simulation}
               asModal={question.id === 7}
+              onTap={isInternalSim ? handleOptionSelect : undefined}
+              selectedIndex={isInternalSim ? displayIndex : undefined}
+              anySelected={isInternalSim ? selectedIndex !== null : undefined}
+              options={isInternalSim ? question.options : undefined}
             />
           </View>
         )}
@@ -244,8 +252,8 @@ function QuestionBody({
           </>
         )}
 
-        {/* Options */}
-        {question.type !== 'slider' && question.options && (
+        {/* Options — suppressed for simulation types that handle their own taps */}
+        {question.type !== 'slider' && question.options && !isInternalSim && (
           <View style={styles.options}>
             {question.type === 'scenario' && (
               <Text style={[type.label, { color: colors.textTertiary, marginBottom: 12 }]}>
@@ -284,10 +292,19 @@ function QuestionBody({
 function SimulationCard({
   simulation,
   asModal = false,
+  onTap,
+  selectedIndex,
+  anySelected,
+  options,
 }: {
   simulation: NonNullable<Question['simulation']>
   asModal?: boolean
+  onTap?: (index: number) => void
+  selectedIndex?: number | null
+  anySelected?: boolean
+  options?: NonNullable<Question['options']>
 }) {
+  const { colors, type } = useTheme()
   const { uiType, sender, content, preview } = simulation
 
   const initials = sender
@@ -298,6 +315,316 @@ function SimulationCard({
     .join('')
     .slice(0, 2)
     .toUpperCase()
+
+  // ── Wi-Fi settings ───────────────────────────────────────────────────────────
+  if (uiType === 'wifi-settings') {
+    const rowMeta = [
+      { bars: 3, open: true },
+      { bars: 2, open: false },
+      { bars: 0, badge: '4G' },
+      { bars: 0, badge: 'VPN' },
+    ] as { bars: number; open?: boolean; badge?: string }[]
+
+    return (
+      <View style={styles.wifiContainer}>
+        <View style={styles.wifiStatusBar}>
+          <Text style={styles.wifiStatusTime}>9:41</Text>
+          <Text style={styles.wifiStatusRight}>●●●</Text>
+        </View>
+        <View style={styles.wifiTitleRow}>
+          <Text style={styles.wifiBackChevron}>‹ Settings</Text>
+          <Text style={styles.wifiTitle}>Wi-Fi</Text>
+        </View>
+        <View style={styles.wifiList}>
+          <Text style={styles.wifiSectionLabel}>NETWORKS</Text>
+          {(options ?? []).map((opt, i) => {
+            const meta = rowMeta[i] ?? { bars: 2 }
+            const isSelected = selectedIndex === i
+            const isLast = i === (options?.length ?? 0) - 1
+            return (
+              <Pressable
+                key={i}
+                onPress={() => { if (!anySelected) onTap?.(i) }}
+                style={[
+                  styles.wifiRow,
+                  !isLast && styles.wifiRowDivider,
+                  isSelected && { backgroundColor: 'rgba(91,92,246,0.06)' },
+                ]}
+              >
+                {/* Signal indicator */}
+                {meta.badge ? (
+                  <View style={styles.wifiBadge}>
+                    <Text style={styles.wifiBadgeText}>{meta.badge}</Text>
+                  </View>
+                ) : (
+                  <View style={styles.wifiSignalWrap}>
+                    {[5, 8, 11, 14].map((h, barIdx) => (
+                      <View
+                        key={barIdx}
+                        style={{
+                          width: 3,
+                          height: h,
+                          borderRadius: 1,
+                          backgroundColor:
+                            barIdx < meta.bars
+                              ? isSelected ? '#5B5CF6' : '#007AFF'
+                              : 'rgba(0,0,0,0.18)',
+                        }}
+                      />
+                    ))}
+                  </View>
+                )}
+                <Text
+                  style={[
+                    styles.wifiRowLabel,
+                    isSelected && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' },
+                  ]}
+                >
+                  {opt.label}
+                </Text>
+                {meta.open === true && <Text style={styles.wifiLockIcon}>🔓</Text>}
+                {meta.open === false && i < 2 && <Text style={styles.wifiLockIcon}>🔒</Text>}
+                {isSelected && <Text style={styles.wifiCheck}>✓</Text>}
+              </Pressable>
+            )
+          })}
+        </View>
+      </View>
+    )
+  }
+
+  // ── Reward popup ─────────────────────────────────────────────────────────────
+  if (uiType === 'reward-popup') {
+    return (
+      <View style={styles.rewardDim}>
+        <Text style={styles.rewardTime}>9:41</Text>
+        <Text style={styles.rewardDate}>Wednesday, May 2</Text>
+        <View style={styles.rewardCard}>
+          {/* Close button → option index 1 */}
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(1) }}
+            style={[
+              styles.rewardCloseBtn,
+              selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.2)' },
+            ]}
+          >
+            <Text style={styles.rewardCloseTxt}>✕</Text>
+          </Pressable>
+          <Text style={styles.rewardGift}>🎁</Text>
+          <Text style={styles.rewardTitle}>You've been selected!</Text>
+          <Text style={styles.rewardBody}>{content}</Text>
+          {/* Claim → option index 0 */}
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(0) }}
+            style={[
+              styles.rewardClaimBtn,
+              selectedIndex === 0 && { backgroundColor: '#7C3AED' },
+            ]}
+          >
+            <Text style={styles.rewardClaimTxt}>Claim my reward</Text>
+          </Pressable>
+          {/* Terms → option index 2 */}
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(2) }}
+            style={{ marginTop: 12 }}
+          >
+            <Text
+              style={[
+                styles.rewardTermsTxt,
+                selectedIndex === 2 && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' },
+              ]}
+            >
+              Terms & Conditions
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    )
+  }
+
+  // ── iMessage + action buttons ─────────────────────────────────────────────────
+  if (uiType === 'message-actions') {
+    return (
+      <View style={styles.iMessageContainer}>
+        <View style={styles.iMessageHeader}>
+          <View style={[styles.iMessageAvatar, { backgroundColor: '#8E8E93' }]}>
+            <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
+          </View>
+          <View>
+            <Text style={styles.iMessageSenderName}>{sender}</Text>
+            <Text style={styles.iMessageMeta}>Unknown Caller</Text>
+          </View>
+        </View>
+        <View style={styles.iMessageChatArea}>
+          <View style={styles.iMessageBubbleRow}>
+            <View style={[styles.iMessageAvatarSmall, { backgroundColor: '#8E8E93' }]}>
+              <Text style={styles.iMessageAvatarSmallText}>{initials || '?'}</Text>
+            </View>
+            <View style={styles.iMessageBubble}>
+              <Text style={styles.iMessageBubbleText}>{content}</Text>
+            </View>
+          </View>
+          <Text style={styles.iMessageDelivered}>delivered</Text>
+        </View>
+        {/* Action bar */}
+        <View style={styles.msgActionBar}>
+          {(options ?? []).map((opt, i) => (
+            <Pressable
+              key={i}
+              onPress={() => { if (!anySelected) onTap?.(i) }}
+              style={[
+                styles.msgActionBtn,
+                i < (options?.length ?? 1) - 1 && styles.msgActionBtnDivider,
+                selectedIndex === i && { backgroundColor: 'rgba(91,92,246,0.08)' },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.msgActionTxt,
+                  i === 0 ? { color: '#FF3B30' } : { color: '#007AFF' },
+                ]}
+              >
+                {opt.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    )
+  }
+
+  // ── Instagram DM ─────────────────────────────────────────────────────────────
+  if (uiType === 'instagram-dm') {
+    const linkMatch = content.match(/bit\.ly\/\S+/)
+    const linkText = linkMatch ? linkMatch[0] : ''
+    const beforeLink = linkText ? content.slice(0, content.indexOf(linkText)) : content
+    const afterLink = linkText ? content.slice(content.indexOf(linkText) + linkText.length) : ''
+
+    return (
+      <View style={styles.igContainer}>
+        <View style={styles.igHeader}>
+          <View style={[styles.igAvatarMed, { backgroundColor: '#C837AB' }]}>
+            <Text style={styles.igAvatarMedTxt}>{initials || '?'}</Text>
+          </View>
+          <View>
+            <Text style={styles.igUsername}>{sender}</Text>
+            <Text style={styles.igSubtitle}>Active now</Text>
+          </View>
+        </View>
+        <View style={styles.igChatArea}>
+          <View style={[styles.igAvatarSm, { backgroundColor: '#C837AB' }]}>
+            <Text style={styles.igAvatarSmTxt}>{initials || '?'}</Text>
+          </View>
+          {/* Tap bubble = tap the link (option 0) */}
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(0) }}
+            style={[
+              styles.igBubble,
+              selectedIndex === 0 && { borderColor: '#5B5CF6', borderWidth: 1.5 },
+            ]}
+          >
+            <Text style={styles.igBubbleTxt}>
+              {beforeLink}
+              {linkText ? (
+                <Text
+                  style={[
+                    styles.igLinkTxt,
+                    selectedIndex === 0 && { color: '#B1FF58' },
+                  ]}
+                >
+                  {linkText}
+                </Text>
+              ) : null}
+              {afterLink}
+            </Text>
+          </Pressable>
+        </View>
+        <View style={styles.igActionBar}>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(1) }}
+            style={[
+              styles.igActionBtn,
+              styles.igActionBtnDivider,
+              selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.1)' },
+            ]}
+          >
+            <Text style={styles.igActionTxt}>Reply</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(2) }}
+            style={[
+              styles.igActionBtn,
+              selectedIndex === 2 && { backgroundColor: 'rgba(255,59,48,0.1)' },
+            ]}
+          >
+            <Text style={[styles.igActionTxt, { color: '#FF3B30' }]}>Report & Delete</Text>
+          </Pressable>
+        </View>
+      </View>
+    )
+  }
+
+  // ── Browser (fake bank login) ─────────────────────────────────────────────────
+  if (uiType === 'browser') {
+    return (
+      <View style={styles.browserContainer}>
+        {/* URL bar — tapping = option 1 (safe) */}
+        <Pressable
+          onPress={() => { if (!anySelected) onTap?.(1) }}
+          style={[
+            styles.browserURLBar,
+            selectedIndex === 1 && {
+              backgroundColor: 'rgba(91,92,246,0.08)',
+              borderColor: '#5B5CF6',
+              borderWidth: 1,
+            },
+          ]}
+        >
+          <Text style={styles.browserWarningIcon}>⚠️</Text>
+          <Text style={styles.browserURLText} numberOfLines={1}>{sender}</Text>
+          <Text style={styles.browserMenuDots}>···</Text>
+        </Pressable>
+
+        {/* Page content — tapping = option 0 (risky) */}
+        <Pressable
+          onPress={() => { if (!anySelected) onTap?.(0) }}
+          style={[
+            styles.browserPage,
+            selectedIndex === 0 && { backgroundColor: 'rgba(91,92,246,0.03)' },
+          ]}
+        >
+          <Text style={styles.browserPageTitle}>{content}</Text>
+          <View
+            style={[
+              styles.browserField,
+              selectedIndex === 0 && { borderColor: '#5B5CF6' },
+            ]}
+          >
+            <Text style={styles.browserFieldLabel}>Email</Text>
+            <Text style={styles.browserFieldHint}>your@email.com</Text>
+          </View>
+          <View
+            style={[
+              styles.browserField,
+              { marginTop: 10 },
+              selectedIndex === 0 && { borderColor: '#5B5CF6' },
+            ]}
+          >
+            <Text style={styles.browserFieldLabel}>Password</Text>
+            <Text style={styles.browserFieldHint}>••••••••</Text>
+          </View>
+          <View
+            style={[
+              styles.browserSignInBtn,
+              selectedIndex === 0 && { backgroundColor: '#7C3AED' },
+            ]}
+          >
+            <Text style={styles.browserSignInTxt}>Sign In</Text>
+          </View>
+        </Pressable>
+      </View>
+    )
+  }
 
   // ── iOS-style lockscreen notification ────────────────────────────────────────
   if (uiType === 'notification') {
@@ -390,7 +717,6 @@ function SimulationCard({
   }
 
   // ── Alert fallback ────────────────────────────────────────────────────────────
-  const { colors, type } = useTheme()
   return (
     <View style={[styles.simCardAlert, { backgroundColor: colors.dangerBg, borderColor: colors.dangerText }]}>
       <Text style={[type.cardTitle, { color: colors.dangerText }]}>{sender}</Text>
@@ -581,7 +907,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // ── Back / Next nav bar ──
+  // ── Back nav bar ──
   navBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -603,6 +929,399 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#5B5CF6',
     textDecorationLine: 'underline',
+  },
+
+  // ── WiFi settings ──
+  wifiContainer: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  wifiStatusBar: {
+    backgroundColor: '#F2F2F7',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 4,
+  },
+  wifiStatusTime: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#0A0A0A',
+  },
+  wifiStatusRight: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 10,
+    color: '#0A0A0A',
+    letterSpacing: 2,
+  },
+  wifiTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    gap: 8,
+  },
+  wifiBackChevron: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#007AFF',
+  },
+  wifiTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 22,
+    color: '#0A0A0A',
+    flex: 1,
+    textAlign: 'center',
+    marginRight: 60,
+  },
+  wifiList: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 0,
+  },
+  wifiSectionLabel: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#8E8E93',
+    letterSpacing: 0.5,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 6,
+    textTransform: 'uppercase',
+  },
+  wifiRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 13,
+    backgroundColor: '#FFFFFF',
+    gap: 10,
+  },
+  wifiRowDivider: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0,0,0,0.08)',
+  },
+  wifiSignalWrap: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 2,
+    width: 20,
+  },
+  wifiBadge: {
+    backgroundColor: '#5B5CF6',
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    width: 20,
+    alignItems: 'center',
+  },
+  wifiBadgeText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 8,
+    color: '#FFFFFF',
+  },
+  wifiRowLabel: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 15,
+    color: '#0A0A0A',
+    flex: 1,
+  },
+  wifiLockIcon: {
+    fontSize: 13,
+  },
+  wifiCheck: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#5B5CF6',
+  },
+
+  // ── Reward popup ──
+  rewardDim: {
+    backgroundColor: 'rgba(0,0,0,0.88)',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 24,
+    alignItems: 'center',
+  },
+  rewardTime: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 54,
+    color: '#FFFFFF',
+    letterSpacing: -1,
+    lineHeight: 58,
+  },
+  rewardDate: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 2,
+    marginBottom: 20,
+  },
+  rewardCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  rewardCloseBtn: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F2F2F7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rewardCloseTxt: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#8E8E93',
+  },
+  rewardGift: {
+    fontSize: 44,
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  rewardTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 17,
+    color: '#0A0A0A',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  rewardBody: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#8E8E93',
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 16,
+  },
+  rewardClaimBtn: {
+    backgroundColor: '#5B5CF6',
+    borderRadius: 50,
+    height: 44,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rewardClaimTxt: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
+  },
+  rewardTermsTxt: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: '#8E8E93',
+    textDecorationLine: 'underline',
+  },
+
+  // ── iMessage with action buttons ──
+  msgActionBar: {
+    flexDirection: 'row',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  msgActionBtn: {
+    flex: 1,
+    paddingVertical: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  msgActionBtnDivider: {
+    borderRightWidth: 0.5,
+    borderRightColor: 'rgba(0,0,0,0.1)',
+  },
+  msgActionTxt: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+  },
+
+  // ── Instagram DM ──
+  igContainer: {
+    backgroundColor: '#1C1C1E',
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  igHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(255,255,255,0.08)',
+  },
+  igAvatarMed: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  igAvatarMedTxt: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 13,
+    color: '#FFFFFF',
+  },
+  igUsername: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  igSubtitle: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.45)',
+    marginTop: 1,
+  },
+  igChatArea: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+  },
+  igAvatarSm: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  igAvatarSmTxt: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 9,
+    color: '#FFFFFF',
+  },
+  igBubble: {
+    backgroundColor: '#2C2C2E',
+    borderRadius: 18,
+    borderBottomLeftRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flex: 1,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  igBubbleTxt: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#FFFFFF',
+    lineHeight: 19,
+  },
+  igLinkTxt: {
+    color: '#007AFF',
+    fontFamily: 'Inter_600SemiBold',
+    textDecorationLine: 'underline',
+  },
+  igActionBar: {
+    flexDirection: 'row',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+  },
+  igActionBtn: {
+    flex: 1,
+    paddingVertical: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  igActionBtnDivider: {
+    borderRightWidth: 0.5,
+    borderRightColor: 'rgba(255,255,255,0.08)',
+  },
+  igActionTxt: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: '#007AFF',
+  },
+
+  // ── Browser ──
+  browserContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.1)',
+  },
+  browserURLBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F2F7',
+    marginHorizontal: 10,
+    marginVertical: 10,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    gap: 6,
+    borderWidth: 0.5,
+    borderColor: 'transparent',
+  },
+  browserWarningIcon: {
+    fontSize: 14,
+  },
+  browserURLText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: '#FF3B30',
+    flex: 1,
+  },
+  browserMenuDots: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#8E8E93',
+    letterSpacing: 1,
+  },
+  browserPage: {
+    paddingHorizontal: 18,
+    paddingTop: 10,
+    paddingBottom: 18,
+  },
+  browserPageTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 18,
+    color: '#0A0A0A',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  browserField: {
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.15)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  browserFieldLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    color: '#8E8E93',
+    marginBottom: 2,
+  },
+  browserFieldHint: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: 'rgba(0,0,0,0.25)',
+  },
+  browserSignInBtn: {
+    backgroundColor: '#5B5CF6',
+    borderRadius: 8,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 14,
+  },
+  browserSignInTxt: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
   },
 
   // ── iOS lockscreen notification ──

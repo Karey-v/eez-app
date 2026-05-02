@@ -6,7 +6,7 @@ export type Question = {
   type: QuestionType
   prompt?: string
   simulation?: {
-    uiType: 'message' | 'email' | 'alert' | 'notification'
+    uiType: 'message' | 'email' | 'alert' | 'notification' | 'wifi-settings' | 'reward-popup' | 'message-actions' | 'instagram-dm' | 'browser'
     sender: string
     content: string
     preview?: string
@@ -102,79 +102,83 @@ export const questions: Question[] = [
   {
     id: 6,
     category: 'Habits',
-    type: 'scenario',
-    prompt: 'you\'re at a coffee shop. you connect to the free Wi-Fi to check your bank app. how risky is this?',
+    type: 'simulation-tap',
+    prompt: "you're at a coffee shop. pick a network.",
+    simulation: {
+      uiType: 'wifi-settings',
+      sender: 'Wi-Fi',
+      content: '',
+    },
     options: [
-      { label: 'Totally fine, Wi-Fi is Wi-Fi', score: 3, feedback: 'public Wi-Fi can be intercepted. use mobile data for banking.' },
-      { label: 'Risky — I\'d use my mobile data instead', score: 0, feedback: 'exactly right. financial apps = mobile data only.' },
-      { label: 'Fine if it\'s a named network like "Costa Coffee"', score: 2, feedback: 'attackers can spoof named networks. still a risk.' },
-      { label: 'I\'d use a VPN first', score: 1, feedback: 'smart — a VPN significantly reduces the risk.' },
+      { label: 'Free City WiFi', score: 3, feedback: 'open public networks can be intercepted. never use them for banking.' },
+      { label: 'Coffee House WiFi', score: 3, feedback: 'named networks can be spoofed by attackers. still risky without a VPN.' },
+      { label: 'Mobile Data', score: 0, feedback: 'smart. your own data connection is the safest option.' },
+      { label: 'VPN On', score: 1, feedback: 'good — a VPN significantly reduces risk on public networks.' },
     ],
   },
   {
     id: 7,
     category: 'Impulse',
     type: 'simulation-tap',
-    prompt: 'this pops up on Instagram. what do you do?',
+    prompt: 'a popup appears. what do you tap?',
     simulation: {
-      uiType: 'notification',
-      sender: 'instagram_official_promo',
-      content: "🎉 You've been selected! You are 1 of 500 users chosen for our exclusive £500 gift card giveaway. Claim in the next 10 minutes or lose your spot!",
-      preview: 'Claim your £500 reward',
+      uiType: 'reward-popup',
+      sender: 'Promo',
+      content: 'Claim your £500 gift card before the offer expires. Limited time only.',
     },
     options: [
-      { label: 'Tap to claim — sounds legit', score: 3, feedback: 'artificial urgency is a red flag. real giveaways never expire in 10 minutes.' },
-      { label: 'Check the account\'s profile first', score: 1, feedback: 'better — but a fake verified-looking account can still fool you.' },
-      { label: 'Report the account as spam', score: 0, feedback: 'great response. you\'re protecting yourself and others.' },
-      { label: 'Ignore it', score: 0, feedback: 'correct. if it sounds too good to be true, it is.' },
+      { label: 'Claim my reward', score: 3, feedback: 'artificial urgency is a classic scam tactic. there is no prize.' },
+      { label: 'Close it', score: 0, feedback: 'correct. dismiss and move on.' },
+      { label: 'Terms & Conditions', score: 2, feedback: 'curious but risky — the link itself could be malicious.' },
     ],
   },
   {
     id: 8,
     category: 'Verification',
     type: 'simulation-tap',
-    prompt: 'you get this message out of nowhere. what do you do?',
+    prompt: 'you get this from an unknown number. what do you do?',
     simulation: {
-      uiType: 'message',
-      sender: 'Barclays',
-      content: 'BARCLAYS: Unusual activity detected on your account. Please call our fraud team immediately on 0800-XXX-XXXX to prevent your account from being frozen.',
+      uiType: 'message-actions',
+      sender: '+44 7700 900123',
+      content: 'BARCLAYS: Unusual activity detected on your account. Call our fraud team immediately on 0800-XXX-XXXX to prevent your account being frozen.',
       preview: 'Unusual activity detected',
     },
     options: [
-      { label: 'Call the number in the message', score: 3, feedback: 'never call numbers from messages. find the official number on your card.' },
-      { label: 'Call the number on the back of your card', score: 0, feedback: 'perfect. the official number on your card is always safe.' },
-      { label: 'Reply to the message asking for more info', score: 2, feedback: 'risky — you\'re engaging with a potential scammer.' },
-      { label: 'Ignore it and check the app', score: 1, feedback: 'mostly right — go to the app, not the message.' },
+      { label: 'Call the number', score: 3, feedback: 'never call numbers from messages. find the official number on your card.' },
+      { label: 'Report as spam', score: 0, feedback: 'perfect. report and block — this is a smishing attempt.' },
+      { label: 'Go back', score: 0, feedback: 'good. ignoring suspicious messages is the right move.' },
     ],
   },
   {
     id: 9,
     category: 'Social Pressure',
     type: 'simulation-tap',
-    prompt: 'your cousin sends this in the family group chat. what do you do?',
+    prompt: 'your friend sends you this DM. what do you do?',
     simulation: {
-      uiType: 'message',
-      sender: 'Cousin Priya 👑',
-      content: "guys check this out I made £800 in 2 days!! this investment platform is legit, you just put in £50 and watch it grow 😭 here's my ref link",
-      preview: 'I made £800 in 2 days!!',
+      uiType: 'instagram-dm',
+      sender: 'priya.m',
+      content: "omg I made £800 in 2 days!! this is actually legit, just put in £50 👀 bit.ly/inv-promo",
     },
     options: [
-      { label: 'Click the link — Priya wouldn\'t lie', score: 3, feedback: 'family members get hacked too. this is a classic pig butchering scam pattern.' },
-      { label: 'Message Priya privately to verify', score: 0, feedback: 'smart. confirm via a different channel before clicking anything.' },
-      { label: 'Do my own research on the platform first', score: 1, feedback: 'good instinct — but don\'t use the link itself to research.' },
-      { label: 'Warn the group it might be a scam', score: 0, feedback: 'brave and correct. protecting others is always the right move.' },
+      { label: 'Tap the bit.ly link', score: 3, feedback: "shortened links hide destinations — don't tap. verify with Priya directly." },
+      { label: 'Reply to ask more', score: 2, feedback: 'engaging keeps the scam alive. the account may be compromised.' },
+      { label: 'Report & delete', score: 0, feedback: 'smart. accounts can be hijacked — reporting protects others.' },
     ],
   },
   {
     id: 10,
     category: 'Response Style',
-    type: 'multiple-choice',
-    prompt: 'you click a link and the page looks like your bank\'s website — but the URL is "bankk-secure-login.co.uk". what do you do?',
+    type: 'simulation-tap',
+    prompt: 'you click a link and this page loads. what do you do?',
+    simulation: {
+      uiType: 'browser',
+      sender: 'bankk-secure-login.co.uk',
+      content: 'Sign in to your account',
+      preview: '⚠️ Not Secure',
+    },
     options: [
-      { label: 'Log in — the page looks legit', score: 3, feedback: 'visual appearance is easy to fake. the URL is the real tell.' },
-      { label: 'Check the URL more carefully and leave', score: 0, feedback: 'exactly right. always verify the URL before entering credentials.' },
-      { label: 'Try typing the URL directly instead', score: 0, feedback: 'great thinking — always navigate directly, never via suspicious links.' },
-      { label: 'Log in but change my password after', score: 2, feedback: 'too late — the damage is done the moment you log in.' },
+      { label: 'Enter my login details', score: 3, feedback: "the URL is fake — 'bankk' is not your bank. entering credentials hands them to scammers." },
+      { label: 'Tap the ⚠️ warning', score: 0, feedback: 'exactly right. always check the URL and security indicator before typing anything.' },
     ],
   },
 ]
