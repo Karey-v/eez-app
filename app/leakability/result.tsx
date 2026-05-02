@@ -187,7 +187,7 @@ export default function ResultScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 40, paddingHorizontal: 24 },
+          { paddingTop: insets.top + 40, paddingBottom: 64 + insets.bottom, paddingHorizontal: 24 },
         ]}
       >
         {/* ── Score section ── */}

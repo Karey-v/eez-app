@@ -68,7 +68,7 @@ export default function TestIntroScreen() {
           onPress={() => setShowExplain((v) => !v)}
           style={({ pressed }) => [styles.secondaryBtn, { opacity: pressed ? 0.7 : 1 }]}
         >
-          <Text style={styles.secondaryBtnText}>wtf is leakability? 🤔</Text>
+          <Text style={styles.secondaryBtnText}>What is leakability?</Text>
         </Pressable>
 
         {/* Explanation card */}

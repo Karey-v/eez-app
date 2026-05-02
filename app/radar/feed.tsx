@@ -277,6 +277,7 @@ export default function RadarFeedScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
+          flexGrow: 1,
           paddingTop: 12,
           paddingBottom: 64 + insets.bottom,
           paddingHorizontal: 24,
