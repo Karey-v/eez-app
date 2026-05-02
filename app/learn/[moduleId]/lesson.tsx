@@ -501,7 +501,7 @@ export default function LessonScreen() {
           style={[
             styles.bottomBar,
             {
-              paddingBottom: 16,
+              paddingBottom: insets.bottom + 64 + 12,
               paddingHorizontal: spacing.screenH,
               backgroundColor: '#FFFFFF',
               borderTopColor: colors.borderWeak,
