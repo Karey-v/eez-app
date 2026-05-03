@@ -64,18 +64,18 @@ export default function TestIntroScreen() {
         </Pressable>
 
         {/* Secondary: What is leakability? */}
+        {showExplainer && (
+          <Text style={styles.explainerText}>
+            The leakability score reflects the probability of a user falling for financial fraud based on their habits and behavioral patterns.
+          </Text>
+        )}
+
         <Pressable
           onPress={() => setShowExplainer((v) => !v)}
           style={({ pressed }) => [styles.secondaryBtn, { opacity: pressed ? 0.6 : 1 }]}
         >
           <Text style={styles.secondaryBtnText}>What is leakability?</Text>
         </Pressable>
-
-        {showExplainer && (
-          <Text style={styles.explainerText}>
-            The leakability score reflects the probability of a user falling for financial fraud based on their habits and behavioral patterns.
-          </Text>
-        )}
       </ScrollView>
       <BottomNav activeTab="home" />
     </View>

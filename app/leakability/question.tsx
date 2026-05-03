@@ -148,7 +148,14 @@ export default function QuestionScreen() {
       {/* Fixed header — all questions */}
       <View style={{ paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH, paddingBottom: 8 }}>
         <ProgressLines total={questions.length} current={currentQuestionIndex} />
-        <View style={[styles.categoryPill, { marginTop: 28 }]}>
+        <Pressable
+          onPress={handleBack}
+          hitSlop={12}
+          style={({ pressed }) => [{ marginTop: 10, alignSelf: 'flex-start', opacity: pressed ? 0.5 : 1 }]}
+        >
+          <Text style={styles.navBackText}>← back</Text>
+        </Pressable>
+        <View style={[styles.categoryPill, { marginTop: 8 }]}>
           <Text style={styles.categoryPillText}>{question.category}</Text>
         </View>
       </View>
@@ -226,15 +233,6 @@ function QuestionBody({
           anySelected={selectedIndex !== null}
           options={question.options}
         />
-        <View style={[styles.navBar, { paddingBottom: insets.bottom + 8 }]}>
-          <Pressable
-            onPress={onBack}
-            hitSlop={12}
-            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-          >
-            <Text style={styles.navBackText}>← back</Text>
-          </Pressable>
-        </View>
       </View>
     )
   }
@@ -297,15 +295,6 @@ function QuestionBody({
         )}
       </ScrollView>
 
-      <View style={[styles.navBar, { paddingBottom: insets.bottom + 8 }]}>
-        <Pressable
-          onPress={onBack}
-          hitSlop={12}
-          style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-        >
-          <Text style={styles.navBackText}>← back</Text>
-        </Pressable>
-      </View>
     </View>
   )
 }
@@ -338,7 +327,7 @@ function SimulationCard({
     .slice(0, 2)
     .toUpperCase()
 
-  // ── Wi-Fi settings (dark mode) ────────────────────────────────────────────
+  // ── Wi-Fi settings (light mode) ──────────────────────────────────────────
   if (uiType === 'wifi-settings') {
     const rowMeta = [
       { bars: 3, open: true },
@@ -349,7 +338,7 @@ function SimulationCard({
 
     return (
       <View style={styles.wifiContainer}>
-        <View style={[styles.wifiStatusBar, { paddingTop: insets.top + 10 }]}>
+        <View style={[styles.wifiStatusBar, { paddingTop: 8 }]}>
           <Text style={styles.wifiStatusTime}>9:41</Text>
           <Text style={styles.wifiStatusRight}>●●●</Text>
         </View>
@@ -370,7 +359,7 @@ function SimulationCard({
                 style={[
                   styles.wifiRow,
                   !isLast && styles.wifiRowDivider,
-                  isSelected && { backgroundColor: 'rgba(91,92,246,0.18)' },
+                  isSelected && { backgroundColor: 'rgba(91,92,246,0.08)' },
                 ]}
               >
                 {meta.badge ? (
@@ -386,7 +375,7 @@ function SimulationCard({
                           width: 3, height: h, borderRadius: 1,
                           backgroundColor: barIdx < meta.bars
                             ? isSelected ? '#5B5CF6' : '#007AFF'
-                            : 'rgba(255,255,255,0.2)',
+                            : 'rgba(0,0,0,0.15)',
                         }}
                       />
                     ))}
@@ -410,28 +399,40 @@ function SimulationCard({
   if (uiType === 'reward-popup') {
     return (
       <View style={[styles.rewardDim, { paddingTop: insets.top + 24 }]}>
-        <View style={styles.rewardCard}>
-          <Pressable
-            onPress={() => { if (!anySelected) onTap?.(1) }}
-            style={[styles.rewardCloseBtn, selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.2)' }]}
-          >
-            <Text style={styles.rewardCloseTxt}>✕</Text>
-          </Pressable>
-          <Text style={styles.rewardGift}>🎁</Text>
-          <Text style={styles.rewardTitle}>You've been selected!</Text>
-          <Text style={styles.rewardBody}>{content}</Text>
-          <Pressable
-            onPress={() => { if (!anySelected) onTap?.(0) }}
-            style={[styles.rewardClaimBtn, selectedIndex === 0 && { backgroundColor: '#7C3AED' }]}
-          >
-            <Text style={styles.rewardClaimTxt}>Claim my reward</Text>
-          </Pressable>
-          <Pressable onPress={() => { if (!anySelected) onTap?.(2) }} style={{ marginTop: 12 }}>
-            <Text style={[styles.rewardTermsTxt, selectedIndex === 2 && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
-              Terms & Conditions
-            </Text>
-          </Pressable>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={styles.rewardCard}>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(1) }}
+              style={[styles.rewardCloseBtn, selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.2)' }]}
+            >
+              <Text style={styles.rewardCloseTxt}>✕</Text>
+            </Pressable>
+            <Text style={styles.rewardGift}>🎁</Text>
+            <Text style={styles.rewardTitle}>You've been selected!</Text>
+            <Text style={styles.rewardBody}>{content}</Text>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(0) }}
+              style={[styles.rewardClaimBtn, selectedIndex === 0 && { backgroundColor: '#7C3AED' }]}
+            >
+              <Text style={styles.rewardClaimTxt}>Claim my reward</Text>
+            </Pressable>
+            <Pressable onPress={() => { if (!anySelected) onTap?.(2) }} style={{ marginTop: 12 }}>
+              <Text style={[styles.rewardTermsTxt, selectedIndex === 2 && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
+                Terms & Conditions
+              </Text>
+            </Pressable>
+          </View>
         </View>
+        <Pressable
+          onPress={() => { if (!anySelected) onTap?.(3) }}
+          style={[
+            styles.rewardReportBtn,
+            selectedIndex === 3 && { backgroundColor: 'rgba(255,255,255,0.2)' },
+            anySelected && selectedIndex !== 3 && { opacity: 0.45 },
+          ]}
+        >
+          <Text style={styles.rewardReportTxt}>Report This</Text>
+        </Pressable>
       </View>
     )
   }
@@ -608,7 +609,7 @@ function SimulationCard({
               selectedIndex === 1 && { backgroundColor: 'rgba(0,149,255,0.18)' },
             ]}
           >
-            <Text style={[styles.notifActionTxt, { color: '#007AFF' }]}>Ignore</Text>
+            <Text style={[styles.notifActionTxt, { color: '#FFFFFF' }]}>Ignore</Text>
           </Pressable>
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(2) }}
@@ -625,7 +626,7 @@ function SimulationCard({
   if (uiType === 'message') {
     return (
       <View style={styles.iMessageContainer}>
-        <View style={[styles.iMessageHeader, { paddingTop: insets.top + 12, paddingBottom: 12 }]}>
+        <View style={[styles.iMessageHeader, { paddingTop: 8, paddingBottom: 12 }]}>
           <Text style={styles.iMsgBackChevron}>‹ Messages</Text>
           <View style={[styles.iMessageAvatar, { backgroundColor: '#34C759' }]}>
             <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
@@ -635,7 +636,7 @@ function SimulationCard({
             <Text style={styles.iMessageMeta}>iMessage</Text>
           </View>
         </View>
-        <View style={styles.iMessageChatArea}>
+        <View style={[styles.iMessageChatArea, { justifyContent: 'flex-start' }]}>
           <View style={styles.iMessageBubbleRow}>
             <View style={[styles.iMessageAvatarSmall, { backgroundColor: '#34C759' }]}>
               <Text style={styles.iMessageAvatarSmallText}>{initials || '?'}</Text>
@@ -667,10 +668,9 @@ function SimulationCard({
 
   // ── Email viewer (Q4) ─────────────────────────────────────────────────────
   if (uiType === 'email') {
-    const btnColors = ['#FF3B30', '#FF9500', '#34C759', '#007AFF']
     return (
       <View style={styles.emailViewer}>
-        <View style={[styles.emailViewerHeader, { paddingTop: insets.top + 14, paddingBottom: 10 }]}>
+        <View style={[styles.emailViewerHeader, { paddingTop: 10, paddingBottom: 10 }]}>
           <View style={[styles.emailAvatar, { backgroundColor: '#FF3B30' }]}>
             <Text style={styles.emailAvatarText}>{initials || '?'}</Text>
           </View>
@@ -680,31 +680,57 @@ function SimulationCard({
           </View>
           <Text style={styles.emailViewerTime}>now</Text>
         </View>
-        <Text style={styles.emailViewerBody} numberOfLines={3}>{content}</Text>
-        <Text style={styles.emailViewerLink}>Verify my account →</Text>
-        <View style={styles.emailActionGrid}>
-          {[0, 1].map((row) => (
-            <View key={row} style={{ flexDirection: 'row', gap: 8 }}>
-              {[0, 1].map((col) => {
-                const i = row * 2 + col
-                const opt = (options ?? [])[i]
-                if (!opt) return null
-                const color = btnColors[i] ?? '#007AFF'
-                const active = selectedIndex === i
-                return (
-                  <Pressable
-                    key={i}
-                    onPress={() => { if (!anySelected) onTap?.(i) }}
-                    style={[styles.emailActionBtn, { flex: 1, borderColor: color, backgroundColor: active ? color : color + '18' }]}
-                  >
-                    <Text style={[styles.emailActionTxt, { color: active ? '#FFFFFF' : color }]}>
-                      {opt.label}
-                    </Text>
-                  </Pressable>
-                )
-              })}
-            </View>
-          ))}
+        <View style={{ flex: 1, paddingHorizontal: 14, paddingTop: 12 }}>
+          <Text style={styles.emailViewerBody}>{content}</Text>
+          <Text style={styles.emailViewerLink}>Verify my account →</Text>
+        </View>
+        <View style={{ paddingHorizontal: 14, paddingBottom: 16, gap: 10 }}>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(0) }}
+            style={[
+              styles.emailContinueBtn,
+              selectedIndex === 0 && { backgroundColor: '#CC1500' },
+              anySelected && selectedIndex !== 0 && { opacity: 0.45 },
+            ]}
+          >
+            <Text style={styles.emailContinueTxt}>Continue →</Text>
+          </Pressable>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(1) }}
+              style={[
+                styles.emailSecondaryBtn,
+                { flex: 1, borderColor: '#FF9500' },
+                selectedIndex === 1 && { backgroundColor: '#FF9500' },
+                anySelected && selectedIndex !== 1 && { opacity: 0.45 },
+              ]}
+            >
+              <Text style={[styles.emailSecondaryTxt, { color: selectedIndex === 1 ? '#FFFFFF' : '#FF9500' }]}>
+                Mark as Spam
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(2) }}
+              style={[
+                styles.emailSecondaryBtn,
+                { flex: 1, borderColor: '#34C759' },
+                selectedIndex === 2 && { backgroundColor: '#34C759' },
+                anySelected && selectedIndex !== 2 && { opacity: 0.45 },
+              ]}
+            >
+              <Text style={[styles.emailSecondaryTxt, { color: selectedIndex === 2 ? '#FFFFFF' : '#34C759' }]}>
+                Report Phishing
+              </Text>
+            </Pressable>
+          </View>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(3) }}
+            style={[{ alignItems: 'center', paddingVertical: 4 }, anySelected && selectedIndex !== 3 && { opacity: 0.45 }]}
+          >
+            <Text style={[styles.emailTertiaryTxt, selectedIndex === 3 && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
+              Check Sender
+            </Text>
+          </Pressable>
         </View>
       </View>
     )

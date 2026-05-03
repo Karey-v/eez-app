@@ -135,6 +135,7 @@ export const questions: Question[] = [
       { label: 'Claim my reward', score: -3, feedback: 'artificial urgency is a classic scam tactic. there is no prize.' },
       { label: 'Close it', score: 3, feedback: 'correct. dismiss and move on.' },
       { label: 'Terms & Conditions', score: -1, feedback: 'curious but risky — the link itself could be malicious.' },
+      { label: 'Report This', score: 2, feedback: 'good instinct — reporting scam popups helps protect others.' },
     ],
   },
   {
@@ -151,7 +152,7 @@ export const questions: Question[] = [
     options: [
       { label: 'Call the number', score: -3, feedback: 'never call numbers from messages. find the official number on your card.' },
       { label: 'Report as spam', score: 3, feedback: 'perfect. report and block — this is a smishing attempt.' },
-      { label: 'Go back', score: 2, feedback: 'good. ignoring suspicious messages is the right move.' },
+      { label: 'Delete', score: 1, feedback: 'deletes the message but reporting it helps protect others too.' },
     ],
   },
   {
@@ -182,8 +183,8 @@ export const questions: Question[] = [
       preview: '⚠️ Not Secure',
     },
     options: [
-      { label: 'Enter my login details', score: -3, feedback: "the URL is fake — 'bankk' is not your bank. entering credentials hands them to scammers." },
-      { label: 'Tap the ⚠️ warning', score: 1, feedback: 'exactly right. always check the URL and security indicator before typing anything.' },
+      { label: 'Open Website', score: -3, feedback: "the URL is fake — 'bankk' is not your bank. entering credentials hands them to scammers." },
+      { label: 'Report', score: 3, feedback: 'exactly right. report the phishing site so your browser can warn others.' },
     ],
   },
 ]
