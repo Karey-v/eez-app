@@ -29,20 +29,18 @@ function computeResults(answers: { questionId: number; score: number; category: 
   const scaledScore = scaleScore(rawScore)
   const band = getBand(scaledScore)
 
-  const catMap: Record<string, number> = {
-    Impulse: 0, Habits: 0, 'Social Pressure': 0, Verification: 0, 'Response Style': 0,
-  }
-  answers.forEach((a) => { catMap[a.category] = (catMap[a.category] ?? 0) + a.score })
+  const byId: Record<number, number> = {}
+  answers.forEach((a) => { byId[a.questionId] = a.score })
 
   return {
     scaledScore,
     band,
     categoryScores: {
-      impulse: catMap['Impulse'],
-      habits: catMap['Habits'],
-      socialPressure: catMap['Social Pressure'],
-      verification: catMap['Verification'],
-      responseStyle: catMap['Response Style'],
+      passwords: byId[2] ?? 0,
+      device:    byId[5] ?? 0,
+      messages:  (byId[3] ?? 0) + (byId[8] ?? 0) + (byId[9] ?? 0),
+      phishing:  (byId[4] ?? 0) + (byId[10] ?? 0),
+      scams:     (byId[1] ?? 0) + (byId[6] ?? 0) + (byId[7] ?? 0),
     },
   }
 }

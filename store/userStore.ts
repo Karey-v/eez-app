@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 
 type CategoryScores = {
-  impulse: number
-  habits: number
-  socialPressure: number
-  verification: number
-  responseStyle: number
+  passwords: number
+  device: number
+  messages: number
+  phishing: number
+  scams: number
 }
 
 type UserState = {
@@ -38,11 +38,11 @@ const initialState: UserState = {
   band: null,
   bandColor: null,
   categoryScores: {
-    impulse: 0,
-    habits: 0,
-    socialPressure: 0,
-    verification: 0,
-    responseStyle: 0,
+    passwords: 0,
+    device: 0,
+    messages: 0,
+    phishing: 0,
+    scams: 0,
   },
   xp: 0,
   streak: 0,

@@ -15,64 +15,71 @@ import { BottomNav } from '@/components/ui/BottomNav'
 
 // ─── Category config ──────────────────────────────────────────────────────────
 
-type CategoryKey = 'impulse' | 'habits' | 'socialPressure' | 'verification' | 'responseStyle'
+type CategoryKey = 'passwords' | 'device' | 'messages' | 'phishing' | 'scams'
 
 type CategoryInfo = {
   key: CategoryKey
   label: string
+  min: number
+  max: number
   insight: (score: number) => string
 }
 
 const CATEGORIES: CategoryInfo[] = [
   {
-    key: 'impulse',
-    label: 'Impulse',
+    key: 'passwords',
+    label: 'Passwords',
+    min: -3, max: 3,
     insight: (s) =>
-      s <= 2
-        ? 'strong. you pause before acting — that\'s your biggest defence.'
-        : s <= 4
-        ? 'you sometimes act on instinct. slow down on anything unexpected.'
-        : 'urgency triggers your actions. scammers exploit exactly this.',
+      s >= 2
+        ? 'strong password habits. unique credentials are your best defence.'
+        : s >= 0
+        ? 'some reuse creeping in. a password manager is a quick win.'
+        : 'shared passwords are a major risk. start with a password manager today.',
   },
   {
-    key: 'habits',
-    label: 'Habits',
+    key: 'device',
+    label: 'Device',
+    min: -3, max: 3,
     insight: (s) =>
-      s <= 2
-        ? 'solid habits — unique passwords and careful Wi-Fi choices.'
-        : s <= 4
-        ? 'some risky habits creeping in. password hygiene is a quick win.'
-        : 'your daily habits create unnecessary exposure. start with a password manager.',
+      s >= 2
+        ? 'you keep your device updated. that closes a lot of doors.'
+        : s >= 0
+        ? 'sometimes delaying updates. they patch real vulnerabilities.'
+        : 'skipping updates leaves you exposed. enable auto-updates now.',
   },
   {
-    key: 'socialPressure',
-    label: 'Social Pressure',
+    key: 'messages',
+    label: 'Messages',
+    min: -9, max: 9,
     insight: (s) =>
-      s <= 2
-        ? 'you verify before trusting — even people you know. smart.'
-        : s <= 4
-        ? 'social pressure occasionally clouds your judgement. add a verification step.'
-        : 'trust in people you know is your weak spot — accounts get hacked too.',
+      s >= 6
+        ? 'you handle suspicious messages well. verify before you trust.'
+        : s >= 0
+        ? 'mixed responses to suspicious messages. pause before clicking or sharing.'
+        : 'messages are your weak spot. always verify the sender before acting.',
   },
   {
-    key: 'verification',
-    label: 'Verification',
+    key: 'phishing',
+    label: 'Phishing',
+    min: -6, max: 6,
     insight: (s) =>
-      s <= 2
-        ? 'you check sources carefully. that domain awareness is valuable.'
-        : s <= 4
-        ? 'you spot obvious fakes but miss subtle ones. train your eye for domain names.'
-        : 'you take things at face value. a 5-second domain check changes everything.',
+      s >= 4
+        ? 'sharp eye for phishing. you check sources before acting.'
+        : s >= 0
+        ? 'you spot obvious fakes but miss subtle ones. train your eye on domain names.'
+        : 'phishing is working on you. a 5-second domain check changes everything.',
   },
   {
-    key: 'responseStyle',
-    label: 'Response Style',
+    key: 'scams',
+    label: 'Scams',
+    min: -7, max: 9,
     insight: (s) =>
-      s <= 2
-        ? 'calm, deliberate responses. you don\'t panic or comply.'
-        : s <= 4
-        ? 'mixed responses under pressure. practice the pause-and-verify habit.'
-        : 'under pressure you react fast — exactly what scammers count on.',
+      s >= 6
+        ? 'strong scam resistance. urgency and fake rewards don\'t fool you.'
+        : s >= 0
+        ? 'some scam tactics catch you off guard. slow down on anything unexpected.'
+        : 'urgency and fake rewards trigger your actions. scammers exploit exactly this.',
   },
 ]
 
@@ -86,7 +93,7 @@ export default function BreakdownScreen() {
 
   const safeColor = bandColor ?? '#5B5CF6'
   const cats = categoryScores ?? {
-    impulse: 0, habits: 0, socialPressure: 0, verification: 0, responseStyle: 0,
+    passwords: 0, device: 0, messages: 0, phishing: 0, scams: 0,
   }
 
   return (
@@ -110,7 +117,7 @@ export default function BreakdownScreen() {
 
         {/* Title */}
         <Text style={[type.label, { color: colors.textTertiary, marginBottom: 6, marginTop: 16 }]}>
-          {band?.toLowerCase()} · {score}/48
+          {band?.toLowerCase()} · {score}/100
         </Text>
         <Text style={[type.heroTitle, { color: colors.textPrimary, marginBottom: 6 }]}>
           score breakdown.
@@ -122,8 +129,15 @@ export default function BreakdownScreen() {
         {/* Category cards */}
         {CATEGORIES.map((cat, index) => {
           const rawScore = cats[cat.key] ?? 0
-          const progress = rawScore / 6 // max 6 per category
+          const progress = Math.max(0, Math.min(1, (rawScore - cat.min) / (cat.max - cat.min)))
           const insight = cat.insight(rawScore)
+          const scoreColor =
+            rawScore >= 0
+              ? rawScore >= cat.max * 0.5
+                ? colors.successText
+                : colors.warningText
+              : colors.dangerText
+          const scoreSign = rawScore > 0 ? '+' : ''
 
           return (
             <Animated.View
@@ -140,20 +154,8 @@ export default function BreakdownScreen() {
                 {/* Header row */}
                 <View style={styles.catHeader}>
                   <Text style={[type.cardTitle, { color: colors.textPrimary }]}>{cat.label}</Text>
-                  <Text
-                    style={[
-                      type.label,
-                      {
-                        color:
-                          rawScore <= 2
-                            ? colors.successText
-                            : rawScore <= 4
-                            ? colors.warningText
-                            : colors.dangerText,
-                      },
-                    ]}
-                  >
-                    {rawScore}/6
+                  <Text style={[type.label, { color: scoreColor }]}>
+                    {scoreSign}{rawScore}
                   </Text>
                 </View>
 
@@ -161,9 +163,7 @@ export default function BreakdownScreen() {
                 <ProgressBar
                   progress={progress}
                   height={6}
-                  fillColor={
-                    rawScore <= 2 ? colors.successText : rawScore <= 4 ? colors.warningText : colors.dangerText
-                  }
+                  fillColor={scoreColor}
                   trackColor="rgba(255,255,255,0.1)"
                   delay={index * 100}
                   style={{ marginBottom: 10, marginTop: 10 }}
