@@ -193,19 +193,24 @@ function QuestionBody({
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.body,
-          {
-            paddingHorizontal: spacing.screenH,
-            paddingBottom: 24,
-            paddingTop: 32,
-          },
+          isInternalSim
+            ? { paddingTop: 12, paddingBottom: 24 }
+            : { paddingHorizontal: spacing.screenH, paddingTop: 32, paddingBottom: 24 },
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         {/* Simulation card */}
         {question.type === 'simulation-tap' && question.simulation && (
-          <View style={{ marginBottom: 28 }}>
-            <Text style={[styles.questionText, { marginBottom: 24 }]}>
+          <>
+            <Text
+              style={[
+                isInternalSim ? styles.simPrompt : styles.questionText,
+                isInternalSim
+                  ? { marginBottom: 16, paddingHorizontal: spacing.screenH }
+                  : { marginBottom: 24 },
+              ]}
+            >
               {cap(question.prompt ?? '')}
             </Text>
             <SimulationCard
@@ -216,7 +221,7 @@ function QuestionBody({
               anySelected={isInternalSim ? selectedIndex !== null : undefined}
               options={isInternalSim ? question.options : undefined}
             />
-          </View>
+          </>
         )}
 
         {/* Scenario — text directly on white */}
@@ -1012,6 +1017,12 @@ const styles = StyleSheet.create({
     color: '#5B5CF6',
     textAlign: 'left',
   },
+  simPrompt: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 21,
+  },
   options: {
     gap: 12,
   },
@@ -1057,7 +1068,6 @@ const styles = StyleSheet.create({
   // ── WiFi settings ──
   wifiContainer: {
     backgroundColor: '#F2F2F7',
-    borderRadius: 18,
     overflow: 'hidden',
   },
   wifiStatusBar: {
@@ -1163,7 +1173,6 @@ const styles = StyleSheet.create({
   // ── Reward popup ──
   rewardDim: {
     backgroundColor: 'rgba(0,0,0,0.88)',
-    borderRadius: 20,
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 24,
@@ -1270,7 +1279,6 @@ const styles = StyleSheet.create({
   // ── Instagram DM ──
   igContainer: {
     backgroundColor: '#1C1C1E',
-    borderRadius: 18,
     overflow: 'hidden',
   },
   igHeader: {
@@ -1370,10 +1378,7 @@ const styles = StyleSheet.create({
   // ── Browser ──
   browserContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.1)',
   },
   browserURLBar: {
     flexDirection: 'row',
@@ -1450,7 +1455,6 @@ const styles = StyleSheet.create({
   // ── iOS lockscreen notification ──
   iosLockscreen: {
     backgroundColor: '#1C1C1E',
-    borderRadius: 20,
     paddingHorizontal: 18,
     paddingTop: 22,
     paddingBottom: 20,
@@ -1548,7 +1552,6 @@ const styles = StyleSheet.create({
   // ── iMessage ──
   iMessageContainer: {
     backgroundColor: '#F2F2F7',
-    borderRadius: 18,
     overflow: 'hidden',
   },
   iMessageHeader: {
@@ -1826,10 +1829,7 @@ const styles = StyleSheet.create({
   // ── Email viewer ──
   emailViewer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.08)',
   },
   emailViewerHeader: {
     flexDirection: 'row',
@@ -1895,7 +1895,6 @@ const styles = StyleSheet.create({
   // ── iOS update screen ──
   iosUpdateContainer: {
     backgroundColor: '#F2F2F7',
-    borderRadius: 18,
     overflow: 'hidden',
   },
   iosUpdateNavBar: {

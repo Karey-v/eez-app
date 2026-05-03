@@ -1,4 +1,5 @@
 // S12 — Test Intro
+import { useState } from 'react'
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
@@ -12,6 +13,8 @@ export default function TestIntroScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const resetTest = useTestStore((s) => s.resetTest)
+  const [showExplainer, setShowExplainer] = useState(false)
+
   function handleStart() {
     resetTest()
     router.push('/leakability/question')
@@ -31,11 +34,11 @@ export default function TestIntroScreen() {
         <Text style={styles.detectiveEmoji}>🕵️</Text>
 
         {/* Title */}
-        <Text style={styles.title}>The leakability test.</Text>
+        <Text style={styles.title}>The Leakability Score</Text>
 
         {/* Description */}
         <Text style={styles.description}>
-          10 real scenarios. Use it as though it's your own phone screen. Tap what you'd actually do. No right answers. No judgment. Just vibes.
+          10 real scenarios. Use it as though it is your own phone screen — tap what you'd actually do. No right answers. No judgment.
         </Text>
 
         {/* Info chips */}
@@ -47,7 +50,7 @@ export default function TestIntroScreen() {
           ))}
         </View>
 
-        {/* Melting emoji — centered with space */}
+        {/* Melting emoji */}
         <View style={styles.emojiWrap}>
           <Text style={styles.meltEmoji}>🫠</Text>
         </View>
@@ -57,9 +60,22 @@ export default function TestIntroScreen() {
           onPress={handleStart}
           style={({ pressed }) => [styles.primaryBtn, { opacity: pressed ? 0.88 : 1 }]}
         >
-          <Text style={styles.primaryBtnText}>start the test 🚀</Text>
+          <Text style={styles.primaryBtnText}>start the test</Text>
         </Pressable>
 
+        {/* Secondary: What is leakability? */}
+        <Pressable
+          onPress={() => setShowExplainer((v) => !v)}
+          style={({ pressed }) => [styles.secondaryBtn, { opacity: pressed ? 0.6 : 1 }]}
+        >
+          <Text style={styles.secondaryBtnText}>What is leakability?</Text>
+        </Pressable>
+
+        {showExplainer && (
+          <Text style={styles.explainerText}>
+            The leakability score reflects the probability of a user falling for financial fraud based on their habits and behavioral patterns.
+          </Text>
+        )}
       </ScrollView>
       <BottomNav activeTab="home" />
     </View>
@@ -74,13 +90,15 @@ const styles = StyleSheet.create({
   detectiveEmoji: {
     fontSize: 48,
     marginBottom: 20,
+    textAlign: 'center',
   },
   title: {
     fontFamily: 'DMSerifDisplay_400Regular',
-    fontSize: 32,
+    fontSize: 34,
     color: '#FFFFFF',
-    lineHeight: 40,
+    lineHeight: 42,
     marginBottom: 14,
+    textAlign: 'center',
   },
   description: {
     fontFamily: 'Inter_400Regular',
@@ -88,11 +106,13 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     lineHeight: 22,
     marginBottom: 20,
+    textAlign: 'center',
   },
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    justifyContent: 'center',
   },
   chip: {
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -126,5 +146,24 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
     fontSize: 15,
     color: '#5B5CF6',
+  },
+  secondaryBtn: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  secondaryBtnText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.6)',
+    textDecorationLine: 'underline',
+  },
+  explainerText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.75)',
+    lineHeight: 20,
+    textAlign: 'center',
+    marginTop: 12,
+    paddingHorizontal: 8,
   },
 })
