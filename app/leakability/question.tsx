@@ -1,5 +1,4 @@
 // S13–S22 — Leakability Test Questions (dynamic, type-driven)
-// Handles: simulation-tap, slider, multiple-choice, scenario
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import {
   View,
@@ -22,16 +21,40 @@ function cap(s: string) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
 }
 
+// ─── Sim helpers ──────────────────────────────────────────────────────────────
+
+const INTERNAL_SIM_TYPES = [
+  'notification', 'message', 'email', 'ios-update',
+  'wifi-settings', 'reward-popup', 'message-actions', 'instagram-dm', 'browser',
+]
+
+function getSimBgColor(uiType: string): string {
+  switch (uiType) {
+    case 'notification':    return '#1C1C1E'
+    case 'instagram-dm':   return '#1C1C1E'
+    case 'reward-popup':   return '#808080'
+    case 'wifi-settings':  return '#000000'
+    case 'message':
+    case 'message-actions': return '#F2F2F7'
+    case 'ios-update':     return '#F2F2F7'
+    case 'email':          return '#FFFFFF'
+    case 'browser':        return '#FFFFFF'
+    default:               return '#FFFFFF'
+  }
+}
+
+function isSimDark(uiType: string): boolean {
+  return ['notification', 'instagram-dm', 'reward-popup', 'wifi-settings'].includes(uiType)
+}
+
 // ─── Score calculation ────────────────────────────────────────────────────────
 
 function computeResults(answers: { questionId: number; score: number; category: string }[]) {
   const rawScore = answers.reduce((sum, a) => sum + a.score, 0)
   const scaledScore = scaleScore(rawScore)
   const band = getBand(scaledScore)
-
   const byId: Record<number, number> = {}
   answers.forEach((a) => { byId[a.questionId] = a.score })
-
   return {
     scaledScore,
     band,
@@ -53,10 +76,7 @@ function ProgressLines({ total, current }: { total: number; current: number }) {
       {Array.from({ length: total }).map((_, i) => (
         <View
           key={i}
-          style={[
-            styles.progressLine,
-            { backgroundColor: i <= current ? '#5B5CF6' : '#EEF0FF' },
-          ]}
+          style={[styles.progressLine, { backgroundColor: i <= current ? '#5B5CF6' : '#EEF0FF' }]}
         />
       ))}
     </View>
@@ -73,6 +93,14 @@ export default function QuestionScreen() {
   const setScore = useUserStore((s) => s.setScore)
 
   const question = questions[currentQuestionIndex]
+  const uiType = question.simulation?.uiType ?? ''
+  const isInternalSim =
+    question.type === 'simulation-tap' &&
+    !!question.simulation &&
+    INTERNAL_SIM_TYPES.includes(uiType)
+
+  const screenBg = isInternalSim ? getSimBgColor(uiType) : '#FFFFFF'
+  const dark = isInternalSim && isSimDark(uiType)
 
   const storedAnswer = answers.find((a) => a.questionId === question.id)
   const initialSelectedIndex: number | null = (() => {
@@ -113,18 +141,19 @@ export default function QuestionScreen() {
   }, [currentQuestionIndex, question.id, router])
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: screenBg }}>
+      <StatusBar style={dark ? 'light' : 'dark'} />
 
-      {/* Fixed header */}
-      <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
-        <ProgressLines total={questions.length} current={currentQuestionIndex} />
-        <View style={[styles.categoryPill, { marginTop: 28 }]}>
-          <Text style={styles.categoryPillText}>{question.category}</Text>
+      {/* Fixed header — only for non-simulation questions */}
+      {!isInternalSim && (
+        <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
+          <ProgressLines total={questions.length} current={currentQuestionIndex} />
+          <View style={[styles.categoryPill, { marginTop: 28 }]}>
+            <Text style={styles.categoryPillText}>{question.category}</Text>
+          </View>
         </View>
-      </View>
+      )}
 
-      {/* Question body — keyed so state fully resets each question */}
       <QuestionBody
         key={currentQuestionIndex}
         question={question}
@@ -132,15 +161,16 @@ export default function QuestionScreen() {
         onAdvance={handleAdvance}
         onBack={handleBack}
         initialSelectedIndex={initialSelectedIndex}
+        isInternalSim={isInternalSim}
+        uiType={uiType}
       />
-      <BottomNav activeTab="home" />
+
+      {!isInternalSim && <BottomNav activeTab="home" />}
     </View>
   )
 }
 
 // ─── QuestionBody ─────────────────────────────────────────────────────────────
-
-const INTERNAL_SIM_TYPES = ['notification', 'message', 'email', 'ios-update', 'wifi-settings', 'reward-popup', 'message-actions', 'instagram-dm', 'browser']
 
 function QuestionBody({
   question,
@@ -148,12 +178,16 @@ function QuestionBody({
   onAdvance,
   onBack,
   initialSelectedIndex,
+  isInternalSim,
+  uiType,
 }: {
   question: Question
   onAnswer: (optionIndex: number) => void
   onAdvance: () => void
   onBack: () => void
   initialSelectedIndex: number | null
+  isInternalSim: boolean
+  uiType: string
 }) {
   const { colors, type, spacing } = useTheme()
   const insets = useSafeAreaInsets()
@@ -161,11 +195,6 @@ function QuestionBody({
   const [displayIndex, setDisplayIndex] = useState<number | null>(initialSelectedIndex)
   const [sliderIndex, setSliderIndex] = useState<number | null>(initialSelectedIndex)
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const isInternalSim =
-    question.type === 'simulation-tap' &&
-    !!question.simulation &&
-    INTERNAL_SIM_TYPES.includes(question.simulation.uiType)
 
   useEffect(() => {
     return () => { if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current) }
@@ -187,60 +216,41 @@ function QuestionBody({
     advanceTimerRef.current = setTimeout(onAdvance, 800)
   }
 
+  // ── Full-screen simulation layout ──
+  if (isInternalSim) {
+    const backColor = isSimDark(uiType) ? 'rgba(255,255,255,0.55)' : '#9CA3AF'
+    return (
+      <View style={{ flex: 1 }}>
+        <SimulationCard
+          simulation={question.simulation!}
+          onTap={handleOptionSelect}
+          selectedIndex={displayIndex}
+          anySelected={selectedIndex !== null}
+          options={question.options}
+        />
+        <Pressable
+          onPress={onBack}
+          hitSlop={16}
+          style={[styles.floatingBack, { top: insets.top + 10 }]}
+        >
+          <Text style={[styles.floatingBackText, { color: backColor }]}>← back</Text>
+        </Pressable>
+      </View>
+    )
+  }
+
+  // ── Standard layout (slider, scenario, MCQ) ──
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.body,
-          isInternalSim
-            ? { paddingTop: 12, paddingBottom: 24 }
-            : { paddingHorizontal: spacing.screenH, paddingTop: 32, paddingBottom: 24 },
+          { paddingHorizontal: spacing.screenH, paddingTop: 32, paddingBottom: 24 },
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Simulation card */}
-        {question.type === 'simulation-tap' && question.simulation && (
-          <>
-            <Text
-              style={[
-                isInternalSim ? styles.simPrompt : styles.questionText,
-                isInternalSim
-                  ? { marginBottom: 16, paddingHorizontal: spacing.screenH }
-                  : { marginBottom: 24 },
-              ]}
-            >
-              {cap(question.prompt ?? '')}
-            </Text>
-            <SimulationCard
-              simulation={question.simulation}
-              asModal={question.id === 7}
-              onTap={isInternalSim ? handleOptionSelect : undefined}
-              selectedIndex={isInternalSim ? displayIndex : undefined}
-              anySelected={isInternalSim ? selectedIndex !== null : undefined}
-              options={isInternalSim ? question.options : undefined}
-            />
-          </>
-        )}
-
-        {/* Scenario — text directly on white */}
-        {question.type === 'scenario' && (
-          <View style={{ marginBottom: 24 }}>
-            <Text style={styles.questionText}>
-              {cap(question.prompt ?? '')}
-            </Text>
-          </View>
-        )}
-
-        {/* Multiple-choice prompt */}
-        {question.type === 'multiple-choice' && (
-          <Text style={[styles.questionText, { marginBottom: 40 }]}>
-            {cap(question.prompt ?? '')}
-          </Text>
-        )}
-
-        {/* Slider */}
         {question.type === 'slider' && (
           <>
             <Text style={[styles.questionText, { marginBottom: 32 }]}>
@@ -255,8 +265,19 @@ function QuestionBody({
           </>
         )}
 
-        {/* Options — suppressed for simulation types that handle their own taps */}
-        {question.type !== 'slider' && question.options && !isInternalSim && (
+        {question.type === 'scenario' && (
+          <View style={{ marginBottom: 24 }}>
+            <Text style={styles.questionText}>{cap(question.prompt ?? '')}</Text>
+          </View>
+        )}
+
+        {question.type === 'multiple-choice' && (
+          <Text style={[styles.questionText, { marginBottom: 40 }]}>
+            {cap(question.prompt ?? '')}
+          </Text>
+        )}
+
+        {question.type !== 'slider' && question.options && (
           <View style={styles.options}>
             {question.type === 'scenario' && (
               <Text style={[type.label, { color: colors.textTertiary, marginBottom: 12 }]}>
@@ -276,7 +297,6 @@ function QuestionBody({
         )}
       </ScrollView>
 
-      {/* Back nav */}
       <View style={[styles.navBar, { paddingBottom: insets.bottom + 8 }]}>
         <Pressable
           onPress={onBack}
@@ -294,20 +314,19 @@ function QuestionBody({
 
 function SimulationCard({
   simulation,
-  asModal = false,
   onTap,
   selectedIndex,
   anySelected,
   options,
 }: {
   simulation: NonNullable<Question['simulation']>
-  asModal?: boolean
   onTap?: (index: number) => void
   selectedIndex?: number | null
   anySelected?: boolean
   options?: NonNullable<Question['options']>
 }) {
   const { colors, type } = useTheme()
+  const insets = useSafeAreaInsets()
   const [expanded, setExpanded] = useState(false)
   const [chipsOpen, setChipsOpen] = useState(false)
   const { uiType, sender, content, preview } = simulation
@@ -321,7 +340,7 @@ function SimulationCard({
     .slice(0, 2)
     .toUpperCase()
 
-  // ── Wi-Fi settings ───────────────────────────────────────────────────────────
+  // ── Wi-Fi settings (dark mode) ────────────────────────────────────────────
   if (uiType === 'wifi-settings') {
     const rowMeta = [
       { bars: 3, open: true },
@@ -332,7 +351,7 @@ function SimulationCard({
 
     return (
       <View style={styles.wifiContainer}>
-        <View style={styles.wifiStatusBar}>
+        <View style={[styles.wifiStatusBar, { paddingTop: insets.top + 10 }]}>
           <Text style={styles.wifiStatusTime}>9:41</Text>
           <Text style={styles.wifiStatusRight}>●●●</Text>
         </View>
@@ -353,10 +372,9 @@ function SimulationCard({
                 style={[
                   styles.wifiRow,
                   !isLast && styles.wifiRowDivider,
-                  isSelected && { backgroundColor: 'rgba(91,92,246,0.06)' },
+                  isSelected && { backgroundColor: 'rgba(91,92,246,0.18)' },
                 ]}
               >
-                {/* Signal indicator */}
                 {meta.badge ? (
                   <View style={styles.wifiBadge}>
                     <Text style={styles.wifiBadgeText}>{meta.badge}</Text>
@@ -367,24 +385,16 @@ function SimulationCard({
                       <View
                         key={barIdx}
                         style={{
-                          width: 3,
-                          height: h,
-                          borderRadius: 1,
-                          backgroundColor:
-                            barIdx < meta.bars
-                              ? isSelected ? '#5B5CF6' : '#007AFF'
-                              : 'rgba(0,0,0,0.18)',
+                          width: 3, height: h, borderRadius: 1,
+                          backgroundColor: barIdx < meta.bars
+                            ? isSelected ? '#5B5CF6' : '#007AFF'
+                            : 'rgba(255,255,255,0.2)',
                         }}
                       />
                     ))}
                   </View>
                 )}
-                <Text
-                  style={[
-                    styles.wifiRowLabel,
-                    isSelected && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' },
-                  ]}
-                >
+                <Text style={[styles.wifiRowLabel, isSelected && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
                   {opt.label}
                 </Text>
                 {meta.open === true && <Text style={styles.wifiLockIcon}>🔓</Text>}
@@ -398,47 +408,28 @@ function SimulationCard({
     )
   }
 
-  // ── Reward popup ─────────────────────────────────────────────────────────────
+  // ── Reward popup ──────────────────────────────────────────────────────────
   if (uiType === 'reward-popup') {
     return (
-      <View style={styles.rewardDim}>
-        <Text style={styles.rewardTime}>9:41</Text>
-        <Text style={styles.rewardDate}>Wednesday, May 2</Text>
+      <View style={[styles.rewardDim, { paddingTop: insets.top + 24 }]}>
         <View style={styles.rewardCard}>
-          {/* Close button → option index 1 */}
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(1) }}
-            style={[
-              styles.rewardCloseBtn,
-              selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.2)' },
-            ]}
+            style={[styles.rewardCloseBtn, selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.2)' }]}
           >
             <Text style={styles.rewardCloseTxt}>✕</Text>
           </Pressable>
           <Text style={styles.rewardGift}>🎁</Text>
           <Text style={styles.rewardTitle}>You've been selected!</Text>
           <Text style={styles.rewardBody}>{content}</Text>
-          {/* Claim → option index 0 */}
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(0) }}
-            style={[
-              styles.rewardClaimBtn,
-              selectedIndex === 0 && { backgroundColor: '#7C3AED' },
-            ]}
+            style={[styles.rewardClaimBtn, selectedIndex === 0 && { backgroundColor: '#7C3AED' }]}
           >
             <Text style={styles.rewardClaimTxt}>Claim my reward</Text>
           </Pressable>
-          {/* Terms → option index 2 */}
-          <Pressable
-            onPress={() => { if (!anySelected) onTap?.(2) }}
-            style={{ marginTop: 12 }}
-          >
-            <Text
-              style={[
-                styles.rewardTermsTxt,
-                selectedIndex === 2 && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' },
-              ]}
-            >
+          <Pressable onPress={() => { if (!anySelected) onTap?.(2) }} style={{ marginTop: 12 }}>
+            <Text style={[styles.rewardTermsTxt, selectedIndex === 2 && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
               Terms & Conditions
             </Text>
           </Pressable>
@@ -447,11 +438,11 @@ function SimulationCard({
     )
   }
 
-  // ── iMessage + action buttons ─────────────────────────────────────────────────
+  // ── iMessage + action buttons (Q8) ────────────────────────────────────────
   if (uiType === 'message-actions') {
     return (
       <View style={styles.iMessageContainer}>
-        <View style={styles.iMessageHeader}>
+        <View style={[styles.iMessageHeader, { paddingTop: insets.top + 12, paddingBottom: 12 }]}>
           <View style={[styles.iMessageAvatar, { backgroundColor: '#8E8E93' }]}>
             <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
           </View>
@@ -471,7 +462,6 @@ function SimulationCard({
           </View>
           <Text style={styles.iMessageDelivered}>delivered</Text>
         </View>
-        {/* Action bar */}
         <View style={styles.msgActionBar}>
           {(options ?? []).map((opt, i) => (
             <Pressable
@@ -483,12 +473,7 @@ function SimulationCard({
                 selectedIndex === i && { backgroundColor: 'rgba(91,92,246,0.08)' },
               ]}
             >
-              <Text
-                style={[
-                  styles.msgActionTxt,
-                  i === 0 ? { color: '#FF3B30' } : { color: '#007AFF' },
-                ]}
-              >
+              <Text style={[styles.msgActionTxt, i === 0 ? { color: '#FF3B30' } : { color: '#007AFF' }]}>
                 {opt.label}
               </Text>
             </Pressable>
@@ -498,7 +483,7 @@ function SimulationCard({
     )
   }
 
-  // ── Instagram DM ─────────────────────────────────────────────────────────────
+  // ── Instagram DM (Q9) ─────────────────────────────────────────────────────
   if (uiType === 'instagram-dm') {
     const linkMatch = content.match(/bit\.ly\/\S+/)
     const linkText = linkMatch ? linkMatch[0] : ''
@@ -507,7 +492,7 @@ function SimulationCard({
 
     return (
       <View style={styles.igContainer}>
-        <View style={styles.igHeader}>
+        <View style={[styles.igHeader, { paddingTop: insets.top + 12, paddingBottom: 12 }]}>
           <View style={[styles.igAvatarMed, { backgroundColor: '#C837AB' }]}>
             <Text style={styles.igAvatarMedTxt}>{initials || '?'}</Text>
           </View>
@@ -520,23 +505,14 @@ function SimulationCard({
           <View style={[styles.igAvatarSm, { backgroundColor: '#C837AB' }]}>
             <Text style={styles.igAvatarSmTxt}>{initials || '?'}</Text>
           </View>
-          {/* Tap bubble = tap the link (option 0) */}
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(0) }}
-            style={[
-              styles.igBubble,
-              selectedIndex === 0 && { borderColor: '#5B5CF6', borderWidth: 1.5 },
-            ]}
+            style={[styles.igBubble, selectedIndex === 0 && { borderColor: '#5B5CF6', borderWidth: 1.5 }]}
           >
             <Text style={styles.igBubbleTxt}>
               {beforeLink}
               {linkText ? (
-                <Text
-                  style={[
-                    styles.igLinkTxt,
-                    selectedIndex === 0 && { color: '#B1FF58' },
-                  ]}
-                >
+                <Text style={[styles.igLinkTxt, selectedIndex === 0 && { color: '#B1FF58' }]}>
                   {linkText}
                 </Text>
               ) : null}
@@ -547,20 +523,13 @@ function SimulationCard({
         <View style={styles.igActionBar}>
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(1) }}
-            style={[
-              styles.igActionBtn,
-              styles.igActionBtnDivider,
-              selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.1)' },
-            ]}
+            style={[styles.igActionBtn, styles.igActionBtnDivider, selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.1)' }]}
           >
             <Text style={styles.igActionTxt}>Reply</Text>
           </Pressable>
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(2) }}
-            style={[
-              styles.igActionBtn,
-              selectedIndex === 2 && { backgroundColor: 'rgba(255,59,48,0.1)' },
-            ]}
+            style={[styles.igActionBtn, selectedIndex === 2 && { backgroundColor: 'rgba(255,59,48,0.1)' }]}
           >
             <Text style={[styles.igActionTxt, { color: '#FF3B30' }]}>Report & Delete</Text>
           </Pressable>
@@ -569,61 +538,36 @@ function SimulationCard({
     )
   }
 
-  // ── Browser (fake bank login) ─────────────────────────────────────────────────
+  // ── Browser (Q10) ─────────────────────────────────────────────────────────
   if (uiType === 'browser') {
     return (
       <View style={styles.browserContainer}>
-        {/* URL bar — tapping = option 1 (safe) */}
         <Pressable
           onPress={() => { if (!anySelected) onTap?.(1) }}
           style={[
             styles.browserURLBar,
-            selectedIndex === 1 && {
-              backgroundColor: 'rgba(91,92,246,0.08)',
-              borderColor: '#5B5CF6',
-              borderWidth: 1,
-            },
+            { marginTop: insets.top + 10 },
+            selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.08)', borderColor: '#5B5CF6', borderWidth: 1 },
           ]}
         >
           <Text style={styles.browserWarningIcon}>⚠️</Text>
           <Text style={styles.browserURLText} numberOfLines={1}>{sender}</Text>
           <Text style={styles.browserMenuDots}>···</Text>
         </Pressable>
-
-        {/* Page content — tapping = option 0 (risky) */}
         <Pressable
           onPress={() => { if (!anySelected) onTap?.(0) }}
-          style={[
-            styles.browserPage,
-            selectedIndex === 0 && { backgroundColor: 'rgba(91,92,246,0.03)' },
-          ]}
+          style={[styles.browserPage, selectedIndex === 0 && { backgroundColor: 'rgba(91,92,246,0.03)' }]}
         >
           <Text style={styles.browserPageTitle}>{content}</Text>
-          <View
-            style={[
-              styles.browserField,
-              selectedIndex === 0 && { borderColor: '#5B5CF6' },
-            ]}
-          >
+          <View style={[styles.browserField, selectedIndex === 0 && { borderColor: '#5B5CF6' }]}>
             <Text style={styles.browserFieldLabel}>Email</Text>
             <Text style={styles.browserFieldHint}>your@email.com</Text>
           </View>
-          <View
-            style={[
-              styles.browserField,
-              { marginTop: 10 },
-              selectedIndex === 0 && { borderColor: '#5B5CF6' },
-            ]}
-          >
+          <View style={[styles.browserField, { marginTop: 10 }, selectedIndex === 0 && { borderColor: '#5B5CF6' }]}>
             <Text style={styles.browserFieldLabel}>Password</Text>
             <Text style={styles.browserFieldHint}>••••••••</Text>
           </View>
-          <View
-            style={[
-              styles.browserSignInBtn,
-              selectedIndex === 0 && { backgroundColor: '#7C3AED' },
-            ]}
-          >
+          <View style={[styles.browserSignInBtn, selectedIndex === 0 && { backgroundColor: '#7C3AED' }]}>
             <Text style={styles.browserSignInTxt}>Sign In</Text>
           </View>
         </Pressable>
@@ -631,14 +575,12 @@ function SimulationCard({
     )
   }
 
-  // ── iOS-style lockscreen notification ────────────────────────────────────────
-  // ── iOS lockscreen notification (interactive) ────────────────────────────────
+  // ── iOS lockscreen notification (Q1) ──────────────────────────────────────
   if (uiType === 'notification') {
     return (
-      <View style={styles.iosLockscreen}>
+      <View style={[styles.iosLockscreen, { paddingTop: insets.top + 22 }]}>
         <Text style={styles.lockTime}>9:41</Text>
         <Text style={styles.lockDate}>Wednesday, May 2</Text>
-        {/* Banner — tapping is the risky choice (option 0) */}
         <Pressable
           onPress={() => { if (!anySelected) onTap?.(0) }}
           style={[
@@ -656,7 +598,6 @@ function SimulationCard({
           {preview && <Text style={styles.iosNotifTitle} numberOfLines={1}>{preview}</Text>}
           <Text style={styles.iosNotifBody} numberOfLines={3}>{content}</Text>
         </Pressable>
-        {/* Swipe-reveal: hint → then Ignore / Mark as Spam */}
         {!expanded ? (
           <Pressable onPress={() => setExpanded(true)} style={styles.notifSwipeHint}>
             <Text style={styles.notifSwipeHintText}>swipe for options ↓</Text>
@@ -675,10 +616,7 @@ function SimulationCard({
             </Pressable>
             <Pressable
               onPress={() => { if (!anySelected) onTap?.(2) }}
-              style={[
-                styles.notifActionBtn,
-                selectedIndex === 2 && { backgroundColor: 'rgba(255,59,48,0.12)' },
-              ]}
+              style={[styles.notifActionBtn, selectedIndex === 2 && { backgroundColor: 'rgba(255,59,48,0.12)' }]}
             >
               <Text style={[styles.notifActionTxt, { color: '#FF3B30' }]}>Mark as Spam</Text>
             </Pressable>
@@ -688,12 +626,11 @@ function SimulationCard({
     )
   }
 
-  // ── iMessage with reply chips ─────────────────────────────────────────────────
+  // ── iMessage with reply chips (Q3) ────────────────────────────────────────
   if (uiType === 'message') {
     return (
       <View style={styles.iMessageContainer}>
-        {/* Header — "‹ Messages" tap = leave on read (option 3) */}
-        <View style={styles.iMessageHeader}>
+        <View style={[styles.iMessageHeader, { paddingTop: insets.top + 12, paddingBottom: 12 }]}>
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(3) }}
             hitSlop={12}
@@ -709,7 +646,6 @@ function SimulationCard({
             <Text style={styles.iMessageMeta}>iMessage</Text>
           </View>
         </View>
-        {/* Chat area */}
         <View style={styles.iMessageChatArea}>
           <View style={styles.iMessageBubbleRow}>
             <View style={[styles.iMessageAvatarSmall, { backgroundColor: '#34C759' }]}>
@@ -721,7 +657,6 @@ function SimulationCard({
           </View>
           <Text style={styles.iMessageDelivered}>delivered</Text>
         </View>
-        {/* Input bar → tap reveals reply chips (options 0, 1, 2) */}
         {!chipsOpen ? (
           <Pressable onPress={() => setChipsOpen(true)} style={styles.iMsgInputBar}>
             <Text style={styles.iMsgInputPlaceholder}>Message</Text>
@@ -733,10 +668,7 @@ function SimulationCard({
               <Pressable
                 key={i}
                 onPress={() => { if (!anySelected) onTap?.(i) }}
-                style={[
-                  styles.iMsgChip,
-                  selectedIndex === i && { backgroundColor: '#5B5CF6', borderColor: '#5B5CF6' },
-                ]}
+                style={[styles.iMsgChip, selectedIndex === i && { backgroundColor: '#5B5CF6', borderColor: '#5B5CF6' }]}
               >
                 <Text style={[styles.iMsgChipTxt, selectedIndex === i && { color: '#FFFFFF' }]}>
                   {opt.label}
@@ -749,13 +681,12 @@ function SimulationCard({
     )
   }
 
-  // ── Email viewer with action buttons ─────────────────────────────────────────
+  // ── Email viewer (Q4) ─────────────────────────────────────────────────────
   if (uiType === 'email') {
     const btnColors = ['#FF3B30', '#FF9500', '#34C759', '#007AFF']
     return (
       <View style={styles.emailViewer}>
-        {/* Header */}
-        <View style={styles.emailViewerHeader}>
+        <View style={[styles.emailViewerHeader, { paddingTop: insets.top + 14, paddingBottom: 10 }]}>
           <View style={[styles.emailAvatar, { backgroundColor: '#FF3B30' }]}>
             <Text style={styles.emailAvatarText}>{initials || '?'}</Text>
           </View>
@@ -765,10 +696,8 @@ function SimulationCard({
           </View>
           <Text style={styles.emailViewerTime}>now</Text>
         </View>
-        {/* Body */}
         <Text style={styles.emailViewerBody} numberOfLines={3}>{content}</Text>
         <Text style={styles.emailViewerLink}>Verify my account →</Text>
-        {/* 2×2 action grid */}
         <View style={styles.emailActionGrid}>
           {[0, 1].map((row) => (
             <View key={row} style={{ flexDirection: 'row', gap: 8 }}>
@@ -782,10 +711,7 @@ function SimulationCard({
                   <Pressable
                     key={i}
                     onPress={() => { if (!anySelected) onTap?.(i) }}
-                    style={[
-                      styles.emailActionBtn,
-                      { flex: 1, borderColor: color, backgroundColor: active ? color : color + '18' },
-                    ]}
+                    style={[styles.emailActionBtn, { flex: 1, borderColor: color, backgroundColor: active ? color : color + '18' }]}
                   >
                     <Text style={[styles.emailActionTxt, { color: active ? '#FFFFFF' : color }]}>
                       {opt.label}
@@ -800,11 +726,11 @@ function SimulationCard({
     )
   }
 
-  // ── iOS software update screen ────────────────────────────────────────────────
+  // ── iOS software update (Q5) ──────────────────────────────────────────────
   if (uiType === 'ios-update') {
     return (
       <View style={styles.iosUpdateContainer}>
-        <View style={styles.iosUpdateNavBar}>
+        <View style={[styles.iosUpdateNavBar, { paddingTop: insets.top + 14, paddingBottom: 12 }]}>
           <Text style={styles.iosUpdateBack}>‹ General</Text>
           <Text style={styles.iosUpdateTitle}>Software Update</Text>
           <Text style={{ width: 60 }} />
@@ -844,7 +770,7 @@ function SimulationCard({
     )
   }
 
-  // ── Alert fallback ────────────────────────────────────────────────────────────
+  // ── Alert fallback ────────────────────────────────────────────────────────
   return (
     <View style={[styles.simCardAlert, { backgroundColor: colors.dangerBg, borderColor: colors.dangerText }]}>
       <Text style={[type.cardTitle, { color: colors.dangerText }]}>{sender}</Text>
@@ -856,15 +782,9 @@ function SimulationCard({
 // ─── Option Button ────────────────────────────────────────────────────────────
 
 function OptionButton({
-  label,
-  selected,
-  anySelected,
-  onPress,
+  label, selected, anySelected, onPress,
 }: {
-  label: string
-  selected: boolean
-  anySelected: boolean
-  onPress: () => void
+  label: string; selected: boolean; anySelected: boolean; onPress: () => void
 }) {
   return (
     <Pressable
@@ -888,10 +808,7 @@ function OptionButton({
 // ─── Slider Question ──────────────────────────────────────────────────────────
 
 function SliderQuestion({
-  options,
-  labels,
-  selectedIndex,
-  onChange,
+  options, labels, selectedIndex, onChange,
 }: {
   options: NonNullable<Question['options']>
   labels: { left: string; right: string }
@@ -948,12 +865,10 @@ function SliderQuestion({
           />
         )}
       </View>
-
       <View style={styles.sliderLabelRow}>
         <Text style={[type.bodySmall, { color: colors.textTertiary, flex: 1 }]}>{labels.left}</Text>
         <Text style={[type.bodySmall, { color: colors.textTertiary }]}>{labels.right}</Text>
       </View>
-
       <View style={styles.sliderStepRow}>
         {options.map((opt, i) => (
           <Pressable
@@ -1017,12 +932,6 @@ const styles = StyleSheet.create({
     color: '#5B5CF6',
     textAlign: 'left',
   },
-  simPrompt: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 21,
-  },
   options: {
     gap: 12,
   },
@@ -1041,11 +950,22 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // ── Back nav bar ──
+  // ── Floating back button (internal sims) ──
+  floatingBack: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 10,
+  },
+  floatingBackText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    textDecorationLine: 'underline',
+  },
+
+  // ── Bottom nav bar (non-sim questions) ──
   navBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingTop: 10,
     borderTopWidth: 0.5,
@@ -1058,36 +978,30 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textDecorationLine: 'underline',
   },
-  navNextText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
-    color: '#5B5CF6',
-    textDecorationLine: 'underline',
-  },
 
-  // ── WiFi settings ──
+  // ── WiFi settings (dark mode) ──
   wifiContainer: {
-    backgroundColor: '#F2F2F7',
+    flex: 1,
+    backgroundColor: '#000000',
     overflow: 'hidden',
   },
   wifiStatusBar: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#000000',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 10,
     paddingBottom: 4,
   },
   wifiStatusTime: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
   },
   wifiStatusRight: {
     fontFamily: 'Inter_400Regular',
     fontSize: 10,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
     letterSpacing: 2,
   },
   wifiTitleRow: {
@@ -1105,19 +1019,18 @@ const styles = StyleSheet.create({
   wifiTitle: {
     fontFamily: 'Inter_700Bold',
     fontSize: 22,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
     flex: 1,
     textAlign: 'center',
     marginRight: 60,
   },
   wifiList: {
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 0,
+    backgroundColor: '#1C1C1E',
   },
   wifiSectionLabel: {
     fontFamily: 'Inter_400Regular',
     fontSize: 11,
-    color: '#8E8E93',
+    color: 'rgba(255,255,255,0.4)',
     letterSpacing: 0.5,
     paddingHorizontal: 16,
     paddingTop: 14,
@@ -1129,12 +1042,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 13,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1C1C1E',
     gap: 10,
   },
   wifiRowDivider: {
     borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(0,0,0,0.08)',
+    borderBottomColor: 'rgba(255,255,255,0.08)',
   },
   wifiSignalWrap: {
     flexDirection: 'row',
@@ -1158,7 +1071,7 @@ const styles = StyleSheet.create({
   wifiRowLabel: {
     fontFamily: 'Inter_400Regular',
     fontSize: 15,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
     flex: 1,
   },
   wifiLockIcon: {
@@ -1172,25 +1085,12 @@ const styles = StyleSheet.create({
 
   // ── Reward popup ──
   rewardDim: {
-    backgroundColor: 'rgba(0,0,0,0.88)',
+    flex: 1,
+    backgroundColor: '#808080',
     paddingHorizontal: 20,
-    paddingTop: 24,
     paddingBottom: 24,
     alignItems: 'center',
-  },
-  rewardTime: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 54,
-    color: '#FFFFFF',
-    letterSpacing: -1,
-    lineHeight: 58,
-  },
-  rewardDate: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
-    marginTop: 2,
-    marginBottom: 20,
+    justifyContent: 'center',
   },
   rewardCard: {
     backgroundColor: '#FFFFFF',
@@ -1255,7 +1155,93 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 
-  // ── iMessage with action buttons ──
+  // ── iMessage (shared for message + message-actions) ──
+  iMessageContainer: {
+    flex: 1,
+    backgroundColor: '#F2F2F7',
+    overflow: 'hidden',
+  },
+  iMessageHeader: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+  iMessageAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iMessageAvatarText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 13,
+    color: '#FFFFFF',
+  },
+  iMessageSenderName: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#0A0A0A',
+  },
+  iMessageMeta: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#8E8E93',
+    marginTop: 1,
+  },
+  iMessageChatArea: {
+    flex: 1,
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 16,
+    justifyContent: 'flex-end',
+  },
+  iMessageBubbleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 8,
+    marginBottom: 4,
+  },
+  iMessageAvatarSmall: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  iMessageAvatarSmallText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 9,
+    color: '#FFFFFF',
+  },
+  iMessageBubble: {
+    backgroundColor: '#E5E5EA',
+    borderRadius: 18,
+    borderBottomLeftRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    maxWidth: '85%',
+  },
+  iMessageBubbleText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#0A0A0A',
+    lineHeight: 19,
+  },
+  iMessageDelivered: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#8E8E93',
+    textAlign: 'right',
+    marginTop: 2,
+  },
+
+  // ── iMessage action bar (Q8) ──
   msgActionBar: {
     flexDirection: 'row',
     borderTopWidth: 0.5,
@@ -1276,8 +1262,62 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
+  // ── iMessage chips (Q3) ──
+  iMsgBackChevron: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#007AFF',
+    marginRight: 4,
+  },
+  iMsgInputBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  iMsgInputPlaceholder: {
+    flex: 1,
+    fontFamily: 'Inter_400Regular',
+    fontSize: 15,
+    color: '#8E8E93',
+    backgroundColor: '#F2F2F7',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+  },
+  iMsgSendBtn: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 18,
+    color: '#007AFF',
+  },
+  iMsgChipsWrap: {
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.08)',
+    padding: 10,
+    gap: 8,
+  },
+  iMsgChip: {
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0,122,255,0.35)',
+    backgroundColor: 'rgba(0,122,255,0.05)',
+  },
+  iMsgChipTxt: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#007AFF',
+  },
+
   // ── Instagram DM ──
   igContainer: {
+    flex: 1,
     backgroundColor: '#1C1C1E',
     overflow: 'hidden',
   },
@@ -1286,7 +1326,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: 14,
-    paddingVertical: 12,
     borderBottomWidth: 0.5,
     borderBottomColor: 'rgba(255,255,255,0.08)',
   },
@@ -1314,6 +1353,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   igChatArea: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 8,
@@ -1377,6 +1417,7 @@ const styles = StyleSheet.create({
 
   // ── Browser ──
   browserContainer: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
   },
@@ -1385,7 +1426,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F2F2F7',
     marginHorizontal: 10,
-    marginVertical: 10,
+    marginBottom: 10,
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -1454,9 +1495,9 @@ const styles = StyleSheet.create({
 
   // ── iOS lockscreen notification ──
   iosLockscreen: {
+    flex: 1,
     backgroundColor: '#1C1C1E',
     paddingHorizontal: 18,
-    paddingTop: 22,
     paddingBottom: 20,
     alignItems: 'center',
   },
@@ -1521,231 +1562,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
     lineHeight: 18,
   },
-
-  // ── Gift card modal ──
-  modalDim: {
-    backgroundColor: 'rgba(0,0,0,0.88)',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 24,
-    alignItems: 'center',
-  },
-  modalPhoneHint: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTime: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 54,
-    color: '#FFFFFF',
-    letterSpacing: -1,
-    lineHeight: 58,
-  },
-  modalDate: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
-    marginTop: 2,
-  },
-
-  // ── iMessage ──
-  iMessageContainer: {
-    backgroundColor: '#F2F2F7',
-    overflow: 'hidden',
-  },
-  iMessageHeader: {
-    backgroundColor: '#FFFFFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
-  },
-  iMessageAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iMessageAvatarText: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 13,
-    color: '#FFFFFF',
-  },
-  iMessageSenderName: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 14,
-    color: '#0A0A0A',
-  },
-  iMessageMeta: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: '#8E8E93',
-    marginTop: 1,
-  },
-  iMessageChatArea: {
-    paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 16,
-  },
-  iMessageBubbleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 8,
-    marginBottom: 4,
-  },
-  iMessageAvatarSmall: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  iMessageAvatarSmallText: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 9,
-    color: '#FFFFFF',
-  },
-  iMessageBubble: {
-    backgroundColor: '#E5E5EA',
-    borderRadius: 18,
-    borderBottomLeftRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    maxWidth: '85%',
-  },
-  iMessageBubbleText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: '#0A0A0A',
-    lineHeight: 19,
-  },
-  iMessageDelivered: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: '#8E8E93',
-    textAlign: 'right',
-    marginTop: 2,
-  },
-
-  // ── Email inbox card ──
-  emailInboxCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.08)',
-  },
-  emailInboxRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  emailAvatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  emailAvatarText: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 14,
-    color: '#FFFFFF',
-  },
-  emailInboxTopLine: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  emailInboxSender: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 13,
-    color: '#0A0A0A',
-    flex: 1,
-    marginRight: 8,
-  },
-  emailInboxTime: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: '#8E8E93',
-    flexShrink: 0,
-  },
-  emailInboxSubject: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
-    color: '#0A0A0A',
-    marginBottom: 2,
-  },
-  emailInboxPreview: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    color: '#8E8E93',
-    lineHeight: 17,
-  },
-
-  // ── Alert fallback ──
-  simCardAlert: {
-    borderRadius: 14,
-    borderWidth: 0.5,
-    padding: 14,
-  },
-
-  // ── Slider ──
-  sliderTouchArea: {
-    height: 44,
-    justifyContent: 'center',
-    marginBottom: 12,
-    position: 'relative',
-  },
-  sliderTrack: {
-    height: 4,
-    borderRadius: 2,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  sliderFill: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    height: 4,
-    borderRadius: 2,
-  },
-  sliderTick: {
-    position: 'absolute',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 1.5,
-    top: (44 - 10) / 2,
-    transform: [{ translateX: -5 }],
-  },
-  sliderThumb: {
-    position: 'absolute',
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    top: (44 - 22) / 2,
-    transform: [{ translateX: -11 }],
-  },
-  sliderLabelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  sliderStepRow: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-
-  // ── Notification interactive ──
   notifSwipeHint: {
     alignItems: 'center',
     paddingVertical: 10,
@@ -1762,6 +1578,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     marginTop: 6,
     overflow: 'hidden',
+    width: '100%',
   },
   notifActionBtn: {
     flex: 1,
@@ -1773,61 +1590,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  // ── iMessage chips ──
-  iMsgBackChevron: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: '#007AFF',
-    marginRight: 4,
-  },
-  iMsgInputBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0,0,0,0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 8,
-  },
-  iMsgInputPlaceholder: {
-    flex: 1,
-    fontFamily: 'Inter_400Regular',
-    fontSize: 15,
-    color: '#8E8E93',
-    backgroundColor: '#F2F2F7',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-  },
-  iMsgSendBtn: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 18,
-    color: '#007AFF',
-  },
-  iMsgChipsWrap: {
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0,0,0,0.08)',
-    padding: 10,
-    gap: 8,
-  },
-  iMsgChip: {
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(0,122,255,0.35)',
-    backgroundColor: 'rgba(0,122,255,0.05)',
-  },
-  iMsgChipTxt: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: '#007AFF',
-  },
-
   // ── Email viewer ──
   emailViewer: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
   },
@@ -1836,10 +1601,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 10,
     borderBottomWidth: 0.5,
     borderBottomColor: 'rgba(0,0,0,0.06)',
+  },
+  emailAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  emailAvatarText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
   },
   emailViewerSender: {
     fontFamily: 'Inter_700Bold',
@@ -1894,6 +1670,7 @@ const styles = StyleSheet.create({
 
   // ── iOS update screen ──
   iosUpdateContainer: {
+    flex: 1,
     backgroundColor: '#F2F2F7',
     overflow: 'hidden',
   },
@@ -1902,7 +1679,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: 14,
     paddingBottom: 12,
     borderBottomWidth: 0.5,
     borderBottomColor: 'rgba(0,0,0,0.1)',
@@ -1985,5 +1761,60 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     fontSize: 15,
     color: '#007AFF',
+  },
+
+  // ── Alert fallback ──
+  simCardAlert: {
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 0.5,
+    padding: 14,
+  },
+
+  // ── Slider ──
+  sliderTouchArea: {
+    height: 44,
+    justifyContent: 'center',
+    marginBottom: 12,
+    position: 'relative',
+  },
+  sliderTrack: {
+    height: 4,
+    borderRadius: 2,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  sliderFill: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    height: 4,
+    borderRadius: 2,
+  },
+  sliderTick: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    top: (44 - 10) / 2,
+    transform: [{ translateX: -5 }],
+  },
+  sliderThumb: {
+    position: 'absolute',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    top: (44 - 22) / 2,
+    transform: [{ translateX: -11 }],
+  },
+  sliderLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  sliderStepRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
   },
 })
