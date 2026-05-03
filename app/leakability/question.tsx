@@ -140,7 +140,7 @@ export default function QuestionScreen() {
 
 // ─── QuestionBody ─────────────────────────────────────────────────────────────
 
-const INTERNAL_SIM_TYPES = ['wifi-settings', 'reward-popup', 'message-actions', 'instagram-dm', 'browser']
+const INTERNAL_SIM_TYPES = ['notification', 'message', 'email', 'ios-update', 'wifi-settings', 'reward-popup', 'message-actions', 'instagram-dm', 'browser']
 
 function QuestionBody({
   question,
@@ -303,6 +303,8 @@ function SimulationCard({
   options?: NonNullable<Question['options']>
 }) {
   const { colors, type } = useTheme()
+  const [expanded, setExpanded] = useState(false)
+  const [chipsOpen, setChipsOpen] = useState(false)
   const { uiType, sender, content, preview } = simulation
 
   const initials = sender
@@ -625,57 +627,84 @@ function SimulationCard({
   }
 
   // ── iOS-style lockscreen notification ────────────────────────────────────────
+  // ── iOS lockscreen notification (interactive) ────────────────────────────────
   if (uiType === 'notification') {
-    const notifCard = (
-      <View style={styles.iosNotifBanner}>
-        <View style={styles.iosNotifTopRow}>
-          <View style={[styles.iosNotifAppIcon, { backgroundColor: '#5B5CF6' }]}>
-            <Text style={styles.iosNotifIconText}>{initials || '?'}</Text>
-          </View>
-          <Text style={styles.iosNotifAppName}>{sender}</Text>
-          <Text style={styles.iosNotifTime}>now</Text>
-        </View>
-        {preview && (
-          <Text style={styles.iosNotifTitle} numberOfLines={1}>{preview}</Text>
-        )}
-        <Text style={styles.iosNotifBody} numberOfLines={3}>{content}</Text>
-      </View>
-    )
-
-    if (asModal) {
-      return (
-        <View style={styles.modalDim}>
-          <View style={styles.modalPhoneHint}>
-            <Text style={styles.modalTime}>9:41</Text>
-            <Text style={styles.modalDate}>Wednesday, April 18</Text>
-          </View>
-          {notifCard}
-        </View>
-      )
-    }
-
     return (
       <View style={styles.iosLockscreen}>
         <Text style={styles.lockTime}>9:41</Text>
-        <Text style={styles.lockDate}>Wednesday, April 18</Text>
-        {notifCard}
+        <Text style={styles.lockDate}>Wednesday, May 2</Text>
+        {/* Banner — tapping is the risky choice (option 0) */}
+        <Pressable
+          onPress={() => { if (!anySelected) onTap?.(0) }}
+          style={[
+            styles.iosNotifBanner,
+            selectedIndex === 0 && { borderWidth: 1.5, borderColor: 'rgba(255,59,48,0.6)' },
+          ]}
+        >
+          <View style={styles.iosNotifTopRow}>
+            <View style={[styles.iosNotifAppIcon, { backgroundColor: '#5B5CF6' }]}>
+              <Text style={styles.iosNotifIconText}>{initials || '?'}</Text>
+            </View>
+            <Text style={styles.iosNotifAppName}>{sender}</Text>
+            <Text style={styles.iosNotifTime}>now</Text>
+          </View>
+          {preview && <Text style={styles.iosNotifTitle} numberOfLines={1}>{preview}</Text>}
+          <Text style={styles.iosNotifBody} numberOfLines={3}>{content}</Text>
+        </Pressable>
+        {/* Swipe-reveal: hint → then Ignore / Mark as Spam */}
+        {!expanded ? (
+          <Pressable onPress={() => setExpanded(true)} style={styles.notifSwipeHint}>
+            <Text style={styles.notifSwipeHintText}>swipe for options ↓</Text>
+          </Pressable>
+        ) : (
+          <View style={styles.notifActionRow}>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(1) }}
+              style={[
+                styles.notifActionBtn,
+                { borderRightWidth: 0.5, borderRightColor: 'rgba(255,255,255,0.15)' },
+                selectedIndex === 1 && { backgroundColor: 'rgba(0,149,255,0.18)' },
+              ]}
+            >
+              <Text style={[styles.notifActionTxt, { color: '#007AFF' }]}>Ignore</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(2) }}
+              style={[
+                styles.notifActionBtn,
+                selectedIndex === 2 && { backgroundColor: 'rgba(255,59,48,0.12)' },
+              ]}
+            >
+              <Text style={[styles.notifActionTxt, { color: '#FF3B30' }]}>Mark as Spam</Text>
+            </Pressable>
+          </View>
+        )}
       </View>
     )
   }
 
-  // ── iMessage-style ────────────────────────────────────────────────────────────
+  // ── iMessage with reply chips ─────────────────────────────────────────────────
   if (uiType === 'message') {
     return (
       <View style={styles.iMessageContainer}>
+        {/* Header — "‹ Messages" tap = leave on read (option 3) */}
         <View style={styles.iMessageHeader}>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(3) }}
+            hitSlop={12}
+            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+          >
+            <Text style={styles.iMsgBackChevron}>‹ Messages</Text>
+          </Pressable>
           <View style={[styles.iMessageAvatar, { backgroundColor: '#34C759' }]}>
             <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
           </View>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.iMessageSenderName}>{sender}</Text>
             <Text style={styles.iMessageMeta}>iMessage</Text>
           </View>
         </View>
+        {/* Chat area */}
         <View style={styles.iMessageChatArea}>
           <View style={styles.iMessageBubbleRow}>
             <View style={[styles.iMessageAvatarSmall, { backgroundColor: '#34C759' }]}>
@@ -687,29 +716,125 @@ function SimulationCard({
           </View>
           <Text style={styles.iMessageDelivered}>delivered</Text>
         </View>
+        {/* Input bar → tap reveals reply chips (options 0, 1, 2) */}
+        {!chipsOpen ? (
+          <Pressable onPress={() => setChipsOpen(true)} style={styles.iMsgInputBar}>
+            <Text style={styles.iMsgInputPlaceholder}>Message</Text>
+            <Text style={styles.iMsgSendBtn}>⬆</Text>
+          </Pressable>
+        ) : (
+          <View style={styles.iMsgChipsWrap}>
+            {(options ?? []).slice(0, 3).map((opt, i) => (
+              <Pressable
+                key={i}
+                onPress={() => { if (!anySelected) onTap?.(i) }}
+                style={[
+                  styles.iMsgChip,
+                  selectedIndex === i && { backgroundColor: '#5B5CF6', borderColor: '#5B5CF6' },
+                ]}
+              >
+                <Text style={[styles.iMsgChipTxt, selectedIndex === i && { color: '#FFFFFF' }]}>
+                  {opt.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
       </View>
     )
   }
 
-  // ── Email inbox card ──────────────────────────────────────────────────────────
+  // ── Email viewer with action buttons ─────────────────────────────────────────
   if (uiType === 'email') {
+    const btnColors = ['#FF3B30', '#FF9500', '#34C759', '#007AFF']
     return (
-      <View style={styles.emailInboxCard}>
-        <View style={styles.emailInboxRow}>
+      <View style={styles.emailViewer}>
+        {/* Header */}
+        <View style={styles.emailViewerHeader}>
           <View style={[styles.emailAvatar, { backgroundColor: '#FF3B30' }]}>
             <Text style={styles.emailAvatarText}>{initials || '?'}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <View style={styles.emailInboxTopLine}>
-              <Text style={styles.emailInboxSender} numberOfLines={1}>{sender}</Text>
-              <Text style={styles.emailInboxTime}>now</Text>
-            </View>
-            {preview && (
-              <Text style={styles.emailInboxSubject} numberOfLines={1}>{preview}</Text>
-            )}
-            <Text style={styles.emailInboxPreview} numberOfLines={2}>{content}</Text>
+            <Text style={styles.emailViewerSender} numberOfLines={1}>{sender}</Text>
+            {preview && <Text style={styles.emailViewerSubject} numberOfLines={1}>{preview}</Text>}
           </View>
+          <Text style={styles.emailViewerTime}>now</Text>
         </View>
+        {/* Body */}
+        <Text style={styles.emailViewerBody} numberOfLines={3}>{content}</Text>
+        <Text style={styles.emailViewerLink}>Verify my account →</Text>
+        {/* 2×2 action grid */}
+        <View style={styles.emailActionGrid}>
+          {[0, 1].map((row) => (
+            <View key={row} style={{ flexDirection: 'row', gap: 8 }}>
+              {[0, 1].map((col) => {
+                const i = row * 2 + col
+                const opt = (options ?? [])[i]
+                if (!opt) return null
+                const color = btnColors[i] ?? '#007AFF'
+                const active = selectedIndex === i
+                return (
+                  <Pressable
+                    key={i}
+                    onPress={() => { if (!anySelected) onTap?.(i) }}
+                    style={[
+                      styles.emailActionBtn,
+                      { flex: 1, borderColor: color, backgroundColor: active ? color : color + '18' },
+                    ]}
+                  >
+                    <Text style={[styles.emailActionTxt, { color: active ? '#FFFFFF' : color }]}>
+                      {opt.label}
+                    </Text>
+                  </Pressable>
+                )
+              })}
+            </View>
+          ))}
+        </View>
+      </View>
+    )
+  }
+
+  // ── iOS software update screen ────────────────────────────────────────────────
+  if (uiType === 'ios-update') {
+    return (
+      <View style={styles.iosUpdateContainer}>
+        <View style={styles.iosUpdateNavBar}>
+          <Text style={styles.iosUpdateBack}>‹ General</Text>
+          <Text style={styles.iosUpdateTitle}>Software Update</Text>
+          <Text style={{ width: 60 }} />
+        </View>
+        <View style={styles.iosUpdateCard}>
+          <View style={styles.iosUpdateIconRow}>
+            <View style={styles.iosUpdateIcon}>
+              <Text style={styles.iosUpdateIconTxt}>iOS</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.iosUpdateVersion}>{sender}</Text>
+              <Text style={styles.iosUpdateSize}>1.2 GB</Text>
+            </View>
+          </View>
+          <Text style={styles.iosUpdateBody} numberOfLines={2}>{content}</Text>
+        </View>
+        {(options ?? []).map((opt, i) => (
+          <Pressable
+            key={i}
+            onPress={() => { if (!anySelected) onTap?.(i) }}
+            style={[
+              i === 0 ? styles.iosUpdatePrimaryBtn : styles.iosUpdateSecondaryRow,
+              selectedIndex === i && i === 0 && { backgroundColor: '#0A5AD4' },
+              selectedIndex === i && i !== 0 && { backgroundColor: 'rgba(91,92,246,0.07)' },
+            ]}
+          >
+            <Text style={[
+              i === 0 ? styles.iosUpdatePrimaryTxt : styles.iosUpdateSecondaryTxt,
+              i === 3 && { color: '#FF3B30' },
+              selectedIndex === i && i !== 0 && { color: '#5B5CF6' },
+            ]}>
+              {opt.label}
+            </Text>
+          </Pressable>
+        ))}
       </View>
     )
   }
@@ -1615,5 +1740,251 @@ const styles = StyleSheet.create({
   sliderStepRow: {
     flexDirection: 'row',
     marginBottom: 16,
+  },
+
+  // ── Notification interactive ──
+  notifSwipeHint: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  notifSwipeHintText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.35)',
+    letterSpacing: 0.3,
+  },
+  notifActionRow: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderRadius: 14,
+    marginTop: 6,
+    overflow: 'hidden',
+  },
+  notifActionBtn: {
+    flex: 1,
+    paddingVertical: 15,
+    alignItems: 'center',
+  },
+  notifActionTxt: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+  },
+
+  // ── iMessage chips ──
+  iMsgBackChevron: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#007AFF',
+    marginRight: 4,
+  },
+  iMsgInputBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  iMsgInputPlaceholder: {
+    flex: 1,
+    fontFamily: 'Inter_400Regular',
+    fontSize: 15,
+    color: '#8E8E93',
+    backgroundColor: '#F2F2F7',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+  },
+  iMsgSendBtn: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 18,
+    color: '#007AFF',
+  },
+  iMsgChipsWrap: {
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.08)',
+    padding: 10,
+    gap: 8,
+  },
+  iMsgChip: {
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0,122,255,0.35)',
+    backgroundColor: 'rgba(0,122,255,0.05)',
+  },
+  iMsgChipTxt: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: '#007AFF',
+  },
+
+  // ── Email viewer ──
+  emailViewer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.08)',
+  },
+  emailViewerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+  },
+  emailViewerSender: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 13,
+    color: '#0A0A0A',
+  },
+  emailViewerSubject: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: '#8E8E93',
+    marginTop: 1,
+  },
+  emailViewerTime: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: '#8E8E93',
+    flexShrink: 0,
+  },
+  emailViewerBody: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#4B5563',
+    paddingHorizontal: 14,
+    paddingTop: 10,
+    lineHeight: 19,
+  },
+  emailViewerLink: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#007AFF',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    textDecorationLine: 'underline',
+  },
+  emailActionGrid: {
+    gap: 8,
+    padding: 12,
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+  },
+  emailActionBtn: {
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderWidth: 1.5,
+    alignItems: 'center',
+  },
+  emailActionTxt: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+  },
+
+  // ── iOS update screen ──
+  iosUpdateContainer: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  iosUpdateNavBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+  iosUpdateBack: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 15,
+    color: '#007AFF',
+    width: 70,
+  },
+  iosUpdateTitle: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 16,
+    color: '#0A0A0A',
+  },
+  iosUpdateCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    marginBottom: 2,
+  },
+  iosUpdateIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 10,
+  },
+  iosUpdateIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iosUpdateIconTxt: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
+  },
+  iosUpdateVersion: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
+    color: '#0A0A0A',
+  },
+  iosUpdateSize: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#8E8E93',
+    marginTop: 2,
+  },
+  iosUpdateBody: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#4B5563',
+    lineHeight: 18,
+  },
+  iosUpdatePrimaryBtn: {
+    backgroundColor: '#007AFF',
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 4,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  iosUpdatePrimaryTxt: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  iosUpdateSecondaryRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+  },
+  iosUpdateSecondaryTxt: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 15,
+    color: '#007AFF',
   },
 })
