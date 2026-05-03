@@ -141,18 +141,16 @@ export default function QuestionScreen() {
   }, [currentQuestionIndex, question.id, router])
 
   return (
-    <View style={{ flex: 1, backgroundColor: screenBg }}>
-      <StatusBar style={dark ? 'light' : 'dark'} />
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <StatusBar style="dark" />
 
-      {/* Fixed header — only for non-simulation questions */}
-      {!isInternalSim && (
-        <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
-          <ProgressLines total={questions.length} current={currentQuestionIndex} />
-          <View style={[styles.categoryPill, { marginTop: 28 }]}>
-            <Text style={styles.categoryPillText}>{question.category}</Text>
-          </View>
+      {/* Fixed header — all questions */}
+      <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
+        <ProgressLines total={questions.length} current={currentQuestionIndex} />
+        <View style={[styles.categoryPill, { marginTop: 28 }]}>
+          <Text style={styles.categoryPillText}>{question.category}</Text>
         </View>
-      )}
+      </View>
 
       <QuestionBody
         key={currentQuestionIndex}
@@ -165,7 +163,7 @@ export default function QuestionScreen() {
         uiType={uiType}
       />
 
-      {!isInternalSim && <BottomNav activeTab="home" />}
+      <BottomNav activeTab="home" />
     </View>
   )
 }
@@ -216,9 +214,8 @@ function QuestionBody({
     advanceTimerRef.current = setTimeout(onAdvance, 800)
   }
 
-  // ── Full-screen simulation layout ──
+  // ── Simulation layout ──
   if (isInternalSim) {
-    const backColor = isSimDark(uiType) ? 'rgba(255,255,255,0.55)' : '#9CA3AF'
     return (
       <View style={{ flex: 1 }}>
         <SimulationCard
@@ -228,13 +225,15 @@ function QuestionBody({
           anySelected={selectedIndex !== null}
           options={question.options}
         />
-        <Pressable
-          onPress={onBack}
-          hitSlop={16}
-          style={[styles.floatingBack, { top: insets.top + 10 }]}
-        >
-          <Text style={[styles.floatingBackText, { color: backColor }]}>← back</Text>
-        </Pressable>
+        <View style={[styles.navBar, { paddingBottom: insets.bottom + 8 }]}>
+          <Pressable
+            onPress={onBack}
+            hitSlop={12}
+            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+          >
+            <Text style={styles.navBackText}>← back</Text>
+          </Pressable>
+        </View>
       </View>
     )
   }
