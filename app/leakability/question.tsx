@@ -16,6 +16,7 @@ import { questions, getBand, scaleScore, Question } from '@/data/questions'
 import { useTestStore } from '@/store/testStore'
 import { useUserStore } from '@/store/userStore'
 import { BottomNav } from '@/components/ui/BottomNav'
+import { LinearGradient } from 'expo-linear-gradient'
 
 function cap(s: string) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
@@ -145,7 +146,7 @@ export default function QuestionScreen() {
       <StatusBar style="dark" />
 
       {/* Fixed header — all questions */}
-      <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.screenH }}>
+      <View style={{ paddingTop: insets.top + 12, paddingHorizontal: spacing.screenH, paddingBottom: 8 }}>
         <ProgressLines total={questions.length} current={currentQuestionIndex} />
         <View style={[styles.categoryPill, { marginTop: 28 }]}>
           <Text style={styles.categoryPillText}>{question.category}</Text>
@@ -326,8 +327,6 @@ function SimulationCard({
 }) {
   const { colors, type } = useTheme()
   const insets = useSafeAreaInsets()
-  const [expanded, setExpanded] = useState(false)
-  const [chipsOpen, setChipsOpen] = useState(false)
   const { uiType, sender, content, preview } = simulation
 
   const initials = sender
@@ -577,7 +576,10 @@ function SimulationCard({
   // ── iOS lockscreen notification (Q1) ──────────────────────────────────────
   if (uiType === 'notification') {
     return (
-      <View style={[styles.iosLockscreen, { paddingTop: insets.top + 22 }]}>
+      <LinearGradient
+        colors={['#1B0E52', '#3B2DA0', '#5B5CF6']}
+        style={[styles.iosLockscreen, { paddingTop: insets.top + 22 }]}
+      >
         <Text style={styles.lockTime}>9:41</Text>
         <Text style={styles.lockDate}>Wednesday, May 2</Text>
         <Pressable
@@ -597,46 +599,34 @@ function SimulationCard({
           {preview && <Text style={styles.iosNotifTitle} numberOfLines={1}>{preview}</Text>}
           <Text style={styles.iosNotifBody} numberOfLines={3}>{content}</Text>
         </Pressable>
-        {!expanded ? (
-          <Pressable onPress={() => setExpanded(true)} style={styles.notifSwipeHint}>
-            <Text style={styles.notifSwipeHintText}>swipe for options ↓</Text>
+        <View style={styles.notifActionRow}>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(1) }}
+            style={[
+              styles.notifActionBtn,
+              { borderRightWidth: 0.5, borderRightColor: 'rgba(255,255,255,0.15)' },
+              selectedIndex === 1 && { backgroundColor: 'rgba(0,149,255,0.18)' },
+            ]}
+          >
+            <Text style={[styles.notifActionTxt, { color: '#007AFF' }]}>Ignore</Text>
           </Pressable>
-        ) : (
-          <View style={styles.notifActionRow}>
-            <Pressable
-              onPress={() => { if (!anySelected) onTap?.(1) }}
-              style={[
-                styles.notifActionBtn,
-                { borderRightWidth: 0.5, borderRightColor: 'rgba(255,255,255,0.15)' },
-                selectedIndex === 1 && { backgroundColor: 'rgba(0,149,255,0.18)' },
-              ]}
-            >
-              <Text style={[styles.notifActionTxt, { color: '#007AFF' }]}>Ignore</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => { if (!anySelected) onTap?.(2) }}
-              style={[styles.notifActionBtn, selectedIndex === 2 && { backgroundColor: 'rgba(255,59,48,0.12)' }]}
-            >
-              <Text style={[styles.notifActionTxt, { color: '#FF3B30' }]}>Mark as Spam</Text>
-            </Pressable>
-          </View>
-        )}
-      </View>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(2) }}
+            style={[styles.notifActionBtn, selectedIndex === 2 && { backgroundColor: 'rgba(255,59,48,0.12)' }]}
+          >
+            <Text style={[styles.notifActionTxt, { color: '#FF3B30' }]}>Mark as Spam</Text>
+          </Pressable>
+        </View>
+      </LinearGradient>
     )
   }
 
-  // ── iMessage with reply chips (Q3) ────────────────────────────────────────
+  // ── iMessage with reply bubbles (Q3) ─────────────────────────────────────
   if (uiType === 'message') {
     return (
       <View style={styles.iMessageContainer}>
         <View style={[styles.iMessageHeader, { paddingTop: insets.top + 12, paddingBottom: 12 }]}>
-          <Pressable
-            onPress={() => { if (!anySelected) onTap?.(3) }}
-            hitSlop={12}
-            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
-          >
-            <Text style={styles.iMsgBackChevron}>‹ Messages</Text>
-          </Pressable>
+          <Text style={styles.iMsgBackChevron}>‹ Messages</Text>
           <View style={[styles.iMessageAvatar, { backgroundColor: '#34C759' }]}>
             <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
           </View>
@@ -655,27 +645,22 @@ function SimulationCard({
             </View>
           </View>
           <Text style={styles.iMessageDelivered}>delivered</Text>
-        </View>
-        {!chipsOpen ? (
-          <Pressable onPress={() => setChipsOpen(true)} style={styles.iMsgInputBar}>
-            <Text style={styles.iMsgInputPlaceholder}>Message</Text>
-            <Text style={styles.iMsgSendBtn}>⬆</Text>
-          </Pressable>
-        ) : (
-          <View style={styles.iMsgChipsWrap}>
-            {(options ?? []).slice(0, 3).map((opt, i) => (
+          <View style={styles.iMsgReplyBubbles}>
+            {(options ?? []).map((opt, i) => (
               <Pressable
                 key={i}
                 onPress={() => { if (!anySelected) onTap?.(i) }}
-                style={[styles.iMsgChip, selectedIndex === i && { backgroundColor: '#5B5CF6', borderColor: '#5B5CF6' }]}
+                style={[
+                  styles.iMsgReplyBubble,
+                  selectedIndex === i && { backgroundColor: '#7C3AED' },
+                  anySelected && selectedIndex !== i && { opacity: 0.4 },
+                ]}
               >
-                <Text style={[styles.iMsgChipTxt, selectedIndex === i && { color: '#FFFFFF' }]}>
-                  {opt.label}
-                </Text>
+                <Text style={styles.iMsgReplyBubbleTxt}>{opt.label}</Text>
               </Pressable>
             ))}
           </View>
-        )}
+        </View>
       </View>
     )
   }
@@ -973,8 +958,8 @@ const styles = StyleSheet.create({
   },
   navBackText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 13,
-    color: '#9CA3AF',
+    fontSize: 12,
+    color: '#9A9A9A',
     textDecorationLine: 'underline',
   },
 
@@ -1268,50 +1253,24 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     marginRight: 4,
   },
-  iMsgInputBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0,0,0,0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+  iMsgReplyBubbles: {
+    marginTop: 14,
+    alignItems: 'flex-end',
     gap: 8,
   },
-  iMsgInputPlaceholder: {
-    flex: 1,
-    fontFamily: 'Inter_400Regular',
-    fontSize: 15,
-    color: '#8E8E93',
-    backgroundColor: '#F2F2F7',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-  },
-  iMsgSendBtn: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 18,
-    color: '#007AFF',
-  },
-  iMsgChipsWrap: {
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0,0,0,0.08)',
-    padding: 10,
-    gap: 8,
-  },
-  iMsgChip: {
+  iMsgReplyBubble: {
+    backgroundColor: '#5B5CF6',
     borderRadius: 18,
+    borderBottomRightRadius: 4,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(0,122,255,0.35)',
-    backgroundColor: 'rgba(0,122,255,0.05)',
+    maxWidth: '85%',
   },
-  iMsgChipTxt: {
+  iMsgReplyBubbleTxt: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    color: '#007AFF',
+    color: '#FFFFFF',
+    lineHeight: 19,
   },
 
   // ── Instagram DM ──
@@ -1560,16 +1519,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: 'rgba(255,255,255,0.85)',
     lineHeight: 18,
-  },
-  notifSwipeHint: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  notifSwipeHintText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.35)',
-    letterSpacing: 0.3,
   },
   notifActionRow: {
     flexDirection: 'row',
