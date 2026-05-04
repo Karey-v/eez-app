@@ -89,6 +89,7 @@ export function BottomNav({ activeTab }: { activeTab: BottomNavTab }) {
             {tab.icon(focused)}
             <Text
               allowFontScaling={false}
+              numberOfLines={1}
               style={[
                 styles.label,
                 {
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,

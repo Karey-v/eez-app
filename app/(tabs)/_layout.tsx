@@ -104,7 +104,7 @@ function TabItem({ icon, label, focused }: { icon: React.ReactNode; label: strin
   return (
     <View style={styles.tabItem}>
       {icon}
-      <Text allowFontScaling={false} style={[styles.label, { color: focused ? TAB_ACTIVE_COLOR : '#9A9A9A' }]}>
+      <Text allowFontScaling={false} numberOfLines={1} style={[styles.label, { color: focused ? TAB_ACTIVE_COLOR : '#9A9A9A' }]}>
         {label}
       </Text>
     </View>
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,

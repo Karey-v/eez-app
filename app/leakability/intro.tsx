@@ -38,7 +38,7 @@ export default function TestIntroScreen() {
 
         {/* Description */}
         <Text style={styles.description}>
-          10 real scenarios. Use it as though it is your own phone screen — tap what you'd actually do. No right answers. No judgment.
+          Real scenarios. Use it as though it is your own phone screen — tap what you'd actually do. No right answers. No judgment.
         </Text>
 
         {/* Info chips */}

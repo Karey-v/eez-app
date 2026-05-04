@@ -420,8 +420,8 @@ function SimulationCard({
   // ── Reward popup ──────────────────────────────────────────────────────────
   if (uiType === 'reward-popup') {
     return (
-      <View style={[styles.rewardDim, { paddingTop: insets.top + 24 }]}>
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={[styles.rewardDim, { paddingTop: insets.top + 24, justifyContent: 'center' }]}>
+        <View style={{ alignItems: 'center' }}>
           <View style={styles.rewardCard}>
             <Pressable
               onPress={() => { if (!anySelected) onTap?.(1) }}
@@ -444,16 +444,17 @@ function SimulationCard({
               </Text>
             </Pressable>
           </View>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(3) }}
+            style={[
+              styles.rewardReportBtn,
+              { marginTop: 8 },
+              anySelected && selectedIndex !== 3 && { opacity: 0.45 },
+            ]}
+          >
+            <Text style={[styles.rewardReportTxt, selectedIndex === 3 && { color: '#FFFFFF' }]}>Report This</Text>
+          </Pressable>
         </View>
-        <Pressable
-          onPress={() => { if (!anySelected) onTap?.(3) }}
-          style={[
-            styles.rewardReportBtn,
-            anySelected && selectedIndex !== 3 && { opacity: 0.45 },
-          ]}
-        >
-          <Text style={[styles.rewardReportTxt, selectedIndex === 3 && { color: '#FFFFFF' }]}>Report This</Text>
-        </Pressable>
       </View>
     )
   }
@@ -1264,7 +1265,7 @@ const styles = StyleSheet.create({
   },
   msgActionBtn: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1392,7 +1393,7 @@ const styles = StyleSheet.create({
   },
   igActionBtn: {
     flex: 1,
-    paddingVertical: 13,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },

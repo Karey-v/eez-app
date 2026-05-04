@@ -127,11 +127,7 @@ export default function DetectorScreen() {
           <Text style={[type.label, { color: colors.textTertiary, marginTop: 24, marginBottom: 10 }]}>
             quick start
           </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 8, paddingRight: 4 }}
-          >
+          <View style={{ gap: 8 }}>
             {QUICK_STARTS.map((qs) => (
               <Pressable
                 key={qs.label}
@@ -141,16 +137,16 @@ export default function DetectorScreen() {
                 }}
                 style={({ pressed }) => [
                   styles.quickCard,
-                  { backgroundColor: colors.bgSecondary, opacity: pressed ? 0.7 : 1 },
+                  { backgroundColor: colors.bgSecondary, opacity: pressed ? 0.7 : 1, flexDirection: 'row', alignItems: 'center', gap: 12, alignSelf: 'stretch' },
                 ]}
               >
-                <Text style={{ fontSize: 20, marginBottom: 8 }}>{qs.icon}</Text>
-                <Text style={[type.body, { color: colors.textPrimary, fontFamily: 'Inter_600SemiBold', lineHeight: 16, textAlign: 'center' }]}>
+                <Text style={{ fontSize: 18 }}>{qs.icon}</Text>
+                <Text style={[type.body, { color: colors.textPrimary, fontFamily: 'Inter_600SemiBold', lineHeight: 16 }]}>
                   {qs.label}
                 </Text>
               </Pressable>
             ))}
-          </ScrollView>
+          </View>
         </ScrollView>
 
         {/* Input bar */}
