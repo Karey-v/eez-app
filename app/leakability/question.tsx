@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   StyleSheet,
+  useWindowDimensions,
 } from 'react-native'
 import Animated from 'react-native-reanimated'
 import { useRouter } from 'expo-router'
@@ -17,6 +18,7 @@ import { useTestStore } from '@/store/testStore'
 import { useUserStore } from '@/store/userStore'
 import { BottomNav } from '@/components/ui/BottomNav'
 import { LinearGradient } from 'expo-linear-gradient'
+import Svg, { Path, Circle as SvgCircle } from 'react-native-svg'
 
 function cap(s: string) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
@@ -37,7 +39,7 @@ function getSimBgColor(uiType: string): string {
     case 'wifi-settings':  return '#000000'
     case 'message':
     case 'message-actions': return '#F2F2F7'
-    case 'email':          return '#1C2633'
+    case 'email':          return '#F2F2F7'
     case 'browser':        return '#FFFFFF'
     default:               return '#FFFFFF'
   }
@@ -196,6 +198,8 @@ function QuestionBody({
 }) {
   const { colors, type, spacing } = useTheme()
   const insets = useSafeAreaInsets()
+  const { height: windowHeight } = useWindowDimensions()
+  const simHeight = windowHeight - insets.top - 80 - 64 - insets.bottom
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [displayIndex, setDisplayIndex] = useState<number | null>(initialSelectedIndex)
   const [sliderIndex, setSliderIndex] = useState<number | null>(initialSelectedIndex)
@@ -224,7 +228,7 @@ function QuestionBody({
   // ── Simulation layout ──
   if (isInternalSim) {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, maxHeight: simHeight, overflow: 'hidden' }}>
         <SimulationCard
           simulation={question.simulation!}
           onTap={handleOptionSelect}
@@ -298,6 +302,18 @@ function QuestionBody({
   )
 }
 
+// ─── Wifi arc icon ────────────────────────────────────────────────────────────
+
+function WifiArcIcon({ bars, color, dim }: { bars: number; color: string; dim: string }) {
+  return (
+    <Svg width={18} height={14} viewBox="0 0 18 14">
+      <SvgCircle cx="9" cy="13" r="1.5" fill={bars >= 1 ? color : dim} />
+      <Path d="M5.5 10 Q9 6.5 12.5 10" stroke={bars >= 2 ? color : dim} strokeWidth="1.8" fill="none" strokeLinecap="round" />
+      <Path d="M2.5 7 Q9 1 15.5 7" stroke={bars >= 3 ? color : dim} strokeWidth="1.8" fill="none" strokeLinecap="round" />
+    </Svg>
+  )
+}
+
 // ─── Simulation Card ──────────────────────────────────────────────────────────
 
 function SimulationCard({
@@ -358,18 +374,12 @@ function SimulationCard({
                   isSelected && { backgroundColor: 'rgba(91,92,246,0.08)' },
                 ]}
               >
-                <View style={styles.wifiSignalWrap}>
-                  {[5, 8, 11, 14].map((h, barIdx) => (
-                    <View
-                      key={barIdx}
-                      style={{
-                        width: 3, height: h, borderRadius: 1,
-                        backgroundColor: barIdx < meta.bars
-                          ? isSelected ? '#5B5CF6' : '#007AFF'
-                          : 'rgba(0,0,0,0.15)',
-                      }}
-                    />
-                  ))}
+                <View style={{ width: 22, alignItems: 'center' }}>
+                  <WifiArcIcon
+                    bars={meta.bars}
+                    color={isSelected ? '#5B5CF6' : '#007AFF'}
+                    dim="rgba(0,0,0,0.15)"
+                  />
                 </View>
                 <Text style={[styles.wifiRowLabel, isSelected && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
                   {opt.label}
@@ -380,7 +390,6 @@ function SimulationCard({
             )
           })}
         </View>
-        <View style={{ flex: 1 }} />
         <View style={styles.wifiActionBtns}>
           {actionOpts.map((opt, i) => {
             const globalIdx = i + 2
@@ -440,39 +449,38 @@ function SimulationCard({
           onPress={() => { if (!anySelected) onTap?.(3) }}
           style={[
             styles.rewardReportBtn,
-            selectedIndex === 3 && { backgroundColor: 'rgba(255,255,255,0.2)' },
             anySelected && selectedIndex !== 3 && { opacity: 0.45 },
           ]}
         >
-          <Text style={styles.rewardReportTxt}>Report This</Text>
+          <Text style={[styles.rewardReportTxt, selectedIndex === 3 && { color: '#FFFFFF' }]}>Report This</Text>
         </Pressable>
       </View>
     )
   }
 
-  // ── iMessage + action buttons (Q8) ────────────────────────────────────────
+  // ── iMessage + action buttons (Q7) ────────────────────────────────────────
   if (uiType === 'message-actions') {
     return (
-      <View style={styles.iMessageContainer}>
-        <View style={[styles.iMessageHeader, { paddingTop: 8, paddingBottom: 12 }]}>
-          <View style={[styles.iMessageAvatar, { backgroundColor: '#8E8E93' }]}>
-            <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
+      <View style={[styles.iMessageContainer, { overflow: 'hidden' }]}>
+        <View style={[styles.iMessageHeader, { paddingTop: 6, paddingBottom: 8 }]}>
+          <View style={[styles.iMessageAvatar, { width: 30, height: 30, borderRadius: 15, backgroundColor: '#8E8E93' }]}>
+            <Text style={[styles.iMessageAvatarText, { fontSize: 11 }]}>{initials || '?'}</Text>
           </View>
           <View>
-            <Text style={styles.iMessageSenderName}>{sender}</Text>
+            <Text style={[styles.iMessageSenderName, { fontSize: 13 }]}>{sender}</Text>
             <Text style={styles.iMessageMeta}>Unknown Caller</Text>
           </View>
         </View>
-        <View style={[styles.iMessageChatArea, { justifyContent: 'flex-start' }]}>
+        <View style={[styles.iMessageChatArea, { justifyContent: 'flex-start', paddingTop: 10, paddingBottom: 8, overflow: 'hidden' }]}>
           <View style={styles.iMessageBubbleRow}>
-            <View style={[styles.iMessageAvatarSmall, { backgroundColor: '#8E8E93' }]}>
-              <Text style={styles.iMessageAvatarSmallText}>{initials || '?'}</Text>
+            <View style={[styles.iMessageAvatarSmall, { width: 20, height: 20, borderRadius: 10, backgroundColor: '#8E8E93' }]}>
+              <Text style={[styles.iMessageAvatarSmallText, { fontSize: 7 }]}>{initials || '?'}</Text>
             </View>
-            <View style={styles.iMessageBubble}>
+            <View style={[styles.iMessageBubble, { paddingHorizontal: 10, paddingVertical: 8 }]}>
               <Text style={[styles.iMessageBubbleText, { fontSize: 12, lineHeight: 17 }]}>{content}</Text>
             </View>
           </View>
-          <Text style={styles.iMessageDelivered}>delivered</Text>
+          <Text style={[styles.iMessageDelivered, { marginTop: 2 }]}>delivered</Text>
         </View>
         <View style={styles.msgActionBar}>
           {(options ?? []).map((opt, i) => (
@@ -485,7 +493,7 @@ function SimulationCard({
                 selectedIndex === i && { backgroundColor: 'rgba(91,92,246,0.08)' },
               ]}
             >
-              <Text style={[styles.msgActionTxt, i === 0 ? { color: '#FF3B30' } : { color: '#007AFF' }]}>
+              <Text style={[styles.msgActionTxt, { fontSize: 13 }, i === 0 ? { color: '#FF3B30' } : { color: '#007AFF' }]}>
                 {opt.label}
               </Text>
             </Pressable>
@@ -641,7 +649,7 @@ function SimulationCard({
               selectedIndex === 1 && { backgroundColor: 'rgba(0,149,255,0.18)' },
             ]}
           >
-            <Text style={[styles.notifActionTxt, { color: '#FFFFFF' }]}>Ignore</Text>
+            <Text style={[styles.notifActionTxt, { color: '#FFFFFF' }]}>Go back</Text>
           </Pressable>
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(2) }}
@@ -702,36 +710,33 @@ function SimulationCard({
   if (uiType === 'email') {
     return (
       <View style={styles.emailContainer}>
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <View style={styles.emailPopupCard}>
-            <View style={styles.emailPopupHeader}>
-              <View style={[styles.emailAvatar, { backgroundColor: '#FF3B30' }]}>
-                <Text style={styles.emailAvatarText}>{initials || '?'}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.emailViewerSender} numberOfLines={1}>{sender}</Text>
-                {preview && <Text style={styles.emailViewerSubject} numberOfLines={1}>{preview}</Text>}
-              </View>
-              <Text style={styles.emailViewerTime}>now</Text>
+        <View style={styles.emailPopupCard}>
+          <View style={styles.emailPopupHeader}>
+            <View style={[styles.emailAvatar, { backgroundColor: '#FF3B30' }]}>
+              <Text style={styles.emailAvatarText}>{initials || '?'}</Text>
             </View>
-            <View style={{ height: 0.5, backgroundColor: 'rgba(0,0,0,0.08)' }} />
-            <Text style={styles.emailPopupBody}>{content}</Text>
-            <Text style={styles.emailPopupLink}>Verify my account →</Text>
-            <Pressable
-              onPress={() => { if (!anySelected) onTap?.(0) }}
-              style={[
-                styles.emailContinueBtn,
-                { marginHorizontal: 14, marginBottom: 14 },
-                selectedIndex === 0 && { backgroundColor: '#CC1500' },
-                anySelected && selectedIndex !== 0 && { opacity: 0.45 },
-              ]}
-            >
-              <Text style={styles.emailContinueTxt}>Continue →</Text>
-            </Pressable>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.emailViewerSender} numberOfLines={1}>{sender}</Text>
+              {preview && <Text style={styles.emailViewerSubject} numberOfLines={1}>{preview}</Text>}
+            </View>
+            <Text style={styles.emailViewerTime}>now</Text>
           </View>
-        </View>
-        <View style={styles.emailBottomActions}>
-          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>
+          <View style={{ height: 0.5, backgroundColor: 'rgba(0,0,0,0.08)' }} />
+          <Text style={styles.emailPopupBody}>{content}</Text>
+          <Text style={styles.emailPopupLink}>Verify my account →</Text>
+          <Pressable
+            onPress={() => { if (!anySelected) onTap?.(0) }}
+            style={[
+              styles.emailContinueBtn,
+              { marginHorizontal: 12, marginBottom: 10 },
+              selectedIndex === 0 && { backgroundColor: '#CC1500' },
+              anySelected && selectedIndex !== 0 && { opacity: 0.45 },
+            ]}
+          >
+            <Text style={styles.emailContinueTxt}>Continue →</Text>
+          </Pressable>
+          <View style={{ height: 0.5, backgroundColor: 'rgba(0,0,0,0.06)', marginHorizontal: 12 }} />
+          <View style={{ flexDirection: 'row', gap: 8, margin: 12, marginTop: 10 }}>
             <Pressable
               onPress={() => { if (!anySelected) onTap?.(1) }}
               style={[
@@ -761,9 +766,9 @@ function SimulationCard({
           </View>
           <Pressable
             onPress={() => { if (!anySelected) onTap?.(3) }}
-            style={[{ alignItems: 'center', paddingVertical: 4 }, anySelected && selectedIndex !== 3 && { opacity: 0.45 }]}
+            style={[{ alignItems: 'center', paddingBottom: 14, paddingTop: 2 }, anySelected && selectedIndex !== 3 && { opacity: 0.45 }]}
           >
-            <Text style={[styles.emailTertiaryTxt, selectedIndex === 3 && { color: '#FFFFFF', fontFamily: 'Inter_700Bold' }]}>
+            <Text style={[styles.emailTertiaryTxt, selectedIndex === 3 && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
               Check Sender
             </Text>
           </Pressable>
@@ -1155,16 +1160,14 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   rewardReportBtn: {
-    borderRadius: 12,
-    paddingVertical: 14,
+    paddingVertical: 10,
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.5)',
   },
   rewardReportTxt: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 15,
-    color: '#FFFFFF',
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.6)',
+    textDecorationLine: 'underline',
   },
 
   // ── iMessage (shared for message + message-actions) ──
@@ -1639,42 +1642,38 @@ const styles = StyleSheet.create({
   // ── Email viewer ──
   emailContainer: {
     flex: 1,
-    backgroundColor: '#1C2633',
+    backgroundColor: '#F2F2F7',
     paddingHorizontal: 18,
-    paddingBottom: 20,
+    justifyContent: 'center',
   },
   emailPopupCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 16,
   },
   emailPopupHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   emailPopupBody: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 13,
+    fontSize: 12,
     color: '#4B5563',
-    paddingHorizontal: 14,
-    paddingTop: 10,
-    paddingBottom: 6,
-    lineHeight: 19,
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 4,
+    lineHeight: 18,
   },
   emailPopupLink: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
+    fontSize: 12,
     color: '#007AFF',
-    paddingHorizontal: 14,
-    paddingBottom: 12,
+    paddingHorizontal: 12,
+    paddingBottom: 10,
     textDecorationLine: 'underline',
-  },
-  emailBottomActions: {
-    paddingTop: 4,
   },
   emailAvatar: {
     width: 42,
@@ -1730,14 +1729,15 @@ const styles = StyleSheet.create({
   },
   emailTertiaryTxt: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    fontSize: 12,
+    color: '#8E8E93',
     textDecorationLine: 'underline',
   },
 
   // ── WiFi action buttons ──
   wifiActionBtns: {
     paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 20,
     gap: 10,
   },

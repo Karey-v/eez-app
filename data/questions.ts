@@ -33,7 +33,7 @@ export const questions: Question[] = [
     },
     options: [
       { label: 'Tap to verify', score: -1, feedback: 'tapping suspicious notifications is how scams get you.' },
-      { label: 'Ignore', score: 3, feedback: 'right call. dismissing suspicious notifications is the safest move.' },
+      { label: 'Go back', score: 3, feedback: 'right call. dismissing suspicious notifications is the safest move.' },
       { label: 'Mark as Spam', score: 1, feedback: 'good — blocking the sender helps protect you.' },
     ],
   },
