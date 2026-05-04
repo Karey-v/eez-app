@@ -25,7 +25,7 @@ function cap(s: string) {
 // ─── Sim helpers ──────────────────────────────────────────────────────────────
 
 const INTERNAL_SIM_TYPES = [
-  'notification', 'message', 'email', 'ios-update',
+  'notification', 'message', 'email',
   'wifi-settings', 'reward-popup', 'message-actions', 'instagram-dm', 'browser',
 ]
 
@@ -37,8 +37,7 @@ function getSimBgColor(uiType: string): string {
     case 'wifi-settings':  return '#000000'
     case 'message':
     case 'message-actions': return '#F2F2F7'
-    case 'ios-update':     return '#F2F2F7'
-    case 'email':          return '#FFFFFF'
+    case 'email':          return '#1C2633'
     case 'browser':        return '#FFFFFF'
     default:               return '#FFFFFF'
   }
@@ -61,10 +60,10 @@ function computeResults(answers: { questionId: number; score: number; category: 
     band,
     categoryScores: {
       passwords: byId[2] ?? 0,
-      device:    byId[5] ?? 0,
-      messages:  (byId[3] ?? 0) + (byId[8] ?? 0) + (byId[9] ?? 0),
-      phishing:  (byId[4] ?? 0) + (byId[10] ?? 0),
-      scams:     (byId[1] ?? 0) + (byId[6] ?? 0) + (byId[7] ?? 0),
+      device:    0,
+      messages:  (byId[3] ?? 0) + (byId[7] ?? 0) + (byId[8] ?? 0),
+      phishing:  (byId[4] ?? 0) + (byId[9] ?? 0),
+      scams:     (byId[1] ?? 0) + (byId[5] ?? 0) + (byId[6] ?? 0),
     },
   }
 }
@@ -329,12 +328,9 @@ function SimulationCard({
 
   // ── Wi-Fi settings (light mode) ──────────────────────────────────────────
   if (uiType === 'wifi-settings') {
-    const rowMeta = [
-      { bars: 3, open: true },
-      { bars: 2, open: false },
-      { bars: 0, badge: '4G' },
-      { bars: 0, badge: 'VPN' },
-    ] as { bars: number; open?: boolean; badge?: string }[]
+    const networkMeta = [{ bars: 3, locked: false }, { bars: 2, locked: true }]
+    const networkOpts = (options ?? []).slice(0, 2)
+    const actionOpts = (options ?? []).slice(2)
 
     return (
       <View style={styles.wifiContainer}>
@@ -348,10 +344,10 @@ function SimulationCard({
         </View>
         <View style={styles.wifiList}>
           <Text style={styles.wifiSectionLabel}>NETWORKS</Text>
-          {(options ?? []).map((opt, i) => {
-            const meta = rowMeta[i] ?? { bars: 2 }
+          {networkOpts.map((opt, i) => {
+            const meta = networkMeta[i]
             const isSelected = selectedIndex === i
-            const isLast = i === (options?.length ?? 0) - 1
+            const isLast = i === networkOpts.length - 1
             return (
               <Pressable
                 key={i}
@@ -362,31 +358,48 @@ function SimulationCard({
                   isSelected && { backgroundColor: 'rgba(91,92,246,0.08)' },
                 ]}
               >
-                {meta.badge ? (
-                  <View style={styles.wifiBadge}>
-                    <Text style={styles.wifiBadgeText}>{meta.badge}</Text>
-                  </View>
-                ) : (
-                  <View style={styles.wifiSignalWrap}>
-                    {[5, 8, 11, 14].map((h, barIdx) => (
-                      <View
-                        key={barIdx}
-                        style={{
-                          width: 3, height: h, borderRadius: 1,
-                          backgroundColor: barIdx < meta.bars
-                            ? isSelected ? '#5B5CF6' : '#007AFF'
-                            : 'rgba(0,0,0,0.15)',
-                        }}
-                      />
-                    ))}
-                  </View>
-                )}
+                <View style={styles.wifiSignalWrap}>
+                  {[5, 8, 11, 14].map((h, barIdx) => (
+                    <View
+                      key={barIdx}
+                      style={{
+                        width: 3, height: h, borderRadius: 1,
+                        backgroundColor: barIdx < meta.bars
+                          ? isSelected ? '#5B5CF6' : '#007AFF'
+                          : 'rgba(0,0,0,0.15)',
+                      }}
+                    />
+                  ))}
+                </View>
                 <Text style={[styles.wifiRowLabel, isSelected && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
                   {opt.label}
                 </Text>
-                {meta.open === true && <Text style={styles.wifiLockIcon}>🔓</Text>}
-                {meta.open === false && i < 2 && <Text style={styles.wifiLockIcon}>🔒</Text>}
+                {meta.locked && <Text style={styles.wifiLockIcon}>🔒</Text>}
                 {isSelected && <Text style={styles.wifiCheck}>✓</Text>}
+              </Pressable>
+            )
+          })}
+        </View>
+        <View style={{ flex: 1 }} />
+        <View style={styles.wifiActionBtns}>
+          {actionOpts.map((opt, i) => {
+            const globalIdx = i + 2
+            const isSelected = selectedIndex === globalIdx
+            const isPrimary = i === 0
+            return (
+              <Pressable
+                key={globalIdx}
+                onPress={() => { if (!anySelected) onTap?.(globalIdx) }}
+                style={[
+                  isPrimary ? styles.wifiActionPrimary : styles.wifiActionSecondary,
+                  isSelected && isPrimary && { backgroundColor: '#4A4AE0' },
+                  isSelected && !isPrimary && { backgroundColor: 'rgba(91,92,246,0.12)' },
+                  anySelected && !isSelected && { opacity: 0.45 },
+                ]}
+              >
+                <Text style={isPrimary ? styles.wifiActionPrimaryTxt : styles.wifiActionSecondaryTxt}>
+                  {opt.label}
+                </Text>
               </Pressable>
             )
           })}
@@ -441,7 +454,7 @@ function SimulationCard({
   if (uiType === 'message-actions') {
     return (
       <View style={styles.iMessageContainer}>
-        <View style={[styles.iMessageHeader, { paddingTop: insets.top + 12, paddingBottom: 12 }]}>
+        <View style={[styles.iMessageHeader, { paddingTop: 8, paddingBottom: 12 }]}>
           <View style={[styles.iMessageAvatar, { backgroundColor: '#8E8E93' }]}>
             <Text style={styles.iMessageAvatarText}>{initials || '?'}</Text>
           </View>
@@ -450,13 +463,13 @@ function SimulationCard({
             <Text style={styles.iMessageMeta}>Unknown Caller</Text>
           </View>
         </View>
-        <View style={styles.iMessageChatArea}>
+        <View style={[styles.iMessageChatArea, { justifyContent: 'flex-start' }]}>
           <View style={styles.iMessageBubbleRow}>
             <View style={[styles.iMessageAvatarSmall, { backgroundColor: '#8E8E93' }]}>
               <Text style={styles.iMessageAvatarSmallText}>{initials || '?'}</Text>
             </View>
             <View style={styles.iMessageBubble}>
-              <Text style={styles.iMessageBubbleText}>{content}</Text>
+              <Text style={[styles.iMessageBubbleText, { fontSize: 12, lineHeight: 17 }]}>{content}</Text>
             </View>
           </View>
           <Text style={styles.iMessageDelivered}>delivered</Text>
@@ -491,7 +504,7 @@ function SimulationCard({
 
     return (
       <View style={styles.igContainer}>
-        <View style={[styles.igHeader, { paddingTop: insets.top + 12, paddingBottom: 12 }]}>
+        <View style={[styles.igHeader, { paddingTop: 8, paddingBottom: 12 }]}>
           <View style={[styles.igAvatarMed, { backgroundColor: '#C837AB' }]}>
             <Text style={styles.igAvatarMedTxt}>{initials || '?'}</Text>
           </View>
@@ -537,39 +550,58 @@ function SimulationCard({
     )
   }
 
-  // ── Browser (Q10) ─────────────────────────────────────────────────────────
+  // ── Browser / phishing popup (Q10) ──────────────────────────────────────
   if (uiType === 'browser') {
     return (
       <View style={styles.browserContainer}>
-        <Pressable
-          onPress={() => { if (!anySelected) onTap?.(1) }}
-          style={[
-            styles.browserURLBar,
-            { marginTop: insets.top + 10 },
-            selectedIndex === 1 && { backgroundColor: 'rgba(91,92,246,0.08)', borderColor: '#5B5CF6', borderWidth: 1 },
-          ]}
-        >
+        {/* Dimmed fake browser behind popup */}
+        <View style={[styles.browserURLBar, { marginTop: 10, opacity: 0.4 }]}>
           <Text style={styles.browserWarningIcon}>⚠️</Text>
           <Text style={styles.browserURLText} numberOfLines={1}>{sender}</Text>
           <Text style={styles.browserMenuDots}>···</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => { if (!anySelected) onTap?.(0) }}
-          style={[styles.browserPage, selectedIndex === 0 && { backgroundColor: 'rgba(91,92,246,0.03)' }]}
-        >
+        </View>
+        <View style={[styles.browserPage, { opacity: 0.3 }]}>
           <Text style={styles.browserPageTitle}>{content}</Text>
-          <View style={[styles.browserField, selectedIndex === 0 && { borderColor: '#5B5CF6' }]}>
+          <View style={styles.browserField}>
             <Text style={styles.browserFieldLabel}>Email</Text>
             <Text style={styles.browserFieldHint}>your@email.com</Text>
           </View>
-          <View style={[styles.browserField, { marginTop: 10 }, selectedIndex === 0 && { borderColor: '#5B5CF6' }]}>
+          <View style={[styles.browserField, { marginTop: 10 }]}>
             <Text style={styles.browserFieldLabel}>Password</Text>
             <Text style={styles.browserFieldHint}>••••••••</Text>
           </View>
-          <View style={[styles.browserSignInBtn, selectedIndex === 0 && { backgroundColor: '#7C3AED' }]}>
-            <Text style={styles.browserSignInTxt}>Sign In</Text>
+        </View>
+        {/* Security popup overlay */}
+        <View style={styles.browserPopupOverlay}>
+          <View style={styles.browserPopupCard}>
+            <Text style={styles.browserPopupIcon}>⚠️</Text>
+            <Text style={styles.browserPopupTitle}>Suspicious Site Detected</Text>
+            <Text style={styles.browserPopupSubtitle}>
+              This page may be a phishing site trying to steal your login details.
+            </Text>
+            <Text style={styles.browserPopupURL}>{sender}</Text>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(0) }}
+              style={[
+                styles.browserPopupDangerBtn,
+                selectedIndex === 0 && { backgroundColor: '#CC1500' },
+                anySelected && selectedIndex !== 0 && { opacity: 0.45 },
+              ]}
+            >
+              <Text style={styles.browserPopupDangerTxt}>Open Website</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(1) }}
+              style={[
+                styles.browserPopupSafeBtn,
+                selectedIndex === 1 && { backgroundColor: 'rgba(0,122,255,0.12)' },
+                anySelected && selectedIndex !== 1 && { opacity: 0.45 },
+              ]}
+            >
+              <Text style={styles.browserPopupSafeTxt}>Report</Text>
+            </Pressable>
           </View>
-        </Pressable>
+        </View>
       </View>
     )
   }
@@ -669,33 +701,37 @@ function SimulationCard({
   // ── Email viewer (Q4) ─────────────────────────────────────────────────────
   if (uiType === 'email') {
     return (
-      <View style={styles.emailViewer}>
-        <View style={[styles.emailViewerHeader, { paddingTop: 10, paddingBottom: 10 }]}>
-          <View style={[styles.emailAvatar, { backgroundColor: '#FF3B30' }]}>
-            <Text style={styles.emailAvatarText}>{initials || '?'}</Text>
+      <View style={styles.emailContainer}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <View style={styles.emailPopupCard}>
+            <View style={styles.emailPopupHeader}>
+              <View style={[styles.emailAvatar, { backgroundColor: '#FF3B30' }]}>
+                <Text style={styles.emailAvatarText}>{initials || '?'}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.emailViewerSender} numberOfLines={1}>{sender}</Text>
+                {preview && <Text style={styles.emailViewerSubject} numberOfLines={1}>{preview}</Text>}
+              </View>
+              <Text style={styles.emailViewerTime}>now</Text>
+            </View>
+            <View style={{ height: 0.5, backgroundColor: 'rgba(0,0,0,0.08)' }} />
+            <Text style={styles.emailPopupBody}>{content}</Text>
+            <Text style={styles.emailPopupLink}>Verify my account →</Text>
+            <Pressable
+              onPress={() => { if (!anySelected) onTap?.(0) }}
+              style={[
+                styles.emailContinueBtn,
+                { marginHorizontal: 14, marginBottom: 14 },
+                selectedIndex === 0 && { backgroundColor: '#CC1500' },
+                anySelected && selectedIndex !== 0 && { opacity: 0.45 },
+              ]}
+            >
+              <Text style={styles.emailContinueTxt}>Continue →</Text>
+            </Pressable>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.emailViewerSender} numberOfLines={1}>{sender}</Text>
-            {preview && <Text style={styles.emailViewerSubject} numberOfLines={1}>{preview}</Text>}
-          </View>
-          <Text style={styles.emailViewerTime}>now</Text>
         </View>
-        <View style={{ flex: 1, paddingHorizontal: 14, paddingTop: 12 }}>
-          <Text style={styles.emailViewerBody}>{content}</Text>
-          <Text style={styles.emailViewerLink}>Verify my account →</Text>
-        </View>
-        <View style={{ paddingHorizontal: 14, paddingBottom: 16, gap: 10 }}>
-          <Pressable
-            onPress={() => { if (!anySelected) onTap?.(0) }}
-            style={[
-              styles.emailContinueBtn,
-              selectedIndex === 0 && { backgroundColor: '#CC1500' },
-              anySelected && selectedIndex !== 0 && { opacity: 0.45 },
-            ]}
-          >
-            <Text style={styles.emailContinueTxt}>Continue →</Text>
-          </Pressable>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={styles.emailBottomActions}>
+          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>
             <Pressable
               onPress={() => { if (!anySelected) onTap?.(1) }}
               style={[
@@ -727,55 +763,11 @@ function SimulationCard({
             onPress={() => { if (!anySelected) onTap?.(3) }}
             style={[{ alignItems: 'center', paddingVertical: 4 }, anySelected && selectedIndex !== 3 && { opacity: 0.45 }]}
           >
-            <Text style={[styles.emailTertiaryTxt, selectedIndex === 3 && { color: '#5B5CF6', fontFamily: 'Inter_700Bold' }]}>
+            <Text style={[styles.emailTertiaryTxt, selectedIndex === 3 && { color: '#FFFFFF', fontFamily: 'Inter_700Bold' }]}>
               Check Sender
             </Text>
           </Pressable>
         </View>
-      </View>
-    )
-  }
-
-  // ── iOS software update (Q5) ──────────────────────────────────────────────
-  if (uiType === 'ios-update') {
-    return (
-      <View style={styles.iosUpdateContainer}>
-        <View style={[styles.iosUpdateNavBar, { paddingTop: insets.top + 14, paddingBottom: 12 }]}>
-          <Text style={styles.iosUpdateBack}>‹ General</Text>
-          <Text style={styles.iosUpdateTitle}>Software Update</Text>
-          <Text style={{ width: 60 }} />
-        </View>
-        <View style={styles.iosUpdateCard}>
-          <View style={styles.iosUpdateIconRow}>
-            <View style={styles.iosUpdateIcon}>
-              <Text style={styles.iosUpdateIconTxt}>iOS</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.iosUpdateVersion}>{sender}</Text>
-              <Text style={styles.iosUpdateSize}>1.2 GB</Text>
-            </View>
-          </View>
-          <Text style={styles.iosUpdateBody} numberOfLines={2}>{content}</Text>
-        </View>
-        {(options ?? []).map((opt, i) => (
-          <Pressable
-            key={i}
-            onPress={() => { if (!anySelected) onTap?.(i) }}
-            style={[
-              i === 0 ? styles.iosUpdatePrimaryBtn : styles.iosUpdateSecondaryRow,
-              selectedIndex === i && i === 0 && { backgroundColor: '#0A5AD4' },
-              selectedIndex === i && i !== 0 && { backgroundColor: 'rgba(91,92,246,0.07)' },
-            ]}
-          >
-            <Text style={[
-              i === 0 ? styles.iosUpdatePrimaryTxt : styles.iosUpdateSecondaryTxt,
-              i === 3 && { color: '#FF3B30' },
-              selectedIndex === i && i !== 0 && { color: '#5B5CF6' },
-            ]}>
-              {opt.label}
-            </Text>
-          </Pressable>
-        ))}
       </View>
     )
   }
@@ -989,14 +981,14 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 
-  // ── WiFi settings (dark mode) ──
+  // ── WiFi settings (light mode) ──
   wifiContainer: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
   },
   wifiStatusBar: {
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -1006,12 +998,12 @@ const styles = StyleSheet.create({
   wifiStatusTime: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
   },
   wifiStatusRight: {
     fontFamily: 'Inter_400Regular',
     fontSize: 10,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     letterSpacing: 2,
   },
   wifiTitleRow: {
@@ -1029,18 +1021,18 @@ const styles = StyleSheet.create({
   wifiTitle: {
     fontFamily: 'Inter_700Bold',
     fontSize: 22,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     flex: 1,
     textAlign: 'center',
     marginRight: 60,
   },
   wifiList: {
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#F2F2F7',
   },
   wifiSectionLabel: {
     fontFamily: 'Inter_400Regular',
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: 'rgba(0,0,0,0.4)',
     letterSpacing: 0.5,
     paddingHorizontal: 16,
     paddingTop: 14,
@@ -1052,12 +1044,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 13,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#FFFFFF',
     gap: 10,
   },
   wifiRowDivider: {
     borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(255,255,255,0.08)',
+    borderBottomColor: 'rgba(0,0,0,0.08)',
   },
   wifiSignalWrap: {
     flexDirection: 'row',
@@ -1081,7 +1073,7 @@ const styles = StyleSheet.create({
   wifiRowLabel: {
     fontFamily: 'Inter_400Regular',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     flex: 1,
   },
   wifiLockIcon: {
@@ -1099,8 +1091,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#808080',
     paddingHorizontal: 20,
     paddingBottom: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   rewardCard: {
     backgroundColor: '#FFFFFF',
@@ -1163,6 +1153,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8E8E93',
     textDecorationLine: 'underline',
+  },
+  rewardReportBtn: {
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.5)',
+  },
+  rewardReportTxt: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 15,
+    color: '#FFFFFF',
   },
 
   // ── iMessage (shared for message + message-actions) ──
@@ -1259,7 +1261,7 @@ const styles = StyleSheet.create({
   },
   msgActionBtn: {
     flex: 1,
-    paddingVertical: 13,
+    paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1299,10 +1301,10 @@ const styles = StyleSheet.create({
     lineHeight: 19,
   },
 
-  // ── Instagram DM ──
+  // ── Instagram DM (light mode) ──
   igContainer: {
     flex: 1,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
   },
   igHeader: {
@@ -1311,7 +1313,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(255,255,255,0.08)',
+    borderBottomColor: 'rgba(0,0,0,0.08)',
   },
   igAvatarMed: {
     width: 36,
@@ -1328,12 +1330,12 @@ const styles = StyleSheet.create({
   igUsername: {
     fontFamily: 'Inter_700Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
   },
   igSubtitle: {
     fontFamily: 'Inter_400Regular',
     fontSize: 11,
-    color: 'rgba(255,255,255,0.45)',
+    color: '#8E8E93',
     marginTop: 1,
   },
   igChatArea: {
@@ -1343,6 +1345,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 12,
     paddingVertical: 14,
+    backgroundColor: '#F2F2F7',
   },
   igAvatarSm: {
     width: 26,
@@ -1358,7 +1361,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   igBubble: {
-    backgroundColor: '#2C2C2E',
+    backgroundColor: '#E5E5EA',
     borderRadius: 18,
     borderBottomLeftRadius: 4,
     paddingHorizontal: 12,
@@ -1370,7 +1373,7 @@ const styles = StyleSheet.create({
   igBubbleTxt: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     lineHeight: 19,
   },
   igLinkTxt: {
@@ -1381,7 +1384,8 @@ const styles = StyleSheet.create({
   igActionBar: {
     flexDirection: 'row',
     borderTopWidth: 0.5,
-    borderTopColor: 'rgba(255,255,255,0.08)',
+    borderTopColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: '#FFFFFF',
   },
   igActionBtn: {
     flex: 1,
@@ -1391,7 +1395,7 @@ const styles = StyleSheet.create({
   },
   igActionBtnDivider: {
     borderRightWidth: 0.5,
-    borderRightColor: 'rgba(255,255,255,0.08)',
+    borderRightColor: 'rgba(0,0,0,0.08)',
   },
   igActionTxt: {
     fontFamily: 'Inter_600SemiBold',
@@ -1475,6 +1479,74 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
     fontSize: 15,
     color: '#FFFFFF',
+  },
+  browserPopupOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  browserPopupCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 22,
+    width: '100%',
+    alignItems: 'center',
+  },
+  browserPopupIcon: {
+    fontSize: 36,
+    marginBottom: 10,
+  },
+  browserPopupTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
+    color: '#0A0A0A',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  browserPopupSubtitle: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 10,
+  },
+  browserPopupURL: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: '#FF3B30',
+    marginBottom: 18,
+    textAlign: 'center',
+  },
+  browserPopupDangerBtn: {
+    backgroundColor: '#FF3B30',
+    borderRadius: 10,
+    height: 46,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  browserPopupDangerTxt: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
+  },
+  browserPopupSafeBtn: {
+    borderWidth: 1.5,
+    borderColor: '#007AFF',
+    borderRadius: 10,
+    height: 46,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  browserPopupSafeTxt: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 15,
+    color: '#007AFF',
   },
 
   // ── iOS lockscreen notification ──
@@ -1565,18 +1637,44 @@ const styles = StyleSheet.create({
   },
 
   // ── Email viewer ──
-  emailViewer: {
+  emailContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden',
+    backgroundColor: '#1C2633',
+    paddingHorizontal: 18,
+    paddingBottom: 20,
   },
-  emailViewerHeader: {
+  emailPopupCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  emailPopupHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: 14,
-    borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
+    paddingVertical: 12,
+  },
+  emailPopupBody: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: '#4B5563',
+    paddingHorizontal: 14,
+    paddingTop: 10,
+    paddingBottom: 6,
+    lineHeight: 19,
+  },
+  emailPopupLink: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: '#007AFF',
+    paddingHorizontal: 14,
+    paddingBottom: 12,
+    textDecorationLine: 'underline',
+  },
+  emailBottomActions: {
+    paddingTop: 4,
   },
   emailAvatar: {
     width: 42,
@@ -1608,133 +1706,63 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     flexShrink: 0,
   },
-  emailViewerBody: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 13,
-    color: '#4B5563',
-    paddingHorizontal: 14,
-    paddingTop: 10,
-    lineHeight: 19,
-  },
-  emailViewerLink: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
-    color: '#007AFF',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    textDecorationLine: 'underline',
-  },
-  emailActionGrid: {
-    gap: 8,
-    padding: 12,
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0,0,0,0.06)',
-  },
-  emailActionBtn: {
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderWidth: 1.5,
-    alignItems: 'center',
-  },
-  emailActionTxt: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
-  },
-
-  // ── iOS update screen ──
-  iosUpdateContainer: {
-    flex: 1,
-    backgroundColor: '#F2F2F7',
-    overflow: 'hidden',
-  },
-  iosUpdateNavBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
-  },
-  iosUpdateBack: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 15,
-    color: '#007AFF',
-    width: 70,
-  },
-  iosUpdateTitle: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 16,
-    color: '#0A0A0A',
-  },
-  iosUpdateCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    marginBottom: 2,
-  },
-  iosUpdateIconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 10,
-  },
-  iosUpdateIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 12,
-    backgroundColor: '#007AFF',
+  emailContinueBtn: {
+    backgroundColor: '#FF3B30',
+    borderRadius: 10,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iosUpdateIconTxt: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 14,
-    color: '#FFFFFF',
-    letterSpacing: -0.5,
-  },
-  iosUpdateVersion: {
+  emailContinueTxt: {
     fontFamily: 'Inter_700Bold',
     fontSize: 16,
-    color: '#0A0A0A',
+    color: '#FFFFFF',
   },
-  iosUpdateSize: {
+  emailSecondaryBtn: {
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1.5,
+  },
+  emailSecondaryTxt: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+  },
+  emailTertiaryTxt: {
     fontFamily: 'Inter_400Regular',
     fontSize: 13,
-    color: '#8E8E93',
-    marginTop: 2,
+    color: 'rgba(255,255,255,0.6)',
+    textDecorationLine: 'underline',
   },
-  iosUpdateBody: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 13,
-    color: '#4B5563',
-    lineHeight: 18,
+
+  // ── WiFi action buttons ──
+  wifiActionBtns: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+    gap: 10,
   },
-  iosUpdatePrimaryBtn: {
-    backgroundColor: '#007AFF',
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 4,
+  wifiActionPrimary: {
+    backgroundColor: '#5B5CF6',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  iosUpdatePrimaryTxt: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 16,
+  wifiActionPrimaryTxt: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 15,
     color: '#FFFFFF',
   },
-  iosUpdateSecondaryRow: {
+  wifiActionSecondary: {
+    borderRadius: 12,
     paddingVertical: 14,
-    paddingHorizontal: 16,
     alignItems: 'center',
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0,0,0,0.06)',
+    borderWidth: 1.5,
+    borderColor: '#5B5CF6',
   },
-  iosUpdateSecondaryTxt: {
-    fontFamily: 'Inter_400Regular',
+  wifiActionSecondaryTxt: {
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 15,
-    color: '#007AFF',
+    color: '#5B5CF6',
   },
 
   // ── Alert fallback ──

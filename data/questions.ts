@@ -88,24 +88,6 @@ export const questions: Question[] = [
   },
   {
     id: 5,
-    category: 'Response Style',
-    type: 'simulation-tap',
-    prompt: 'your phone shows this. what do you do?',
-    simulation: {
-      uiType: 'ios-update',
-      sender: 'iOS 26',
-      content: 'iOS 26 is now available. This update includes important security fixes and improvements.',
-      preview: 'Settings · General · Software Update',
-    },
-    options: [
-      { label: 'Update Now', score: 3, feedback: 'updates patch real vulnerabilities — always update promptly.' },
-      { label: 'Remind Me Tonight', score: 1, feedback: 'ok compromise, but sooner is always safer.' },
-      { label: 'Dismiss', score: -1, feedback: 'dismissing leaves you exposed longer than needed.' },
-      { label: 'Turn Off Automatic Updates', score: -3, feedback: 'disabling updates is one of the riskiest habits you can have.' },
-    ],
-  },
-  {
-    id: 6,
     category: 'Habits',
     type: 'simulation-tap',
     prompt: "you're at a coffee shop. pick a network.",
@@ -115,14 +97,14 @@ export const questions: Question[] = [
       content: '',
     },
     options: [
-      { label: 'Free City WiFi', score: -3, feedback: 'open public networks can be intercepted. never use them for banking.' },
+      { label: 'Free Open City WiFi', score: -3, feedback: 'open public networks can be intercepted. never use them for banking.' },
       { label: 'Coffee House WiFi', score: 2, feedback: 'named networks can be spoofed by attackers. still risky without a VPN.' },
-      { label: 'Mobile Data', score: 3, feedback: 'smart. your own data connection is the safest option.' },
-      { label: 'VPN On', score: 1, feedback: 'good — a VPN significantly reduces risk on public networks.' },
+      { label: 'Use Mobile Data', score: 3, feedback: 'smart. your own data connection is the safest option.' },
+      { label: 'Use VPN Instead', score: 1, feedback: 'good — a VPN significantly reduces risk on public networks.' },
     ],
   },
   {
-    id: 7,
+    id: 6,
     category: 'Impulse',
     type: 'simulation-tap',
     prompt: 'a popup appears. what do you tap?',
@@ -139,7 +121,7 @@ export const questions: Question[] = [
     ],
   },
   {
-    id: 8,
+    id: 7,
     category: 'Verification',
     type: 'simulation-tap',
     prompt: 'you get this from an unknown number. what do you do?',
@@ -156,7 +138,7 @@ export const questions: Question[] = [
     ],
   },
   {
-    id: 9,
+    id: 8,
     category: 'Social Pressure',
     type: 'simulation-tap',
     prompt: 'your friend sends you this DM. what do you do?',
@@ -172,7 +154,7 @@ export const questions: Question[] = [
     ],
   },
   {
-    id: 10,
+    id: 9,
     category: 'Response Style',
     type: 'simulation-tap',
     prompt: 'you click a link and this page loads. what do you do?',
@@ -200,6 +182,7 @@ export function getBand(scaledScore: number) {
   return BANDS.find((b) => scaledScore >= b.min && scaledScore <= b.max) ?? BANDS[BANDS.length - 1]
 }
 
+// Range without ios-update Q: max ≈ +26, min ≈ -25, span = 51
 export function scaleScore(rawScore: number): number {
-  return Math.round(Math.max(0, Math.min(100, ((rawScore + 30) / 60) * 100)))
+  return Math.round(Math.max(0, Math.min(100, ((rawScore + 25) / 51) * 100)))
 }
